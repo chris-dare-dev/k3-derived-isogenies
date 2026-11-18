@@ -150,7 +150,9 @@ def execute(computation: Computation, places: Places, procs: int) -> Execution:
     after = _signature(stored_files(places.data))
     changed = sorted(name for name in before if after.get(name) != before[name])
     if changed:
-        raise WorkspaceError(f"stored file {changed[0]} changed while the computation ran ({len(changed)} in all)")
+        raise WorkspaceError(
+            f"stored file {changed[0]} changed while the computation ran ({len(changed)} in all)"
+        )
     return Execution(work_dir, stdout, stderr, done.returncode, seconds)
 
 
@@ -195,7 +197,9 @@ def evaluate(
         value[check.label] = outcome.verdict
         predicted[check.label] = IDENTICAL
         if outcome.produced_sha256:
-            digests[check.produced if not check.produced.startswith("@") else check.produced[1:]] = outcome.produced_sha256
+            digests[check.produced if not check.produced.startswith("@") else check.produced[1:]] = (
+                outcome.produced_sha256
+            )
         if outcome.verdict != IDENTICAL or outcome.note:
             differences[check.label] = {"mode": check.mode} | outcome.note
     output = execution.stdout.read_text(errors="replace")

@@ -41,8 +41,12 @@ class Registry(unittest.TestCase):
         compared = {check.stored for c in registry.all_computations() for check in c.checks}
         # logs that record a timing or an enumeration rather than a command's output
         not_outputs = {
-            "sixlines_enumerate_29_37.log", "sixlines_enumerate_41.log", "sixlines_enumerate_43.log",
-            "sixlines_delta41_primary.log", "sixlines_delta41_more.log", "sixlines_ledger.log",
+            "sixlines_enumerate_29_37.log",
+            "sixlines_enumerate_41.log",
+            "sixlines_enumerate_43.log",
+            "sixlines_delta41_primary.log",
+            "sixlines_delta41_more.log",
+            "sixlines_ledger.log",
         }
         logs = {name for name in archive_manifest() if name.endswith(".log")}
         self.assertEqual(sorted(logs - compared - not_outputs), [])
@@ -110,7 +114,9 @@ class Registry(unittest.TestCase):
         self.assertEqual(len(enumerations), 9)
         self.assertTrue(all(c.note == 2 for c in registry.select(notes=[2])))
         self.assertTrue(all("heavy" in c.tags for c in registry.select(tags=["heavy"])))
-        self.assertFalse(any("heavy" in c.tags for c in registry.select(groups=["lattices"], exclude_tags=["heavy"])))
+        self.assertFalse(
+            any("heavy" in c.tags for c in registry.select(groups=["lattices"], exclude_tags=["heavy"]))
+        )
         self.assertNotIn("n02/enumerate-p37", [c.id for c in registry.select(notes=[2], exclude=["*-p37"])])
         with self.assertRaises(ValueError):
             registry.select(ids=["n99/*"])

@@ -97,14 +97,18 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(done.returncode, 1)
         (record,) = self.records()
         self.assertEqual(record["status"], "mismatch")
-        self.assertEqual(record["detail"]["differences"]["sixlines_ledger.log"]["rerun"], "170 comparisons, 161 agree")
+        self.assertEqual(
+            record["detail"]["differences"]["sixlines_ledger.log"]["rerun"], "170 comparisons, 161 agree"
+        )
         report = render(self.run_dir)
         self.assertIn("1 differs.", report)
         self.assertIn("## What differs", report)
         self.assertTrue(Path(record["detail"]["work_dir"]).is_dir())
 
     def test_a_failing_script_is_an_error(self) -> None:
-        (self.scripts / "sixlines_ledger.py").write_text("raise SystemExit('ledger: error: no stored files')\n")
+        (self.scripts / "sixlines_ledger.py").write_text(
+            "raise SystemExit('ledger: error: no stored files')\n"
+        )
         done = self.taskbatch("run")
         self.assertEqual(done.returncode, 1)
         (record,) = self.records()

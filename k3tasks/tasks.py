@@ -41,7 +41,18 @@ from typing import Any
 
 from . import registry, workspace
 
-TASK_KEYS = {"kind", "ids", "notes", "groups", "tags", "exclude", "exclude_tags", "procs", "keep_work", "control"}
+TASK_KEYS = {
+    "kind",
+    "ids",
+    "notes",
+    "groups",
+    "tags",
+    "exclude",
+    "exclude_tags",
+    "procs",
+    "keep_work",
+    "control",
+}
 SYNTHETIC_KEYS = {"name", "cost", "sleep_seconds", "allocate_mb", "fail"}
 CONTROL_SUFFIX = "!control"
 CONTROL_GROUP = "negative control"
@@ -71,27 +82,36 @@ def expand_batch(description: dict[str, Any]) -> list[dict[str, Any]]:
                 tasks.append(task)
             continue
         if table.get("kind") != "computation":
+            kind = table.get("kind")
             raise ValueError(
-                f"tasks[{index}]: unknown kind {table.get('kind')!r}; the kinds are 'computation' and 'synthetic'"
+                f"tasks[{index}]: unknown kind {kind!r}; the kinds are 'computation' and 'synthetic'"
             )
         unknown = set(table) - TASK_KEYS
         if unknown:
             raise ValueError(f"tasks[{index}]: unknown key {sorted(unknown)[0]!r}")
-        selectors = {key: _list(table, key, str) for key in ("ids", "groups", "tags", "exclude", "exclude_tags")}
+        selectors = {
+            key: _list(table, key, str) for key in ("ids", "groups", "tags", "exclude", "exclude_tags")
+        }
         notes = _list(table, "notes", int)
         if not any(selectors[key] is not None for key in ("ids", "groups", "tags")) and notes is None:
             raise ValueError(f"tasks[{index}]: select computations with ids, notes, groups or tags")
         procs_cap = table.get("procs")
-        if procs_cap is not None and (not isinstance(procs_cap, int) or isinstance(procs_cap, bool) or procs_cap < 1):
+        if procs_cap is not None and (
+            not isinstance(procs_cap, int) or isinstance(procs_cap, bool) or procs_cap < 1
+        ):
             raise ValueError(f"tasks[{index}]: procs must be a positive whole number")
         keep = table.get("keep_work", False)
         if not isinstance(keep, bool):
             raise ValueError(f"tasks[{index}]: keep_work must be true or false")
         control = table.get("control")
         if control is not None and (
-            not isinstance(control, dict) or set(control) != {"predicted"} or not isinstance(control["predicted"], dict)
+            not isinstance(control, dict)
+            or set(control) != {"predicted"}
+            or not isinstance(control["predicted"], dict)
         ):
-            raise ValueError(f"tasks[{index}]: control must be a table with the one key predicted, itself a table")
+            raise ValueError(
+                f"tasks[{index}]: control must be a table with the one key predicted, itself a table"
+            )
         chosen = registry.select(notes=notes, **selectors)
         if not chosen:
             raise ValueError(f"tasks[{index}] selects no computation")
@@ -119,9 +139,10 @@ def expand_batch(description: dict[str, Any]) -> list[dict[str, Any]]:
             if control:
                 unknown = set(control["predicted"]) - set(computation.predicted())
                 if unknown:
+                    gives = ", ".join(computation.predicted()) or "nothing"
                     raise ValueError(
-                        f"tasks[{index}]: the control predicts {sorted(unknown)[0]!r}, which {computation.id} does "
-                        f"not give; it gives {', '.join(computation.predicted()) or 'nothing'}"
+                        f"tasks[{index}]: the control predicts {sorted(unknown)[0]!r}, which "
+                        f"{computation.id} does not give; it gives {gives}"
                     )
                 task |= {
                     "group": CONTROL_GROUP,

@@ -17,6 +17,7 @@ results; it writes there and never into `experiments/` (see `workspace.py`).
 from __future__ import annotations
 
 import fnmatch
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -138,7 +139,7 @@ def _check(produced: str, stored: str | tuple[str, str], default_mode: str, unst
     return Check(produced, stored, default_mode, unstored_tail=unstored_tail)
 
 
-def C(  # noqa: N802 - reads as a table
+def C(
     id: str,
     script: str,
     args: str | list[str],
@@ -150,7 +151,7 @@ def C(  # noqa: N802 - reads as a table
     stdout: str | tuple[str, str] | None = None,
     stdout_unstored_tail: int = 0,
     stderr: str | tuple[str, str] | None = None,
-    outputs: dict[str, str | tuple[str, ...] | tuple[str, str, tuple[str, ...]]] | None = None,
+    outputs: Mapping[str, str | tuple[Any, ...]] | None = None,
     expect: tuple[str, ...] = (),
     counts: dict[str, int] | None = None,
     writes: tuple[str, ...] = (),
@@ -167,7 +168,7 @@ def C(  # noqa: N802 - reads as a table
         checks.append(_check(STDERR, stderr, "text"))
     for produced, target in (outputs or {}).items():
         # a mode alone compares the file with the stored file of the same name
-        checks.append(Check(produced, produced, target) if isinstance(target, str) else Check(produced, *target))  # type: ignore[arg-type]
+        checks.append(Check(produced, produced, target) if isinstance(target, str) else Check(produced, *target))
     computation = Computation(
         id=id,
         note=note,

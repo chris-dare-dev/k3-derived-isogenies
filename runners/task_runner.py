@@ -23,10 +23,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from k3tasks import __version__  # noqa: E402
-from k3tasks.registry import validate  # noqa: E402
-from k3tasks.tasks import expand_batch, run_task  # noqa: E402
-from k3tasks.workspace import DATA_MARKER, Places, WorkspaceError  # noqa: E402
+from k3tasks import __version__
+from k3tasks.registry import validate
+from k3tasks.tasks import expand_batch, run_task
+from k3tasks.workspace import DATA_MARKER, Places, WorkspaceError
 
 
 def emit(mark: str, content: object) -> None:

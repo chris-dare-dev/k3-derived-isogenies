@@ -61,7 +61,7 @@ class Batches(unittest.TestCase):
         self.assertEqual(sorted({c.id for c in registry.all_computations()} - batched), [])
 
     def test_smoke_is_quick(self) -> None:
-        config, tasks = expanded(BATCHES / "smoke.toml")
+        _, tasks = expanded(BATCHES / "smoke.toml")
         ids = {task["id"] for task in tasks}
         self.assertTrue({"n27/ledger", "n20/selftest", "n14/prym-check-17"} <= ids)
         self.assertLess(sum(task["cost"] for task in tasks), 60)
@@ -69,22 +69,32 @@ class Batches(unittest.TestCase):
 
 class Expansion(unittest.TestCase):
     def test_selectors_and_settings(self) -> None:
-        tasks = expand_batch({"tasks": [
-            {"kind": "computation", "ids": ["n02/enumerate-p37"], "procs": 4, "keep_work": True},
-            {"kind": "computation", "notes": [2], "exclude": ["n02/enumerate-*"]},
-        ]})
+        tasks = expand_batch(
+            {
+                "tasks": [
+                    {"kind": "computation", "ids": ["n02/enumerate-p37"], "procs": 4, "keep_work": True},
+                    {"kind": "computation", "notes": [2], "exclude": ["n02/enumerate-*"]},
+                ]
+            }
+        )
         first = tasks[0]
-        self.assertEqual((first["id"], first["procs"], first["set"], first["keep_work"]), ("n02/enumerate-p37", 4, 0, True))
+        self.assertEqual(
+            (first["id"], first["procs"], first["set"], first["keep_work"]), ("n02/enumerate-p37", 4, 0, True)
+        )
         self.assertEqual(first["cost"], 2 * registry.get("n02/enumerate-p37").seconds)
         self.assertIn("--procs 4", first["command"])
         self.assertEqual({t["set"] for t in tasks[1:]}, {1})
         self.assertNotIn("n02/enumerate-p7", [t["id"] for t in tasks[1:]])
 
     def test_a_computation_is_taken_once(self) -> None:
-        tasks = expand_batch({"tasks": [
-            {"kind": "computation", "ids": ["n27/ledger"]},
-            {"kind": "computation", "groups": ["ledger"], "procs": 2},
-        ]})
+        tasks = expand_batch(
+            {
+                "tasks": [
+                    {"kind": "computation", "ids": ["n27/ledger"]},
+                    {"kind": "computation", "groups": ["ledger"], "procs": 2},
+                ]
+            }
+        )
         self.assertEqual([(t["id"], t["set"]) for t in tasks], [("n27/ledger", 0)])
 
     def test_procs_never_exceed_the_recorded_number(self) -> None:
@@ -92,10 +102,18 @@ class Expansion(unittest.TestCase):
         self.assertEqual(tasks[0]["procs"], 1)
 
     def test_a_control_is_the_same_computation_with_a_wrong_prediction(self) -> None:
-        plain, control = expand_batch({"tasks": [
-            {"kind": "computation", "ids": ["n27/ledger"]},
-            {"kind": "computation", "ids": ["n27/ledger"], "control": {"predicted": {"sixlines_ledger.log": "differs"}}},
-        ]})
+        plain, control = expand_batch(
+            {
+                "tasks": [
+                    {"kind": "computation", "ids": ["n27/ledger"]},
+                    {
+                        "kind": "computation",
+                        "ids": ["n27/ledger"],
+                        "control": {"predicted": {"sixlines_ledger.log": "differs"}},
+                    },
+                ]
+            }
+        )
         self.assertEqual(plain["predicted"], {"sixlines_ledger.log": "identical"})
         self.assertEqual(plain["compared"], [{"file": "sixlines_ledger.log", "mode": "exact"}])
         self.assertNotIn("control", plain)
@@ -109,7 +127,9 @@ class Expansion(unittest.TestCase):
         self.assertEqual(len(tasks), 3)
         for task in tasks:
             self.assertTrue(task["control"] and task["id"].endswith("!control"), task["id"])
-            self.assertNotEqual(task["predicted"], registry.get(task["id"].removesuffix("!control")).predicted())
+            self.assertNotEqual(
+                task["predicted"], registry.get(task["id"].removesuffix("!control")).predicted()
+            )
 
     def test_controls_and_synthetic_tasks_stay_in_their_own_batches(self) -> None:
         for path in sorted(BATCHES.glob("*.toml")):
@@ -139,7 +159,11 @@ class Expansion(unittest.TestCase):
             {"kind": "computation", "notes": [1]},
             {"kind": "computation", "notes": ["2"]},
             {"kind": "computation", "ids": ["n27/ledger"], "control": {"predicted": 3}},
-            {"kind": "computation", "ids": ["n27/ledger"], "control": {"predicted": {"another.log": "differs"}}},
+            {
+                "kind": "computation",
+                "ids": ["n27/ledger"],
+                "control": {"predicted": {"another.log": "differs"}},
+            },
             {"kind": "computation", "ids": ["n27/ledger"], "control": {"value": 1}},
             {"kind": "census", "ids": ["n27/ledger"]},
             {"kind": "synthetic", "items": [{"sleep_seconds": 1}]},

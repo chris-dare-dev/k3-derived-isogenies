@@ -12,8 +12,8 @@ import sys
 import tempfile
 import textwrap
 import unittest
-from unittest import mock
 from pathlib import Path
+from unittest import mock
 
 from k3tasks.registry import STDOUT, Check, Computation
 from k3tasks.workspace import Places, WorkspaceError, evaluate, execute, finish, prepare
@@ -129,7 +129,9 @@ class Workspace(unittest.TestCase):
     def test_a_control_ends_as_a_mismatch_and_leaves_no_work_directory(self) -> None:
         execution = execute(toy(), self.places, 1)
         result = evaluate(toy(), execution, self.places, control={"toy.log": "differs"})
-        self.assertEqual((result["status"], result["agrees"], result["verdict"]), ("mismatch", False, "differs"))
+        self.assertEqual(
+            (result["status"], result["agrees"], result["verdict"]), ("mismatch", False, "differs")
+        )
         self.assertEqual(result["value"]["toy.log"], "identical")
         self.assertEqual(result["predicted"]["toy.log"], "differs")
         finish(execution, result, keep=False, discard=True)
@@ -150,7 +152,9 @@ class Workspace(unittest.TestCase):
         self.assertEqual(result["caveat"], "output not kept")
 
     def test_procs_reach_the_command(self) -> None:
-        computation = toy("workers", args=("workers", "{procs}"), procs=4, checks=(), expect=(r"^workers 3$",))
+        computation = toy(
+            "workers", args=("workers", "{procs}"), procs=4, checks=(), expect=(r"^workers 3$",)
+        )
         execution = execute(computation, self.places, 3)
         self.assertEqual(evaluate(computation, execution, self.places)["verdict"], "checked")
 

@@ -1,8 +1,8 @@
 """Command line of the task registry.
 
     python3 -m k3tasks list [--batch FILE] [--group G] [--note N]   the computations, with times and limits
-    python3 -m k3tasks report RUN_DIR [--full]                     the scheduler's report and the reproduction table
-    python3 -m k3tasks check                                       is the registry consistent, are the data installed?
+    python3 -m k3tasks report RUN_DIR [--full]      the scheduler's report and the reproduction table
+    python3 -m k3tasks check                        is the registry consistent, are the data installed?
 
 Planning and running go through the scheduler: `python3 -m taskbatch plan|run batches/<name>.toml`.
 """
@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 from taskbatch.config import ConfigError, load_config
+from taskbatch.model import Task
 
 from . import registry, report
 from .tasks import expand_batch
@@ -27,29 +28,30 @@ def _list(arguments: argparse.Namespace) -> int:
         tasks = expand_batch(config.description)
         rows = []
         for task in tasks:
-            limits = config.limits_for(_as_task(task))
+            limits = config.limits_for(Task.from_payload(task))
             rows.append((task, limits))
-        print(f"{'id':38} {'group':20} {'procs':>5} {'expect s':>9} {'limit s':>8} {'expect MB':>9} {'limit MB':>8}")
+        header = ("id", "group", "procs", "expect s", "limit s", "expect MB", "limit MB")
+        print("{:38} {:20} {:>5} {:>9} {:>8} {:>9} {:>8}".format(*header))
         for task, limits in rows:
-            print(f"{task['id']:38} {task['group']:20} {task['procs']:5d} {task['cost']:9g} "
-                  f"{limits.time_seconds:8g} {task['expected_memory_mb']:9d} {limits.memory_mb:8d}")
+            print(
+                f"{task['id']:38} {task['group']:20} {task['procs']:5d} {task['cost']:9g} "
+                f"{limits.time_seconds:8g} {task['expected_memory_mb']:9d} {limits.memory_mb:8d}"
+            )
         return 0
     chosen = registry.select(
-        groups=[arguments.group] if arguments.group else None, notes=[arguments.note] if arguments.note else None
+        groups=[arguments.group] if arguments.group else None,
+        notes=[arguments.note] if arguments.note else None,
     )
     print(f"{'id':38} {'group':20} {'procs':>5} {'expect s':>9} {'expect MB':>9}  checks")
     for c in chosen:
-        checks = ", ".join(f"{k.stored} ({k.mode})" for k in c.checks) or ("output lines" if c.expect or c.counts else "-")
+        checks = ", ".join(f"{k.stored} ({k.mode})" for k in c.checks) or (
+            "output lines" if c.expect or c.counts else "-"
+        )
         tag = " [heavy]" if "heavy" in c.tags else ""
-        print(f"{c.id:38} {c.group:20} {c.procs:5d} {c.seconds:9g} {c.expected_memory_mb(c.procs):9d}  {checks}{tag}")
+        memory = c.expected_memory_mb(c.procs)
+        print(f"{c.id:38} {c.group:20} {c.procs:5d} {c.seconds:9g} {memory:9d}  {checks}{tag}")
     print(f"\n{len(chosen)} computations")
     return 0
-
-
-def _as_task(payload: dict) -> object:
-    from taskbatch.model import Task
-
-    return Task.from_payload(payload)
 
 
 def _report(arguments: argparse.Namespace) -> int:
@@ -68,7 +70,8 @@ def _check(arguments: argparse.Namespace) -> int:
     print(f"{len(registry.all_computations())} computations in {len(registry.GROUPS)} groups")
     if (places.data / DATA_MARKER).exists():
         stored = {p.name for p in stored_files(places.data)}
-        missing = sorted({c.stored for c in registry.all_computations() for c in c.checks} - stored)
+        named = {check.stored for c in registry.all_computations() for check in c.checks}
+        missing = sorted(named - stored)
         print(f"stored results: {len(stored)} files in {places.data}")
         for name in missing:
             print(f"stored file named in the registry but not installed: {name}")
@@ -80,9 +83,13 @@ def _check(arguments: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="k3tasks", description="The computations behind the notes, as tasks.")
+    parser = argparse.ArgumentParser(
+        prog="k3tasks", description="The computations behind the notes, as tasks."
+    )
     commands = parser.add_subparsers(dest="command", required=True)
-    listing = commands.add_parser("list", help="list the computations, or the tasks of a batch with their limits")
+    listing = commands.add_parser(
+        "list", help="list the computations, or the tasks of a batch with their limits"
+    )
     listing.add_argument("--batch", type=Path)
     listing.add_argument("--group", choices=sorted(registry.GROUPS))
     listing.add_argument("--note", type=int)

@@ -20,7 +20,18 @@ from taskbatch import report as scheduler_report
 from taskbatch.report import load_manifest
 from taskbatch.store import ResultStore
 
-ORDER = ["reproduced", "differs", "checked", "ran", "timeout", "memory", "error", "crashed", "unsupported", "not run"]
+ORDER = [
+    "reproduced",
+    "differs",
+    "checked",
+    "ran",
+    "timeout",
+    "memory",
+    "error",
+    "crashed",
+    "unsupported",
+    "not run",
+]
 
 
 def _cell(value: Any) -> str:
@@ -41,7 +52,10 @@ def verdict(record: dict[str, Any] | None) -> str:
     if record is None:
         return "not run"
     if record["status"] in ("ok", "mismatch"):
-        return str(record.get("detail", {}).get("verdict") or ("differs" if record["status"] == "mismatch" else "ran"))
+        return str(
+            record.get("detail", {}).get("verdict")
+            or ("differs" if record["status"] == "mismatch" else "ran")
+        )
     return str(record["status"])
 
 
@@ -69,7 +83,8 @@ def _peak(record: dict[str, Any] | None) -> float | None:
     largest process."""
     if record is None:
         return None
-    return record.get("detail", {}).get("scope_peak_mb") or record["peak_rss_mb"]
+    peak = record.get("detail", {}).get("scope_peak_mb") or record["peak_rss_mb"]
+    return None if peak is None else float(peak)
 
 
 def reproduction_lines(run_dir: Path) -> list[str]:
@@ -83,7 +98,9 @@ def reproduction_lines(run_dir: Path) -> list[str]:
         task = record["task"] if record else next((t for t in manifest if t["id"] == task_id), {})
         word = verdict(record)
         counts[word] += 1
-        compared = ", ".join(k for k in (record or {}).get("value") or {} if not k.startswith(("expect ", "lines ")))
+        compared = ", ".join(
+            k for k in (record or {}).get("value") or {} if not k.startswith(("expect ", "lines "))
+        )
         rows.append(
             [
                 f"`{task_id}`",
@@ -97,11 +114,19 @@ def reproduction_lines(run_dir: Path) -> list[str]:
     summary = ", ".join(f"{counts[word]} {word}" for word in ORDER if counts[word])
     lines = ["## Reproduction", "", f"{summary}.", ""]
     lines += _table(["task", "group", "verdict", "compared with", "wall (s)", "peak (MB)"], rows)
-    problems = [(task_id, latest[task_id]) for task_id in ids if task_id in latest and verdict(latest[task_id]) == "differs"]
+    problems = [
+        (task_id, latest[task_id])
+        for task_id in ids
+        if task_id in latest and verdict(latest[task_id]) == "differs"
+    ]
     if problems:
         lines += ["## What differs", ""]
         lines += _table(["task", "difference"], [[f"`{t}`", _differences(r)] for t, r in problems])
-    caveats = [(t, latest[t]["detail"]["caveat"]) for t in ids if t in latest and latest[t].get("detail", {}).get("caveat")]
+    caveats = [
+        (t, latest[t]["detail"]["caveat"])
+        for t in ids
+        if t in latest and latest[t].get("detail", {}).get("caveat")
+    ]
     if caveats:
         lines += ["## Caveats", ""]
         lines += _table(["task", "caveat"], [[f"`{t}`", c] for t, c in caveats])
@@ -109,4 +134,9 @@ def reproduction_lines(run_dir: Path) -> list[str]:
 
 
 def render(run_dir: Path, *, full: bool = False) -> str:
-    return scheduler_report.render(run_dir, full=full).rstrip() + "\n\n" + "\n".join(reproduction_lines(run_dir)).rstrip() + "\n"
+    return (
+        scheduler_report.render(run_dir, full=full).rstrip()
+        + "\n\n"
+        + "\n".join(reproduction_lines(run_dir)).rstrip()
+        + "\n"
+    )

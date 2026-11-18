@@ -18,10 +18,14 @@ class Normalisation(unittest.TestCase):
         )
 
     def test_numbers_that_are_not_times_stay(self) -> None:
-        self.assertEqual(normalise_text("e = [6, -369, -20172] signs [1]"), ["e = [6, -369, -20172] signs [1]"])
+        self.assertEqual(
+            normalise_text("e = [6, -369, -20172] signs [1]"), ["e = [6, -369, -20172] signs [1]"]
+        )
 
     def test_shell_and_gnu_time_lines_are_dropped(self) -> None:
-        text = "result 1\nreal\t0m20.574s\nuser\t0m21.068s\nsys\t0m0.055s\n\tCommand being timed: \"python x\"\n"
+        text = (
+            'result 1\nreal\t0m20.574s\nuser\t0m21.068s\nsys\t0m0.055s\n\tCommand being timed: "python x"\n'
+        )
         text += "\tMaximum resident set size (kbytes): 4000\n"
         self.assertEqual(normalise_text(text), ["result 1"])
 
@@ -30,9 +34,7 @@ class Normalisation(unittest.TestCase):
         self.assertEqual(normalise_text(text), ["selftest passed"])
 
     def test_path_prefixes_are_removed(self) -> None:
-        self.assertEqual(
-            normalise_text("wrote /work/dir/out.json", ("/work/dir",)), ["wrote out.json"]
-        )
+        self.assertEqual(normalise_text("wrote /work/dir/out.json", ("/work/dir",)), ["wrote out.json"])
 
     def test_run_times_inside_printed_records_are_blanked(self) -> None:
         self.assertEqual(
@@ -43,7 +45,9 @@ class Normalisation(unittest.TestCase):
     def test_dicts_of_counts_are_compared_in_sorted_order(self) -> None:
         first = normalise_text("status: {'ok': 296, 'not ordinary': 86, 'reducible': 272}")
         self.assertEqual(first, normalise_text("status: {'reducible': 272, 'ok': 296, 'not ordinary': 86}"))
-        self.assertNotEqual(first, normalise_text("status: {'reducible': 271, 'ok': 296, 'not ordinary': 86}"))
+        self.assertNotEqual(
+            first, normalise_text("status: {'reducible': 271, 'ok': 296, 'not ordinary': 86}")
+        )
         # other dicts keep their order
         self.assertEqual(normalise_text("{'b': [1], 'a': 2}"), ["{'b': [1], 'a': 2}"])
 
@@ -79,7 +83,10 @@ class Modes(unittest.TestCase):
 
     def test_text_contained(self) -> None:
         stored = "first command\nA\n\nsecond command\nB 1 (2 s)\nC\nthird\n"
-        self.assertEqual(compare(*self.files("second command\nB 1 (9 s)\nC\n", stored), "text-contained").verdict, IDENTICAL)
+        self.assertEqual(
+            compare(*self.files("second command\nB 1 (9 s)\nC\n", stored), "text-contained").verdict,
+            IDENTICAL,
+        )
         outcome = compare(*self.files("second command\nB 2\nC\n", stored), "text-contained")
         self.assertEqual(outcome.verdict, DIFFERS)
         self.assertEqual(outcome.note["line"], 2)
@@ -101,7 +108,9 @@ class Modes(unittest.TestCase):
     def test_records_in_any_order_without_times(self) -> None:
         produced = json.dumps({"a": 1, "seconds": 3}) + "\n" + json.dumps({"a": 2, "seconds": 1}) + "\n"
         stored = json.dumps({"a": 2, "seconds": 9}) + "\n" + json.dumps({"seconds": 8, "a": 1}) + "\n"
-        self.assertEqual(compare(*self.files(produced, stored), "records", ignore_keys=("seconds",)).verdict, IDENTICAL)
+        self.assertEqual(
+            compare(*self.files(produced, stored), "records", ignore_keys=("seconds",)).verdict, IDENTICAL
+        )
         self.assertEqual(compare(*self.files(produced, stored), "records").verdict, DIFFERS)
 
     def test_records_counts_multiplicity(self) -> None:
@@ -120,8 +129,14 @@ class Modes(unittest.TestCase):
 
     def test_json(self) -> None:
         produced = json.dumps({"x": [1, 2], "seconds": 1})
-        self.assertEqual(compare(*self.files(produced, json.dumps({"x": [1, 2], "seconds": 5})), "json",
-                                 ignore_keys=("seconds",)).verdict, IDENTICAL)
+        self.assertEqual(
+            compare(
+                *self.files(produced, json.dumps({"x": [1, 2], "seconds": 5})),
+                "json",
+                ignore_keys=("seconds",),
+            ).verdict,
+            IDENTICAL,
+        )
         outcome = compare(*self.files(produced, json.dumps({"x": [1, 3]})), "json", ignore_keys=("seconds",))
         self.assertEqual(outcome.verdict, DIFFERS)
         self.assertEqual(outcome.note["keys"], ["x"])

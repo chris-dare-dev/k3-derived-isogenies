@@ -140,11 +140,17 @@ def compare(
     if not stored.exists():
         return Comparison(MISSING, digest, {"why": f"no stored {stored.name}"})
     keys = frozenset(ignore_keys)
+    note: dict[str, Any]
 
     if mode == "exact":
         same = digest == sha256(stored)
-        note = {} if same else _first_difference(
-            produced.read_text(errors="replace").splitlines(), stored.read_text(errors="replace").splitlines()
+        note = (
+            {}
+            if same
+            else _first_difference(
+                produced.read_text(errors="replace").splitlines(),
+                stored.read_text(errors="replace").splitlines(),
+            )
         )
         return Comparison(IDENTICAL if same else DIFFERS, digest, note)
 
@@ -153,7 +159,9 @@ def compare(
         theirs = normalise_text(stored.read_text(errors="replace"), strip_prefixes)
         if mode == "text":
             same = mine == theirs
-            return Comparison(IDENTICAL if same else DIFFERS, digest, {} if same else _first_difference(mine, theirs))
+            return Comparison(
+                IDENTICAL if same else DIFFERS, digest, {} if same else _first_difference(mine, theirs)
+            )
         left_out = {"last_lines_not_compared": unstored_tail} if unstored_tail else {}
         if unstored_tail:
             mine = mine[: max(len(mine) - unstored_tail, 0)]
@@ -172,7 +180,7 @@ def compare(
     mine_records, bad_mine = _records(produced, keys)
     theirs_records, _ = _records(stored, keys)
     extra = mine_records - theirs_records
-    note: dict[str, Any] = {"records": mine_records.total(), "stored_records": theirs_records.total()}
+    note = {"records": mine_records.total(), "stored_records": theirs_records.total()}
     if bad_mine:
         note["unreadable_lines"] = bad_mine
     if mode == "records":
@@ -216,12 +224,17 @@ def _best_block_difference(block: list[str], text: list[str]) -> dict[str, Any]:
     for start, line in enumerate(text):
         if block and line == block[0]:
             length = 0
-            while length < len(block) and start + length < len(text) and text[start + length] == block[length]:
+            while (
+                length < len(block) and start + length < len(text) and text[start + length] == block[length]
+            ):
                 length += 1
             if length > best_length:
                 best_start, best_length = start, length
     if best_start is None:
-        return {"why": "the first line of the rerun is not in the stored log", "rerun": _short(block[0]) if block else ""}
+        return {
+            "why": "the first line of the rerun is not in the stored log",
+            "rerun": _short(block[0]) if block else "",
+        }
     stored_line = text[best_start + best_length] if best_start + best_length < len(text) else "<end of log>"
     return {
         "line": best_length + 1,
