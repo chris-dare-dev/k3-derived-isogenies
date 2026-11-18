@@ -9,7 +9,11 @@
 #   make report BATCH=batches/smoke.toml REPORT_ARGS=--full
 #   make smoke                         the smoke batch, computed afresh, and its report
 #   make record BATCH=batches/smoke.toml   run, then copy the records into records/ (committed code only);
-#                                      EXPECT=1 for the negative control, EXPECT=3 for the limits demo
+#                                      EXPECT=1 for the negative control, EXPECT=3 for the limits demo.
+#                                      Commit what a record wrote before the next one: a file that git does
+#                                      not know makes the working tree differ from its commit.  To record
+#                                      several batches in one go, `make run` each and then `make adopt`
+#   make adopt BATCHES="smoke audits"  copy the records of finished runs into records/
 #   make tables                        write the generated tables of CLAIMS.md, README.md and claims/RECORDS.md
 #   make check                         is the registry consistent, are the data installed, and are those
 #                                      tables what the claim registry and the records give?
@@ -35,7 +39,9 @@ EXPECT  ?= 0
 CHECKED   = taskbatch k3tasks runners tests tools
 FORMATTED = k3tasks runners tests tools
 
-.PHONY: test lint format check list plan run report smoke record tables venv data clean-work
+BATCHES ?= $(basename $(notdir $(BATCH)))
+
+.PHONY: test lint format check list plan run report smoke record adopt tables venv data clean-work
 
 test:
 	$(PYTHON) -m unittest discover -s tests -t .
@@ -73,6 +79,9 @@ record:
 	status=0; $(PYTHON) -m taskbatch run $(BATCH) $(ARGS) || status=$$?; \
 	if [ $$status -ne $(EXPECT) ]; then echo "run ended with status $$status, expected $(EXPECT)"; exit 1; fi
 	$(PYTHON) tools/claims.py adopt $(RUN_DIR)
+
+adopt:
+	$(PYTHON) tools/claims.py adopt $(addprefix results/,$(BATCHES))
 
 tables:
 	$(PYTHON) tools/claims.py tables
