@@ -1,0 +1,848 @@
+# The registry of claims: every row of the claim tables of CLAIMS.md.
+#
+# tools/claims.py writes the tables of CLAIMS.md, the file claims/RECORDS.md and the "Main results" table
+# of README.md from this file, from the batch files (which tasks exist) and from the records in records/.
+# `make check` fails if the committed tables differ from what it writes.
+#
+# A table has a heading of CLAIMS.md and its columns.  A claim has an id, its table and the cells of its
+# row in the order of the columns (Markdown, as printed).  The cells of the table `main` are the rows of
+# the README's "Main results"; those of the table `ledger` are the columns ID, Statement, Source and Class
+# of the ledger of note 27 (docs/27-hypothesis-ledger.md, section 2), word for word: a test compares them.
+#
+# The tasks of a claim are the tasks of the registry groups named in `groups` and the tasks whose ids
+# match a pattern of `tasks` (`*` stands for any run of characters).  A claim without tasks says why in
+# `no_task`: a statement read in a source [P], recalled [M], derived on paper [D] or heuristic [H] has no
+# task, and no computation is attached to it.  `covers` says which part of a claim its tasks bear on.
+# `evidence` names the stored lines that carry the claim's numbers: a file of the data archive (DATA.md),
+# a line or a range of lines, and a text that the first of those lines contains.
+# `records` names the claim under whose heading claims/RECORDS.md lists the tasks, when it is another.
+# Negative controls (ids ending in "!control") and synthetic tasks never count for a claim.
+
+[table.main]
+heading = '''Main results'''
+columns = ['''Result''', '''Numbers''', '''Where''', '''Evidence''']
+
+[table.other]
+heading = '''Computations outside the main results'''
+columns = ['''Computations''', '''Where''', '''Evidence''']
+
+[table.ledger]
+heading = '''The hypothesis ledger of note 27'''
+columns = ['''ID''', '''Statement''', '''Source''', '''Class''']
+
+[[claim]]
+id = "torsors"
+table = "main"
+cells = [
+  '''Surfaces form torsors under a CM class group, acting by twisted derived equivalences (ρ̄ ≥ 12, p ≥ 5)''',
+  '''Assembly of Taelman, Valloni, Bayer-Fluckiger, Bragg–Yang''',
+  '''notes [1](docs/01-prior-art.md), [6](docs/06-torsors-under-cm-class-groups.md)''',
+  '''[P], [D]''',
+]
+no_task = '''read in the cited sources and derived on paper ([P], [D]); nothing is computed'''
+
+[[claim]]
+id = "lattices"
+table = "main"
+cells = [
+  '''Six-line surfaces match Hermitian lattices''',
+  '''44 of 44 polynomials (p ≤ 37), 169 of 169 non-split, 32 of 32 for the step at p''',
+  '''notes [2](docs/02-six-line-count.md)–[5](docs/05-non-split-count.md)''',
+  '''[E]''',
+]
+groups = ["lattices"]
+evidence = [
+  { file = '''sixlines_ledger.log''', line = 13, text = '''recomputed (44, 44), quoted (44, 44)''' },
+]
+
+[[claim]]
+id = "fourfold"
+table = "main"
+cells = [
+  '''**Reduction to abelian fourfolds.** P is a second exterior power of the Frobenius quartic of a fourfold with Z[i]-multiplication (Proposition Y); the fourfold is built over F_p as a Prym variety of a genus-5 curve (Paranjape)''',
+  '''278 surfaces (534 configurations), 4,983 pairs of lines, no exception; also over F₂₅, F₄₉''',
+  '''notes [13](docs/13-hardness-on-paper.md), [14](docs/14-fourfold-of-a-six-line-surface.md), [15](docs/15-fourfold-map-and-the-group-action.md), [16](docs/16-fourfold-over-f25-and-f49.md)''',
+  '''[D], [E]; equivariance a sketch''',
+]
+groups = ["fourfold"]
+covers = '''the measured part [E]: the fourfold's polynomial per pair of lines (notes 14, 16, 18, 21); Proposition Y is [D] and the equivariance a sketch'''
+evidence = [
+  { file = '''sixlines_ledger.log''', line = 35, text = '''column 'sign+ irr pairs' (all p): recomputed 4983''' },
+  { file = '''sixlines_ledger.log''', line = 55, text = '''among the 534: recomputed 278''' },
+  { file = '''sixlines_ledger.log''', line = 58, text = '''TOTAL for sign + and irreducible P''' },
+]
+
+[[claim]]
+id = "group"
+table = "main"
+cells = [
+  '''**The group** G = Cl(E)/⟨Cl(E₀), ramified primes⟩''',
+  '''\|G\| ≈ 0.01·q² over 512 groups to q = 100,003; 2²⁵⁶ needs q ≈ 2¹³¹''',
+  '''note [13](docs/13-hardness-on-paper.md)''',
+  '''[E] in range, [H] beyond''',
+]
+groups = ["group-size"]
+covers = '''the measured part [E], q up to 100,003; the size at q ≈ 2¹³¹ is [H]'''
+evidence = [
+  { file = '''sixlines_ledger.log''', line = 155, text = '''population: 512 groups''' },
+  { file = '''sixlines_ledger.log''', line = 157, text = '''median |G|/q^2: recomputed 0.009208''' },
+]
+
+[[claim]]
+id = "cm-method"
+table = "main"
+cells = [
+  '''**The CM method computes the action on small groups**''',
+  '''98 of 98 surfaces in 17 fields (150 of 150 in 21 fields with notes 26 and 29); ℓ-steps equal Frobenius in characteristic ℓ, 346 of 346; about 190 digits of precision per group element''',
+  '''notes [20](docs/20-cm-method-and-the-action.md), [24](docs/24-the-form-mod-4-is-the-character.md), [27](docs/27-hypothesis-ledger.md)''',
+  '''[E]''',
+]
+groups = ["cm-method"]
+evidence = [
+  { file = '''sixlines_ledger.log''', line = 116, text = '''surfaces of the CM method in 17 fields: recomputed 98''' },
+  { file = '''sixlines_ledger.log''', line = 127, text = '''recomputed (346, 346, 32)''' },
+]
+
+[[claim]]
+id = "one-bit"
+table = "main"
+cells = [
+  '''**One bit leaks.** A sign δ on the fourfold is the character χ₋₁: the genus-character attack of Castryck–Sotáková–Vercauteren carries over (it affects class-group actions with 2-torsion, not CSIDH itself)''',
+  '''60 of 60 surfaces in 5 torsors at 3 primes; χ₋₁ exists for 80 of the 477 examined polynomials that have a quadratic character''',
+  '''notes [19](docs/19-quadratic-characters-from-a-surface.md), [23](docs/23-jacobian-arithmetic-levels-and-the-form-mod-4.md), [24](docs/24-the-form-mod-4-is-the-character.md), [25](docs/25-checks-of-notes-20-23-24.md), [26](docs/26-delta-is-the-character-at-q-41.md)''',
+  '''[E], [D]''',
+]
+groups = ["quadratic-character"]
+covers = '''the measured part [E]; that δ is χ₋₁ in general is not claimed beyond the five torsors'''
+evidence = [
+  { file = '''sixlines_ledger.log''', line = 290, text = '''recomputed (80, 477), quoted (80, 477)''' },
+  { file = '''sixlines_ledger.log''', line = 338, text = '''population: 60 surfaces, 5 torsors''' },
+]
+
+[[claim]]
+id = "leakage"
+table = "main"
+cells = [
+  '''**Nothing else leaks** in a pre-registered audit''',
+  '''about 11,400 candidate invariants; only δ survives correction''',
+  '''note [28](docs/28-leakage-audit.md)''',
+  '''[E]''',
+]
+groups = ["leakage"]
+evidence = [
+  { file = '''sixlines_leakage.log''', line = 2, text = '''L: 3802 candidates''' },
+  { file = '''sixlines_leakage.log''', line = 3, text = '''L: 1036 further candidates''' },
+  { file = '''sixlines_leakage.log''', line = 4, text = '''C: 6570 candidates''' },
+  { file = '''sixlines_leakage.log''', line = 5, text = '''C: 9 further candidates''' },
+]
+
+[[claim]]
+id = "order-3"
+table = "main"
+cells = [
+  '''**No character of order 3 is read either**, in a second audit''',
+  '''7 torsors with 3 ∣ \|G\| (72 surfaces, q = 23 to 41): no cubic residue symbol is a character on the two torsors where one exists, and no candidate separates the cosets beyond chance on any of the seven. At q = 37 the cube roots of unity are cubes, so a reading R with R³ = c³·d would have a constant symbol there and be invisible to these tests. Three more torsors at q = 43 (48 surfaces), where they are not cubes, were scored after the run: no cubic symbol is a character there either, and their one candidate past Holm does not replicate on a held-out torsor (note 29 §7.4)''',
+  '''note [29](docs/29-characters-of-order-3.md)''',
+  '''[E], [D]''',
+]
+groups = ["order-3"]
+
+[[claim]]
+id = "below-16"
+table = "main"
+cells = [
+  '''**Below Picard 16**: no reduction known and no computable step''',
+  '''a reading of the literature; half a step at ℓ = 2 tested on 21,240 elliptic K3 pairs''',
+  '''notes [17](docs/17-below-picard-16.md), [22](docs/22-two-neighbours-of-elliptic-k3.md)''',
+  '''[P], [M], [E]''',
+]
+groups = ["below-16"]
+covers = '''the measured part [E] only: the half step at ℓ = 2 of note 22; the reading of the literature (note 17) is [P], [M]'''
+evidence = [
+  { file = '''sixlines_ledger.log''', line = 456, text = '''ellk3_generic_p5.jsonl: 10 records''' },
+  { file = '''sixlines_ledger.log''', line = 457, text = '''ellk3_generic_p5_seed2.jsonl: 30 records''' },
+  { file = '''sixlines_ledger.log''', line = 458, text = '''ellk3_e8a2_p5.jsonl: 16000 records''' },
+  { file = '''sixlines_ledger.log''', line = 459, text = '''ellk3_e8a2_p7.jsonl: 4000 records''' },
+  { file = '''sixlines_ledger.log''', line = 460, text = '''ellk3_e8_p5.jsonl: 1200 records''' },
+]
+
+[[claim]]
+id = "ledger"
+table = "main"
+cells = [
+  '''**Ledger**: every headline number recomputed from the stored files''',
+  '''162 of 170 match the numbers as first written; the three slips behind the 8 others are corrected in the notes''',
+  '''note [27](docs/27-hypothesis-ledger.md)''',
+  '''[E]''',
+]
+groups = ["ledger"]
+evidence = [
+  { file = '''sixlines_ledger.log''', line = 475, text = '''170 comparisons, 162 agree, 8 differ''' },
+]
+
+[[claim]]
+id = "ring-steps"
+table = "other"
+cells = [
+  '''The rational steps of note 6 and the lattice graphs of the steps that change the endomorphism ring (notes 7 to 12): lattice theory that the verdict does not need''',
+  '''notes [6](docs/06-torsors-under-cm-class-groups.md)–[12](docs/12-rank-six-galois-action.md)''',
+  '''[E]''',
+]
+groups = ["ring-steps"]
+
+[[claim]]
+id = "H1"
+table = "ledger"
+cells = [
+  '''H1''',
+  '''P(±q) = 64q⁵(μ², ν²) and P = Λ²χ for χ = X⁴ − 4(ν + μi)X³ + e₁X² − 4q(ν − μi)X + q²''',
+  '''13 Prop. Y; 18''',
+  '''proved on paper [D, re-derived by 18]; Honda–Tate [M] for the fourfold''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [8, 17], text = '''H1  Proposition Y: P(+-q) = 64 q^5 (mu^2, nu''' },
+]
+
+[[claim]]
+id = "H2"
+table = "ledger"
+cells = [
+  '''H2''',
+  '''The curve of note 14 has Λ²χ = P or P(−t) for every surface of sign + with irreducible P''',
+  '''14, 16, 26''',
+  '''supported by data; an isogeny invariant only''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [20, 58], text = '''H2  The curve of note 14 gives P or P(-t) fo''' },
+]
+
+[[claim]]
+id = "H3"
+table = "ledger"
+cells = [
+  '''H3''',
+  '''χ of the curve is the quartic of H1 (c₃ = p·c̄₁, 4 ∣ c₁, {\|Re c₁\|, \|Im c₁\|} = {4μ, 4ν})''',
+  '''14 §4''',
+  '''supported''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [61, 67], text = '''H3  chi of the curve is Proposition Y's quar''' },
+]
+
+[[claim]]
+id = "H4"
+table = "ledger"
+cells = [
+  '''H4''',
+  '''Sign + and irreducible P: Frobenius commutes with J; no collinear triple, no anomalous pair''',
+  '''14 §5.2, 18, 21 §8''',
+  '''supported; [D] a collinear triple forces a root ±p''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [70, 79], text = '''H4  Sign + and irreducible P: no anomalous (''' },
+]
+
+[[claim]]
+id = "H5"
+table = "ledger"
+cells = [
+  '''H5''',
+  '''f : Cl(K) → Cl(E) is a homomorphism, f(Cl K⁺) ⊂ H, the odd parts of Cl⁻(K) and G are isomorphic. *Corrected:* f is induced by the square of the map of tori; the cokernel has an element of order 4 in 46 cases (18); the maximal-order lattices are not surfaces (20 §5.1)''',
+  '''15 §3, 18 findings 1–2, 20''',
+  '''supported, as corrected; [D] sketch of 18 for every P''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [82, 96], text = '''H5  Dictionary Cl(K) -> Cl(E) (note 15 §3, c''' },
+]
+
+[[claim]]
+id = "H6"
+table = "ledger"
+cells = [
+  '''H6''',
+  '''A configuration and its associate have the same curves''',
+  '''15 §4''',
+  '''proved [D] and measured''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [99, 102], text = '''H6  Association is invisible to the curve (n''' },
+]
+
+[[claim]]
+id = "H7"
+table = "ledger"
+cells = [
+  '''H7''',
+  '''The CM method's class polynomial mod 𝔭 has exactly the enumerated surfaces as roots''',
+  '''20 §6, 24, 26, 29''',
+  '''supported''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [105, 118], text = '''H7  CM method: the class polynomial reduces ''' },
+]
+
+[[claim]]
+id = "H8"
+table = "ledger"
+cells = [
+  '''H8''',
+  '''On even lattices of R the ideals act through G, freely, transitively; the step at 𝔩 is Frobenius conjugation in characteristic ℓ''',
+  '''20 §7''',
+  '''supported; Shimura–Taniyama [M]; orientation fitted on one field''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [121, 135], text = '''H8  The action on lattices is G, freely and ''' },
+]
+
+[[claim]]
+id = "H9"
+table = "ledger"
+cells = [
+  '''H9''',
+  '''The Prym variety separates the levels at ℓ as the lattices predict''',
+  '''23 §4; weight: 25 finding 10''',
+  '''supported, weakly''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [138, 147], text = '''H9  Levels: the fourfold separates the surfa''' },
+]
+
+[[claim]]
+id = "H29"
+table = "ledger"
+cells = [
+  '''H29''',
+  '''Surface ↦ fourfold is equivariant for the two actions''',
+  '''15 §2, 18 finding 3''',
+  '''**open**: a sketch with five gaps; indirect support from H23, H24 (an invariant of the Prym variety follows the CM action)''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H30"
+table = "ledger"
+cells = [
+  '''H30''',
+  '''The CM points are the canonical lifts, so the action of note 20 is the action on the K3 surfaces''',
+  '''20 §7.7, 18 finding 3''',
+  '''**open** (sketch [D])''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H31"
+table = "ledger"
+cells = [
+  '''H31''',
+  '''Self-dual hermitian Z[i]-lattices with π are the principally polarised ordinary fourfolds with Z[i] (Deligne, with polarisations); Honda–Tate gives the isogeny class''',
+  '''13 §4.3, 15 §2, 18 §5''',
+  '''heuristic [M, not read]''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H32"
+table = "ledger"
+cells = [
+  '''H32''',
+  '''Hence the K3 problem in this family is vectorisation for a class-group action on fourfolds with Z[i]: no harder, not a new assumption''',
+  '''13 §1 item 4, 14 §6''',
+  '''heuristic: conditional on H29, H30, Deligne with polarisations [M]''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H10"
+table = "ledger"
+cells = [
+  '''H10''',
+  '''\|G\| ≈ 0.01·q² for maximal orders; fitted exponent ≈ 2''',
+  '''13 §3.3''',
+  '''supported in range; [H] the class-number heuristic beyond''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [153, 171], text = '''H10  |G| ~ 0.01 q^2 for maximal orders, q = 1''' },
+]
+
+[[claim]]
+id = "H11"
+table = "ledger"
+cells = [
+  '''H11''',
+  '''One prime of E ramified over E₀, above 2, the relative discriminant of norm 64; \|G\| even 509/512; odd part cyclic 506/512''',
+  '''13 §3.4''',
+  '''supported''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [174, 184], text = '''H11  Structure of G: one ramified prime, abov''' },
+]
+
+[[claim]]
+id = "H12"
+table = "ledger"
+cells = [
+  '''H12''',
+  '''The polynomials of surfaces are exactly the admissible ones''',
+  '''13 §3.2''',
+  '''supported, **now out of sample**''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [187, 193], text = '''H12  Which polynomials occur: admissible = en''' },
+]
+
+[[claim]]
+id = "H13"
+table = "ledger"
+cells = [
+  '''H13''',
+  '''The order is maximal only if μ = ν = 1''',
+  '''13 §3.2''',
+  '''supported; no proof''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [196, 200], text = '''H13  The order is maximal only when mu = nu =''' },
+]
+
+[[claim]]
+id = "H14"
+table = "ledger"
+cells = [
+  '''H14''',
+  '''One genus: the lattices of a maximal order number \|G\|''',
+  '''13 §3.3, 19 Lemma 2''',
+  '''proved on paper [D] given one ramified prime; measured''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [203, 208], text = '''H14  One genus: the number of lattices equals''' },
+]
+
+[[claim]]
+id = "H15"
+table = "ledger"
+cells = [
+  '''H15''',
+  '''Every character of order 2 of G is that of E(√d)/E, d ∈ E₀; at most 3 + 2-rank Cl(E₀). *Supersedes* 13 §6 "at most 3"''',
+  '''19 §2, 18 finding 4''',
+  '''supported; [D] Lemma 1''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [211, 218], text = '''H15  Characters of order 2 of G (note 19 §2.5''' },
+]
+
+[[claim]]
+id = "H16"
+table = "ledger"
+cells = [
+  '''H16''',
+  '''Surfaces per polynomial, all orders, ≈ 0.006·q²''',
+  '''13 §3.3''',
+  '''supported, small range''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [221, 230], text = '''H16  Surfaces per polynomial over all orders ''' },
+]
+
+[[claim]]
+id = "H33"
+table = "ledger"
+cells = [
+  '''H33''',
+  '''2²⁵⁶ elements need q ≈ 2¹³¹; a surface is named by ~525 bits''',
+  '''13 §5, 17 §6''',
+  '''heuristic (arithmetic on H10)''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H17"
+table = "ledger"
+cells = [
+  '''H17''',
+  '''The CM method evaluates the action only for small \|G\|; the precision it needs grows with \|G\|''',
+  '''20 §9, 24, 26, 29''',
+  '''supported in range, as an upper bound; [H] beyond''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [236, 246], text = '''H17  The CM method needs precision growing wi''' },
+]
+
+[[claim]]
+id = "H18"
+table = "ledger"
+cells = [
+  '''H18''',
+  '''δ costs about a minute per curve and needs F_{p⁴}; about half the pairs are unusable''',
+  '''23, 25, 26''',
+  '''supported in range''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [249, 255], text = '''H18  delta costs about a minute per curve at ''' },
+]
+
+[[claim]]
+id = "H34"
+table = "ledger"
+cells = [
+  '''H34''',
+  '''No step at ℓ ≠ p can be computed on the K3 side itself''',
+  '''13 §2, 15 §1''',
+  '''**open** (absence of a method)''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H35"
+table = "ledger"
+cells = [
+  '''H35''',
+  '''On the fourfold a step costs ~ℓ⁴ by theta functions; the Prym variety has no theta coordinates''',
+  '''13 §5, 15 §5.1, 17 §4.2''',
+  '''heuristic [M: Lubicz–Robert, abstract only]''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H36"
+table = "ledger"
+cells = [
+  '''H36''',
+  '''The zeta function at q ≈ 2¹³¹ prime is out of reach (~√p); instances need small characteristic''',
+  '''13 §5, 17 §5.2''',
+  '''heuristic [M; P for Costa–Harvey–Kedlaya in 17]''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H37"
+table = "ledger"
+cells = [
+  '''H37''',
+  '''Given the action: classical attack ~√\|G\|, quantum Kuperberg 2^{O(√log\|G\|)}''',
+  '''13 §5''',
+  '''heuristic [M]''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H19"
+table = "ledger"
+cells = [
+  '''H19''',
+  '''The ten square classes (type) and the branch count are constant on a torsor; a function of (q mod 16, e₁ mod 16)''',
+  '''19 §4.2''',
+  '''supported; [D] by H14, conditional on the ten classes being local data at 2, which note 19 §7 does not prove''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [261, 268], text = '''H19  Square classes (type), branch count: the''' },
+]
+
+[[claim]]
+id = "H20"
+table = "ledger"
+cells = [
+  '''H20''',
+  '''Conic, j2, j4, quartic product: not characters (neither constant nor balanced)''',
+  '''19 §4.3''',
+  '''supported (negative)''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [271, 277], text = '''H20  Conic, j2, j4, quartic product: neither ''' },
+]
+
+[[claim]]
+id = "H21"
+table = "ledger"
+cells = [
+  '''H21''',
+  '''Square classes of J₂, J₂J₆, J₃J₅ are not characters of the labels''',
+  '''20 §7.6''',
+  '''supported (negative)''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [280, 285], text = '''H21  J2 J6 and J3 J5 square classes are not c''' },
+]
+
+[[claim]]
+id = "H22"
+table = "ledger"
+cells = [
+  '''H22''',
+  '''χ₋₁ is a character of G for 80 of 477 polynomials, exactly when K⁺ has a dyadic prime of odd degree; never for q ≡ 3 mod 4; d = ±2 never''',
+  '''19 §2.4–2.5''',
+  '''supported; [D] sketch''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [288, 298], text = '''H22  chi_{-1} is a character of G exactly for''' },
+]
+
+[[claim]]
+id = "H23"
+table = "ledger"
+cells = [
+  '''H23''',
+  '''δ is an invariant of the surface and balanced on each torsor''',
+  '''23 §5.4, 26 §6''',
+  '''supported''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [301, 319], text = '''H23  delta is an invariant of the surface and''' },
+]
+
+[[claim]]
+id = "H24"
+table = "ledger"
+cells = [
+  '''H24''',
+  '''δ(g·X) = χ₋₁(g)·δ(X) on the five torsors computed''',
+  '''24, 26''',
+  '''supported''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [322, 338], text = '''H24  delta is chi_{-1}: constant on the coset''' },
+]
+
+[[claim]]
+id = "H25"
+table = "ledger"
+cells = [
+  '''H25''',
+  '''The cosets come out the same by the orbits of ideals, the factors of H over E(i), and ξ mod 4 on the lattices; Frobenius at ℓ ≡ 3 mod 4 has cycles of the order of its class''',
+  '''25 §4, 26 §5''',
+  '''supported''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [341, 353], text = '''H25  The cosets by three routes, and Frobeniu''' },
+]
+
+[[claim]]
+id = "H26"
+table = "ledger"
+cells = [
+  '''H26''',
+  '''δ = ζ·Γ(r)/H′(r): the sign of δ is fixed by the lattice''',
+  '''26 §7.1''',
+  '''heuristic: 5 of 5, rule formed after 4, so tested at 1 in 2 (1 in 16 before looking)''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [356, 364], text = '''H26  Sign rule delta = zeta * Gamma/H' on all''' },
+]
+
+[[claim]]
+id = "H38"
+table = "ledger"
+cells = [
+  '''H38''',
+  '''For every polynomial with χ₋₁ the decision problem leaks one bit (attack of Castryck–Sotáková–Vercauteren, *not* on CSIDH: 25 finding 5)''',
+  '''24 §5, 25''',
+  '''**open** beyond 5 of 80 polynomials; on the five, [E] (H24) with the inference of note 24 §2''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H39"
+table = "ledger"
+cells = [
+  '''H39''',
+  '''The characters of order 2 of G are at most 3 genus characters, a number bounded whatever q, and none of them leaks''',
+  '''13 §6''',
+  '''**contradicted**: the bound by 18 finding 4 and H15; that none leaks by H24''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H40"
+table = "ledger"
+cells = [
+  '''H40''',
+  '''The method of Castryck–Sotáková–Vercauteren has nothing to read on the K3 lattice: no local invariant of the lattice is a character''',
+  '''19 §2.2''',
+  '''proved on paper [D] from H14''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H41"
+table = "ledger"
+cells = [
+  '''H41''',
+  '''Over F₂₅, F₄₉ an invariant fixed by Frobenius conjugation cannot be a character that is −1 on 𝔭; such a character exists for 9 of 12 polynomials''',
+  '''19 §2.3, §4.4''',
+  '''supported; [D] criterion''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H42"
+table = "ledger"
+cells = [
+  '''H42''',
+  '''The other characters of order 2 (the 397 of 477 polynomials with no χ₋₁, and the characters other than χ₋₁ of the 80 with it) have no reading from a surface''',
+  '''19 §5, 24 §5''',
+  '''**open** (absence)''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H43"
+table = "ledger"
+cells = [
+  '''H43''',
+  '''The class of g cannot be computed from two surfaces in time polynomial in log q (search problem; "no easier" half)''',
+  '''13 §7, 14 §8''',
+  '''**open**: "the absence of one is not evidence" (13 §7, of an attack)''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H27"
+table = "ledger"
+cells = [
+  '''H27''',
+  '''The two Jacobians of a (4, 4) double cover have the local structure at 2 of a 2-step: (t − 1)² ∣ P mod 2, a split pair when exactly twice, \|Br\| = 4·square''',
+  '''22 §4.2''',
+  '''supported; controls differ''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [370, 390], text = '''H27  Two Jacobians of a (4,4) double cover: t''' },
+]
+
+[[claim]]
+id = "H28"
+table = "ledger"
+cells = [
+  '''H28''',
+  '''Under condition C, X₁ ≇ X₂ and the class of 𝔩/𝔩̄ is never trivial; \|G\| ≈ 0.08p⁴ (ρ̄ = 12), 0.065p⁵ (ρ̄ = 10). *Not tested:* that the step is that class''',
+  '''22 §4.3''',
+  '''supported (the classes), open (the step)''',
+]
+tasks = ["n27/ledger"]
+covers = '''the section of the ledger script recomputes the row's numbers from the stored files; it does not rerun the scripts that wrote them'''
+records = "ledger"
+evidence = [
+  { file = '''sixlines_ledger.log''', lines = [393, 407], text = '''H28  Under condition C the two Jacobians are ''' },
+]
+
+[[claim]]
+id = "H44"
+table = "ledger"
+cells = [
+  '''H44''',
+  '''No reduction to abelian varieties is known for any full family with ρ̄ ≤ 14''',
+  '''17 §2''',
+  '''**open** (literature as of 2026-11-14 [P])''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H45"
+table = "ledger"
+cells = [
+  '''H45''',
+  '''Below 16 there is no usable action: no step at an odd prime, half a step at ℓ = 2''',
+  '''17, 22''',
+  '''**open** (absence)''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H46"
+table = "ledger"
+cells = [
+  '''H46''',
+  '''\|G\| ≈ q^{(20−ρ̄)/2}; an instance has ~512 bits at every ρ̄''',
+  '''13 §3.3, 17 §6''',
+  '''heuristic; the exponent measured over a range of q only at ρ̄ = 16; at ρ̄ = 12 two primes give a slope of 3.8, at ρ̄ = 10 one prime gives only a constant [R]''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''
+
+[[claim]]
+id = "H47"
+table = "ledger"
+cells = [
+  '''H47''',
+  '''The Kuga–Satake variety exists over F_q (Madapusi Pera [P]); its simple factor has dimension 2^{(20−ρ̄)/2}''',
+  '''17 §3–4''',
+  '''heuristic [D, not checked against a source]''',
+]
+no_task = '''the ledger script has no section for it (note 27 §2); its class is the one the note gives'''

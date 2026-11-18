@@ -14,6 +14,7 @@ The full account is [SUMMARY.md](SUMMARY.md), a self-contained summary paper of 
 
 ## Main results
 
+<!-- BEGIN GENERATED main: tools/claims.py tables -->
 | Result | Numbers | Where | Evidence |
 |---|---|---|---|
 | Surfaces form torsors under a CM class group, acting by twisted derived equivalences (ρ̄ ≥ 12, p ≥ 5) | Assembly of Taelman, Valloni, Bayer-Fluckiger, Bragg–Yang | notes [1](docs/01-prior-art.md), [6](docs/06-torsors-under-cm-class-groups.md) | [P], [D] |
@@ -26,6 +27,7 @@ The full account is [SUMMARY.md](SUMMARY.md), a self-contained summary paper of 
 | **No character of order 3 is read either**, in a second audit | 7 torsors with 3 ∣ \|G\| (72 surfaces, q = 23 to 41): no cubic residue symbol is a character on the two torsors where one exists, and no candidate separates the cosets beyond chance on any of the seven. At q = 37 the cube roots of unity are cubes, so a reading R with R³ = c³·d would have a constant symbol there and be invisible to these tests. Three more torsors at q = 43 (48 surfaces), where they are not cubes, were scored after the run: no cubic symbol is a character there either, and their one candidate past Holm does not replicate on a held-out torsor (note 29 §7.4) | note [29](docs/29-characters-of-order-3.md) | [E], [D] |
 | **Below Picard 16**: no reduction known and no computable step | a reading of the literature; half a step at ℓ = 2 tested on 21,240 elliptic K3 pairs | notes [17](docs/17-below-picard-16.md), [22](docs/22-two-neighbours-of-elliptic-k3.md) | [P], [M], [E] |
 | **Ledger**: every headline number recomputed from the stored files | 162 of 170 match the numbers as first written; the three slips behind the 8 others are corrected in the notes | note [27](docs/27-hypothesis-ledger.md) | [E] |
+<!-- END GENERATED main -->
 
 Evidence labels: **[P]** read in the cited source; **[M]** recalled, not checked; **[D]** derived in this work; **[E]** measured by the scripts in this repository; **[H]** heuristic; **[R]** re-derived in a separate re-derivation check, with its own code.
 
@@ -43,12 +45,17 @@ Evidence labels: **[P]** read in the cited source; **[M]** recalled, not checked
 | [SUMMARY.md](SUMMARY.md) | Self-contained summary paper |
 | [docs/](docs/README.md) | 29 notes with the arguments, computations and checks, and an index |
 | [experiments/](experiments/) | The Python scripts behind the notes, and `requirements.txt` |
+| [CLAIMS.md](CLAIMS.md) | Every row of the main results and every hypothesis of the ledger, with the stored lines that carry its numbers, the tasks that bear on it and what their records say |
+| [claims/](claims/) | `claims.toml`, the registry of claims from which the tables of CLAIMS.md and the table of main results above are written, and `RECORDS.md`, every task with its record |
+| [records/](records/) | The records of the batches that were run under the scheduler, each from committed code |
 | [batches/](batches/) | Batch files: which computations of the notes to rerun, with which time and memory limits |
 | [k3tasks/](k3tasks/) | The registry of computations (one per command of a note's *Reproduce* section), the work directories they run in, and the comparison of a rerun with the stored files |
 | [taskbatch/](taskbatch/) | The batch scheduler: one process per task, time and memory limits, one record per task, reports ([PROTOCOL.md](taskbatch/PROTOCOL.md)) |
 | [runners/](runners/) | `task_runner.py`, the command through which the scheduler expands batches and runs tasks |
-| [tests/](tests/) | Unit tests of the scheduler, the registry and the batch files (standard library only) |
-| `Makefile`, `pyproject.toml` | `make test`, `make plan`, `make run`, `make report`; the scheduler's settings |
+| [tools/](tools/) | `claims.py`: writes the generated tables, checks them, and adopts the records of a finished run |
+| [tests/](tests/) | Unit tests of the scheduler, the registry, the batch files and the claim tables (standard library only) |
+| `Makefile`, `pyproject.toml` | `make test`, `make lint`, `make plan`, `make run`, `make report`, `make record`, `make tables`, `make check`; the settings of the scheduler, ruff and mypy |
+| `Dockerfile`, `.python-version` | Python 3.12 with the packages of `experiments/requirements.txt`, for machines without them |
 | [notebooks/](notebooks/README.md) | Two notebooks for readers without a command line: explore the stored results, run small instances live |
 | `binder/` | Configuration for running the notebooks on a free Binder server |
 | [DATA.md](DATA.md) | The stored results: what they are and how to install them |
@@ -163,11 +170,31 @@ A task's cost is the time its command took when its note was written, scaled to 
 | `quadratic-character.toml` | notes 19, 23, 25 and 26: candidate characters, the Jacobian checks, the steps at q = 41 that read the stored enumeration | 18 minutes |
 | `audits.toml` | notes 28 and 29: the features and the pre-registered audits, the q = 43 audit and its held-out test | 8 minutes |
 | `below-16.toml` | note 22: the neighbour graphs and the two short controls | half a minute |
+| `negative-control.toml` | three tasks whose predictions are wrong on purpose: each must end `mismatch`, and the run ends with status 1 | seconds |
+| `limits-demo.toml` | the ledger next to a task that sleeps past its time limit and one that allocates past its memory limit: `timeout`, `memory`, and the run ends with status 3 | seconds |
 | `heavy.toml` | everything that takes from a quarter of an hour to several hours (the enumerations over F₄₉ and at q = 41 and 43, the full Prym runs, the long CM sweeps, the delta and coset runs at q = 41 and 43, the elliptic K3 runs), and the audits again: planned, not run by default | about 10 hours (estimated) |
 
 The times are the wall times of one run on a 16-core machine, with each batch's own workers and processes. `heavy.toml` has not been run as a batch: the times its notes record add up to 19 hours, about 10 with its two workers.
 
 Every computation of the registry is in at least one batch, and the unit tests check that every task's limits are above its expected time and memory.
+
+### Records and claims
+
+`make run` writes into `results/`, which is not in git. A finished run becomes part of the repository through
+
+```bash
+make record BATCH=batches/smoke.toml
+```
+
+which runs the batch and copies its records into `records/smoke/`. Records are adopted only if they were computed from committed code: each names the commit of the code that computed it, and a record from a working tree with uncommitted changes is refused, as is one that names the machine it ran on. Next to the records, `adopted.json` gives the tree of each commit they name. Nothing in `records/` is edited by hand.
+
+[CLAIMS.md](CLAIMS.md) connects the records to the results: for each row of the table of main results and each hypothesis of the ledger, the stored lines that carry its numbers, the tasks that bear on it, and what their records say. A task without a record reads "not re-run". Its tables, [claims/RECORDS.md](claims/RECORDS.md) and the table of main results above are written by `make tables` from [claims/claims.toml](claims/claims.toml), the batch files and the records; `make check` fails if they are not what those give, or if a stored line named as evidence is not where the claim registry says.
+
+The records in this repository were computed on Python 3.12 with the packages of `experiments/requirements.txt`, the interpreter of the stored results ([DATA.md](DATA.md#rerunning-against-the-stored-files)). `make lint` runs ruff and mypy; the `Dockerfile` gives an image with all of it:
+
+```bash
+docker build -t k3-derived-isogenies .
+```
 
 ## Licence and citation
 

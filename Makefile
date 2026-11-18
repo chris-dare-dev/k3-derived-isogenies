@@ -1,12 +1,22 @@
 # Targets run from the repository root.
-#   make test                          the unit tests of the scheduler and the task registry (standard library only)
+#   make test                          the unit tests of the scheduler, the task registry and the claim tables
+#                                      (standard library only)
+#   make lint                          ruff and mypy (neither is needed to run anything)
 #   make venv                          numpy and cypari2 in a virtual environment under ~/.cache
 #   make data                          check the data archive in dist/ and unpack it into experiments/ (DATA.md)
 #   make plan BATCH=batches/smoke.toml list what a run would compute, with limits, without computing
 #   make run BATCH=batches/smoke.toml  compute the tasks of a batch that have no record yet
 #   make report BATCH=batches/smoke.toml REPORT_ARGS=--full
+#   make smoke                         the smoke batch, computed afresh, and its report
+#   make record BATCH=batches/smoke.toml   run, then copy the records into records/ (committed code only);
+#                                      EXPECT=1 for the negative control, EXPECT=3 for the limits demo
+#   make tables                        write the generated tables of CLAIMS.md, README.md and claims/RECORDS.md
+#   make check                         is the registry consistent, are the data installed, and are those
+#                                      tables what the claim registry and the records give?
 #   make list                          every computation of the registry
 # ARGS is passed to the scheduler, for example ARGS="--workers 2 --memory-budget 8000".
+# The interpreter of the stored results and of the records is Python 3.12 (.python-version):
+# `make venv PYTHON=python3.12`.
 PYTHON  ?= python3
 VENV    ?= $(HOME)/.cache/k3-derived-isogenies/venv
 # the interpreter that runs the scripts of experiments/ (needs numpy and cypari2)
@@ -19,14 +29,28 @@ ARCHIVE ?= dist/k3-derived-isogenies-data-v1.tar.xz
 SHA256  := 7a16e7d759533558269147fef4b931c3cdaae66eae78fd41463cf2c9977b3714
 
 RUN_DIR = results/$(basename $(notdir $(BATCH)))
+# the status `run` must end with for `record` to adopt: 0, or 1 when every task is a negative control,
+# or 3 when tasks are stopped at their limits on purpose
+EXPECT  ?= 0
+CHECKED   = taskbatch k3tasks runners tests tools
+FORMATTED = k3tasks runners tests tools
 
-.PHONY: test check list plan run report venv data clean-work
+.PHONY: test lint format check list plan run report smoke record tables venv data clean-work
 
 test:
 	$(PYTHON) -m unittest discover -s tests -t .
 
+lint:
+	ruff check $(CHECKED)
+	ruff format --check $(FORMATTED)
+	mypy
+
+format:
+	ruff format $(FORMATTED)
+
 check:
 	$(PYTHON) -m k3tasks check
+	$(PYTHON) tools/claims.py check
 
 list:
 	$(PYTHON) -m k3tasks list
@@ -39,6 +63,19 @@ run:
 
 report:
 	$(PYTHON) -m k3tasks report $(RUN_DIR) $(REPORT_ARGS)
+
+smoke:
+	rm -rf results/smoke
+	$(PYTHON) -m taskbatch run batches/smoke.toml --quiet $(ARGS)
+	$(PYTHON) -m k3tasks report results/smoke
+
+record:
+	status=0; $(PYTHON) -m taskbatch run $(BATCH) $(ARGS) || status=$$?; \
+	if [ $$status -ne $(EXPECT) ]; then echo "run ended with status $$status, expected $(EXPECT)"; exit 1; fi
+	$(PYTHON) tools/claims.py adopt $(RUN_DIR)
+
+tables:
+	$(PYTHON) tools/claims.py tables
 
 venv:
 	$(PYTHON) -m venv $(VENV)
