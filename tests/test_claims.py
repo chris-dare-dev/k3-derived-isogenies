@@ -103,7 +103,7 @@ class Registry(unittest.TestCase):
 
     def test_what_does_not_fit_is_reported(self) -> None:
         for change, message in (
-            ({"groups": ["quivers"]}, "no task has the group 'quivers'"),
+            ({"groups": ["curves"]}, "no task has the group 'curves'"),
             ({"groups": [], "tasks": ["n99/*"]}, "no task of any batch matches 'n99/*'"),
             ({"cells": ["a", "b"]}, "2 cells for 1 columns"),
             ({"table": "missing"}, "no table 'missing'"),
