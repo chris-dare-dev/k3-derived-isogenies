@@ -1,0 +1,3 @@
+# The image holds the interpreter and the packages only; the repository is mounted when it runs.
+*
+!experiments/requirements.txt

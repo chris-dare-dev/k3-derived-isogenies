@@ -17,5 +17,11 @@ __pycache__/
 *.tar.xz.sha256
 .ipynb_checkpoints/
 
-# Batch records, reports and work directories (make run)
+# Scratch runs of the scheduler: records, reports and work directories (make run); caches of the lint tools
 results/
+.ruff_cache/
+.mypy_cache/
+# Kept in git, although the patterns above would ignore them: the records adopted from finished runs
+!records/*/results.jsonl
+!records/*/manifest.json
+!records/*/adopted.json
