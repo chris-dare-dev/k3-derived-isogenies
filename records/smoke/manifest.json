@@ -1,0 +1,352 @@
+{
+ "batch": "smoke",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines_ledger.py",
+   "compared": [
+    {
+     "file": "sixlines_ledger.log",
+     "mode": "exact"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "ledger",
+   "id": "n27/ledger",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 27,
+   "predicted": {
+    "sixlines_ledger.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": "no stored log; DATA.md records 18 equal, 2 twist, 10 degenerate, no mismatch",
+   "command": "python -I sixlines_prym.py --check 17 2 3 4 11",
+   "compared": [],
+   "cost": 3,
+   "expected_memory_mb": 500,
+   "group": "fourfold",
+   "id": "n14/prym-check-17",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 14,
+   "predicted": {
+    "lines /^\\s*pair .*\\bdegenerate$/": 10,
+    "lines /^\\s*pair .*\\bequal$/": 18,
+    "lines /^\\s*pair .*\\btwist$/": 2,
+    "lines /mismatch/": 0
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cmmethod.py selftest --digits 60",
+   "compared": [
+    {
+     "file": "sixlines_cmmethod_selftest.log",
+     "mode": "exact"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "cm-method",
+   "id": "n20/selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 20,
+   "predicted": {
+    "sixlines_cmmethod_selftest.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py selftest",
+   "compared": [],
+   "cost": 4,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n02/selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 2,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_fq.py selftest",
+   "compared": [],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n03/fq-selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 3,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms.py selftest",
+   "compared": [],
+   "cost": 3,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/forms-selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 4,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py selftest",
+   "compared": [],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n05/nonsplit-selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 5,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_levels.py --out sixlines_levels.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_levels.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_levels.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 5,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n08/levels",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 8,
+   "predicted": {
+    "sixlines_levels.jsonl": "identical",
+    "sixlines_levels.log": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms_fp.py selftest",
+   "compared": [
+    {
+     "file": "sixlines_forms_fp.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "fourfold",
+   "id": "n21/forms-fp-selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 21,
+   "predicted": {
+    "sixlines_forms_fp.log": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py stored",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n25/review2-stored",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py levels",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n25/review2-levels",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py labelcheck",
+   "compared": [
+    {
+     "file": "sixlines_order3_labelcheck.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "order-3",
+   "id": "n29/labelcheck",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_labelcheck.log": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py selfcheck",
+   "compared": [
+    {
+     "file": "sixlines_order3_selfcheck.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 3,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/selfcheck",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_selfcheck.log": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3_holdout43.py",
+   "compared": [
+    {
+     "file": "sixlines_order3_holdout43.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 5,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/holdout43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_holdout43.log": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  }
+ ]
+}

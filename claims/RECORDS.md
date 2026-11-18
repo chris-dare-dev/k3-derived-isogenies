@@ -22,10 +22,10 @@ Six-line surfaces match Hermitian lattices
 | `n02/enumerate-p29` | lattices | `sixlines_p29.jsonl` (records): identical | not re-run |  |  |
 | `n02/enumerate-p31` | lattices | `sixlines_p31.jsonl` (records): identical | not re-run |  |  |
 | `n02/enumerate-p37` | lattices | `sixlines_p37.jsonl` (records): identical | not re-run |  |  |
-| `n02/selftest` | lattices, smoke | expect /selftest passed/: found | not re-run |  |  |
+| `n02/selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `de73a3c`, 7.349 s | checked |  |
 | `n03/enumerate-q25` | lattices | `sixlines_q25.jsonl` (records): identical | not re-run |  |  |
 | `n03/enumerate-q49` | heavy | `sixlines_q49.log` (text): identical; `sixlines_q49.jsonl` (records): identical | not re-run |  |  |
-| `n03/fq-selftest` | lattices, smoke | expect /selftest passed/: found | not re-run |  |  |
+| `n03/fq-selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `de73a3c`, 2.145 s | checked |  |
 | `n03/neighbours` | lattices | `sixlines_neighbours.log` (text): identical; `sixlines_neighbours.jsonl` (records): identical | not re-run |  |  |
 | `n03/q49-cm` | lattices | `sixlines_q49_cm.log` (text): identical; `sixlines_q49_cm.jsonl` (records): identical | not re-run |  |  |
 | `n04/enumerate-p5` | lattices | `sixlines_p5.jsonl` (records): identical | not re-run |  |  |
@@ -33,7 +33,7 @@ Six-line surfaces match Hermitian lattices
 | `n04/forms-compare-p7` | lattices | `sixlines_forms_p7_compare.log` (text): identical; `sixlines_forms_p7_compare.jsonl` (records): identical | not re-run |  |  |
 | `n04/forms-enumerate-p5` | lattices | `sixlines_forms_p5.log` (text): identical; `sixlines_forms_p5.jsonl` (records): identical | not re-run |  |  |
 | `n04/forms-enumerate-p7` | lattices | `sixlines_forms_p7.log` (text): identical; `sixlines_forms_p7.jsonl` (records): identical | not re-run |  |  |
-| `n04/forms-selftest` | lattices, smoke | expect /selftest passed/: found | not re-run |  |  |
+| `n04/forms-selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `de73a3c`, 6.29 s | checked |  |
 | `n04/types-q25` | lattices | `sixlines_types_q25.log` (text): identical; `sixlines_types_q25.jsonl` (records): identical | not re-run |  |  |
 | `n04/types-q49` | lattices | `sixlines_types_q49.log` (text): identical; `sixlines_types_q49.jsonl` (records): identical | not re-run |  |  |
 | `n05/nonsplit-enumerate-p11` | lattices | `sixlines_nonsplit_p11.log` (text): identical; `sixlines_nonsplit_p11.jsonl` (records): identical | not re-run |  |  |
@@ -45,7 +45,7 @@ Six-line surfaces match Hermitian lattices
 | `n05/nonsplit-lattices-p19` | lattices | `sixlines_nonsplit_lat_p19.log` (text): identical; `sixlines_nonsplit_lat_p19.jsonl` (records): identical | not re-run |  |  |
 | `n05/nonsplit-lattices-p23` | lattices | `sixlines_nonsplit_lat_p23.log` (text): identical; `sixlines_nonsplit_lat_p23.jsonl` (records): identical | not re-run |  |  |
 | `n05/nonsplit-lattices-small` | lattices | `sixlines_nonsplit_lat_small.log` (text): identical; `sixlines_nonsplit_lat_small.jsonl` (records): identical | not re-run |  |  |
-| `n05/nonsplit-selftest` | lattices, smoke | expect /selftest passed/: found | not re-run |  |  |
+| `n05/nonsplit-selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `de73a3c`, 1.933 s | checked |  |
 
 <a name="claim-fourfold"></a>
 
@@ -55,7 +55,7 @@ Six-line surfaces match Hermitian lattices
 
 | Task | Batches | Compared with | Record | Verdict | Caveat |
 |---|---|---|---|---|---|
-| `n14/prym-check-17` | fourfold, smoke | lines /^\s*pair .*\bequal$/: 18; lines /^\s*pair .*\btwist$/: 2; lines /^\s*pair .*\bdegenerate$/: 10; lines /mismatch/: 0 | not re-run |  | no stored log; DATA.md records 18 equal, 2 twist, 10 degenerate, no mismatch |
+| `n14/prym-check-17` | fourfold, smoke | lines /^\s*pair .*\bequal$/: 18; lines /^\s*pair .*\btwist$/: 2; lines /^\s*pair .*\bdegenerate$/: 10; lines /mismatch/: 0 | ok, 2026-11-18, `de73a3c`, 4.198 s | checked | no stored log; DATA.md records 18 equal, 2 twist, 10 degenerate, no mismatch |
 | `n14/prym-other-half` | fourfold | nothing: its output was not kept | not re-run |  | the control of note 14 section 5.3; its output was not kept |
 | `n14/prym-run` | heavy | `sixlines_prym.log` (text): identical; `sixlines_prym.jsonl` (records): identical | not re-run |  |  |
 | `n14/prym-run-11-13` | fourfold | `sixlines_prym.jsonl` (records-subset): identical; lines /^p = 1[13]: /: 2 | not re-run |  |  |
@@ -73,7 +73,7 @@ Six-line surfaces match Hermitian lattices
 | `n18/review-step-8` | fourfold | `sixlines_review.log` (text-contained): identical | not re-run |  |  |
 | `n21/forms-fp-commuting` | fourfold | `sixlines_forms_fp.log` (text-contained): identical | not re-run |  |  |
 | `n21/forms-fp-involution` | fourfold | nothing: its output was not kept | not re-run |  | uses random points: the counts of points vary between runs, so the log is not compared |
-| `n21/forms-fp-selftest` | fourfold, smoke | `sixlines_forms_fp.log` (text-contained): identical | not re-run |  |  |
+| `n21/forms-fp-selftest` | fourfold, smoke | `sixlines_forms_fp.log` (text-contained): identical | ok, 2026-11-18, `de73a3c`, 0.454 s | reproduced |  |
 | `n21/forms-fp-types` | fourfold | `sixlines_forms_fp.log` (text-contained): identical | not re-run |  |  |
 | `n21/inverting-k2-7-17` | fourfold | `sixlines_forms_fp.log` (text-contained): identical; `sixlines_forms_fp.jsonl` (records-subset): identical | not re-run |  |  |
 | `n21/inverting-k2-19` | fourfold | `sixlines_forms_fp.log` (text-contained): identical; `sixlines_forms_fp.jsonl` (records-subset): identical | not re-run |  |  |
@@ -107,7 +107,7 @@ Six-line surfaces match Hermitian lattices
 | `n20/action-23` | cm-method | nothing: its output was not kept | not re-run |  | its output was not kept |
 | `n20/points-maximal` | cm-method | nothing: its output was not kept | not re-run |  | its output was not kept |
 | `n20/points-nolevel` | cm-method | nothing: its output was not kept | not re-run |  | its output was not kept |
-| `n20/selftest` | cm-method, smoke | `sixlines_cmmethod_selftest.log` (exact): identical | not re-run |  |  |
+| `n20/selftest` | cm-method, smoke | `sixlines_cmmethod_selftest.log` (exact): identical | ok, 2026-11-18, `de73a3c`, 1.094 s | reproduced |  |
 | `n20/sweep` | heavy | `sixlines_cmmethod.log` (text): identical; `sixlines_cmmethod.jsonl` (records-subset): identical | not re-run |  | the script was corrected after this sweep (note 20 section 7): the surfaces of a polynomial are now selected by e1 and e2, and the ratios with J3 were added, so the records of q = 31 and 37 and the log are expected to differ |
 | `n20/sweep-rerun` | heavy | `sixlines_cmmethod_rerun.log` (text): identical; `sixlines_cmmethod.jsonl` (records-subset): identical | not re-run |  |  |
 | `n20/sweep-rerun2` | cm-method | `sixlines_cmmethod_rerun2.log` (text): identical; `sixlines_cmmethod.jsonl` (records-subset): identical | not re-run |  |  |
@@ -138,9 +138,9 @@ Six-line surfaces match Hermitian lattices
 | `n23/jacobian-one-29` | quadratic-character | nothing: its output was not kept | not re-run |  | a rerun quoted in note 25 section 2; its output was not kept |
 | `n23/jacobian-validate` | quadratic-character | `sixlines_jacobian_validate.log` (text): identical; `sixlines_jacobian_validate.jsonl` (records): identical | not re-run |  | the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not |
 | `n25/review2-delta` | quadratic-character | `sixlines_review2.log` (text-contained): identical; `sixlines_review2.jsonl` (records-subset): identical | not re-run |  |  |
-| `n25/review2-levels` | quadratic-character, smoke | `sixlines_review2.log` (text-contained): identical | not re-run |  |  |
+| `n25/review2-levels` | quadratic-character, smoke | `sixlines_review2.log` (text-contained): identical | ok, 2026-11-18, `de73a3c`, 0.271 s | reproduced |  |
 | `n25/review2-pairing` | quadratic-character | `sixlines_review2.log` (text-contained): identical | not re-run |  |  |
-| `n25/review2-stored` | quadratic-character, smoke | `sixlines_review2.log` (text-contained): identical | not re-run |  |  |
+| `n25/review2-stored` | quadratic-character, smoke | `sixlines_review2.log` (text-contained): identical | ok, 2026-11-18, `de73a3c`, 0.439 s | reproduced |  |
 | `n26/cm-list-p41` | quadratic-character | `sixlines_cm_p41.log` (text): identical; `sixlines_cm_p41.jsonl` (records): identical | not re-run |  |  |
 | `n26/compare` | quadratic-character | `sixlines_delta41_compare.log` (text-contained): identical; `sixlines_delta41_compare.json` (json): identical | not re-run |  |  |
 | `n26/cosets-6` | heavy | `sixlines_delta41_cosets_6.log` (text): identical; `sixlines_delta41_cosets.jsonl` (records-subset): identical | not re-run |  |  |
@@ -205,9 +205,9 @@ Six-line surfaces match Hermitian lattices
 | `n29/features` | audits, heavy | `sixlines_order3_features.log` (text): identical; `sixlines_order3_features.json` (json): identical | not re-run |  |  |
 | `n29/features-q43` | audits, heavy | `sixlines_order3_features_q43.log` (text): identical; `sixlines_order3_features_q43.json` (json): identical | not re-run |  |  |
 | `n29/fields` | audits | `sixlines_order3_fields.log` (text): identical | not re-run |  |  |
-| `n29/holdout43` | audits, smoke | `sixlines_order3_holdout43.log` (text): identical | not re-run |  |  |
-| `n29/labelcheck` | audits, smoke | `sixlines_order3_labelcheck.log` (text): identical | not re-run |  |  |
-| `n29/selfcheck` | audits, smoke | `sixlines_order3_selfcheck.log` (text): identical | not re-run |  |  |
+| `n29/holdout43` | audits, smoke | `sixlines_order3_holdout43.log` (text): identical | ok, 2026-11-18, `de73a3c`, 6.826 s | reproduced |  |
+| `n29/labelcheck` | audits, smoke | `sixlines_order3_labelcheck.log` (text): identical | ok, 2026-11-18, `de73a3c`, 0.247 s | reproduced |  |
+| `n29/selfcheck` | audits, smoke | `sixlines_order3_selfcheck.log` (text): identical | ok, 2026-11-18, `de73a3c`, 3.603 s | reproduced |  |
 | `n29/selfcheck-q43` | audits | `sixlines_order3_selfcheck_q43.log` (text): identical | not re-run |  |  |
 
 <a name="claim-below-16"></a>
@@ -237,7 +237,7 @@ Six-line surfaces match Hermitian lattices
 
 | Task | Batches | Compared with | Record | Verdict | Caveat |
 |---|---|---|---|---|---|
-| `n27/ledger` | limits-demo, smoke | `sixlines_ledger.log` (exact): identical | not re-run |  |  |
+| `n27/ledger` | limits-demo, smoke | `sixlines_ledger.log` (exact): identical | ok, 2026-11-18, `de73a3c`, 1.249 s | reproduced |  |
 
 <a name="claim-ring-steps"></a>
 
@@ -249,7 +249,7 @@ The rational steps of note 6 and the lattice graphs of the steps that change the
 |---|---|---|---|---|---|
 | `n06/rational` | ring-steps | `sixlines_rational.log` (text): identical; `sixlines_rational.jsonl` (records): identical | not re-run |  |  |
 | `n07/vertical` | ring-steps | `sixlines_vertical.log` (text): identical; `sixlines_vertical.jsonl` (records): identical | not re-run |  |  |
-| `n08/levels` | ring-steps, smoke | `sixlines_levels.log` (text): identical; `sixlines_levels.jsonl` (records): identical | not re-run |  |  |
+| `n08/levels` | ring-steps, smoke | `sixlines_levels.log` (text): identical; `sixlines_levels.jsonl` (records): identical | ok, 2026-11-18, `de73a3c`, 5.56 s | reproduced |  |
 | `n09/ramified` | ring-steps | `sixlines_ramified.log` (text): identical; `sixlines_ramified.jsonl` (records): identical | not re-run |  |  |
 | `n09/ramified-q7` | heavy | `sixlines_ramified_q7.log` (text): identical; `sixlines_ramified_q7.jsonl` (records): identical | not re-run |  |  |
 | `n10/deep` | ring-steps | `sixlines_deep.log` (text): identical; `sixlines_deep.jsonl` (records): identical | not re-run |  |  |
