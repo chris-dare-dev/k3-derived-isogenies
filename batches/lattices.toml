@@ -1,0 +1,36 @@
+# Six-line surfaces match Hermitian lattices (notes 2 to 5): the self-tests, the enumerations of six
+# lines over F_p (p <= 37) and F_25, the lattice counts and neighbour steps, the forms over the prime field
+# and the non-split counts.  Each rerun is compared with the stored records and logs.  About an hour of
+# processor time, 15 to 20 minutes on this batch's 2 x 6 processes.  The enumeration over F_49
+# (85 minutes on 14 processes) is in heavy.toml.
+
+name = "lattices"
+
+[scheduler]
+workers = 2
+memory_budget_mb = 8000
+
+[limits]
+time_seconds = 600
+memory_mb = 1500
+
+[[limits.tier]]
+min_cost = 120
+time_seconds = 1800
+
+[[limits.tier]]
+min_cost = 400
+time_seconds = 3600
+
+[[tasks]]
+kind = "computation"
+groups = ["lattices"]
+exclude_tags = ["heavy"]
+exclude = ["n02/enumerate-*", "n03/enumerate-q25", "n05/nonsplit-enumerate-*"]
+
+# the enumerations start their own processes
+[[tasks]]
+kind = "computation"
+ids = ["n02/enumerate-*", "n03/enumerate-q25", "n05/nonsplit-enumerate-*"]
+procs = 6
+limits = { memory_mb = 4000 }

@@ -1,0 +1,11 @@
+Written 2026-11-15 23:57:01 EST, before any value of R2 on q = 43, e1 = 2 was looked at against its cosets.
+
+Held-out test of the A43 survivor "B2 sym d=2 of R2(Y) + R2(X)" on q = 43, e1 = 2 (G = Z/24, 24 surfaces), the one
+torsor at q = 43 where B2 was not scored (n = 24).
+- T1 (the survivor's own statistic): over unordered pairs {X, Y} of the 24 surfaces, f = quadratic symbol of
+  R2(X) + R2(Y) mod 43 with categories {square, non-square, zero, undefined}; g = (c(Y) - c(X)) mod 3 for i < j;
+  statistic = plug-in mutual information of (f, g) over the 276 pairs.  Null: uniformly random balanced labellings
+  (8, 8, 8), 200,000 draws, seed 4302; p = (1 + #{null >= observed}) / (1 + draws).
+- T2 (direction, one-sided): among pairs in the same coset with f in {square, non-square}, the share of
+  non-squares, predicted larger than in the null (the direction seen on 43/22 and 43/14).  Same null draws.
+- Survives if p <= 0.05 for T1.  Either way, report T1 and T2.

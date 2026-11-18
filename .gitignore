@@ -1,0 +1,21 @@
+# Stored results are not kept in git; they ship as a release archive (see DATA.md).
+*.jsonl
+*.jsonl.gz
+*.json
+*.json.gz
+*.part
+*.log
+# Release archive and checksums, built locally
+dist/
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Data archive placed at the root for the notebooks
+*.tar.xz
+*.tar.xz.sha256
+.ipynb_checkpoints/
+
+# Batch records, reports and work directories (make run)
+results/

@@ -1,0 +1,24 @@
+# Lattice graphs of ring-changing steps (notes 6 to 12): rational steps, vertical steps, levels, the
+# ramified case, fourth powers in rank 4 and 6, the Galois action in rank 6.  Every script asserts its
+# statements as it goes, and each rerun is compared with the stored records and log.  About 30 minutes
+# of processor time on one process each; the longest, note 10, about 13 minutes.  The q = 7 run of note 9
+# (half an hour) is in heavy.toml.
+
+name = "ring-steps"
+
+[scheduler]
+workers = 4
+memory_budget_mb = 8000
+
+[limits]
+time_seconds = 900
+memory_mb = 2000
+
+[[limits.tier]]
+min_cost = 300
+time_seconds = 3600
+
+[[tasks]]
+kind = "computation"
+groups = ["ring-steps"]
+exclude_tags = ["heavy"]

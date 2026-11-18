@@ -1,0 +1,31 @@
+# One bit leaks: the sign delta is the character chi_-1 (notes 19, 23, 25 and 26).  Candidate quadratic
+# characters, the Jacobian checks and levels of note 23, the re-derivation checks of note 25, and the
+# steps of note 26 that read the stored enumeration at q = 41: the lattice list, the fourfold of every
+# surface, the self-checks, the comparison of delta with the CM cosets and the three sign reruns.  About
+# 1.5 hours of processor time, under an hour on this batch's 2 x 6 processes.  The enumeration at q = 41,
+# the delta runs and the coset runs at q = 41 and the two long Jacobian runs are in heavy.toml.
+
+name = "quadratic-character"
+
+[scheduler]
+workers = 2
+memory_budget_mb = 10000
+
+[limits]
+time_seconds = 600
+memory_mb = 1500
+
+[[limits.tier]]
+min_cost = 100
+time_seconds = 2400
+
+[[limits.tier]]
+min_cost = 600
+time_seconds = 3600
+
+[[tasks]]
+kind = "computation"
+groups = ["quadratic-character"]
+exclude_tags = ["heavy"]
+procs = 6
+limits = { memory_mb = 5000 }

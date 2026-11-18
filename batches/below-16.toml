@@ -1,0 +1,24 @@
+# Below Picard number 16 (note 22): the two neighbour graphs from the stored runs and the two short
+# controls over F_5.  A few minutes.  The six long runs (0.8 to 5.4 core-hours each, 15 in all) are in
+# heavy.toml.
+
+name = "below-16"
+
+[scheduler]
+workers = 2
+memory_budget_mb = 8000
+
+[limits]
+time_seconds = 600
+memory_mb = 1500
+
+[[limits.tier]]
+min_cost = 20
+time_seconds = 1800
+
+[[tasks]]
+kind = "computation"
+groups = ["below-16"]
+exclude_tags = ["heavy"]
+procs = 6
+limits = { memory_mb = 4000 }

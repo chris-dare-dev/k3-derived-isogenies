@@ -1,0 +1,43 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # The scheduler, the task registry and the batch files: standard library only, no data archive.
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: make test
+      - run: make check
+      - run: |
+          for batch in batches/*.toml; do make plan BATCH="$batch"; done
+
+  # The smoke batch against the stored results, when the data archive can be fetched.
+  # Set DATA_URL (a repository variable) to the release asset of DATA.md to enable it.
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: ${{ vars.DATA_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r experiments/requirements.txt
+      - run: |
+          mkdir -p dist
+          curl -fsSL -o dist/k3-derived-isogenies-data-v1.tar.xz "${{ vars.DATA_URL }}"
+          make data
+      - run: make run BATCH=batches/smoke.toml ARGS="--memory-guard poll"
+      - if: always()
+        run: make report BATCH=batches/smoke.toml

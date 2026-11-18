@@ -1,0 +1,37 @@
+# Nothing else leaks, and no character of order 3 is read (notes 28 and 29): the features of both audits
+# from the stored files, the two pre-registered audits with their self-checks, the q = 43 audit and its
+# held-out test, and the three short coset runs of note 29 at q = 23 and 29.  About 40 minutes of processor
+# time, 10 to 15 minutes on this batch's processes.  The leakage audit's shuffled-label reruns (1.7 hours
+# of processor time), the enumeration at q = 43 and the long coset runs are in heavy.toml.
+
+name = "audits"
+
+[scheduler]
+workers = 2
+memory_budget_mb = 10000
+
+[limits]
+time_seconds = 600
+memory_mb = 1500
+
+[[limits.tier]]
+min_cost = 50
+time_seconds = 1800
+
+# the two audits and the q = 43 audit start their own processes
+[[tasks]]
+kind = "computation"
+ids = ["n28/audit", "n29/audit", "n29/audit-q43"]
+procs = 8
+limits = { memory_mb = 6000 }
+
+# the coset runs compute period points at 700 and 1,200 digits
+[[tasks]]
+kind = "computation"
+ids = ["n29/cosets-23-2", "n29/cosets-29-6", "n29/cosets-29-2"]
+limits = { memory_mb = 3000 }
+
+[[tasks]]
+kind = "computation"
+groups = ["leakage", "order-3"]
+exclude_tags = ["heavy"]

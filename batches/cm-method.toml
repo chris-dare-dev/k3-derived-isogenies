@@ -1,0 +1,29 @@
+# The CM method computes the action (notes 20, 24 and 25): the theta-constant self-test, the one-field
+# sweep at 1,200 digits, the period points and the action at q = 23, the delta labels of three torsors and
+# the Galois checks of note 25.  About 1.5 hours of processor time, under an hour on this batch's 2 x 6
+# processes.  The two long sweeps (45 and 30 minutes on 4 processes) are in heavy.toml.
+
+name = "cm-method"
+
+[scheduler]
+workers = 2
+memory_budget_mb = 10000
+
+[limits]
+time_seconds = 900
+memory_mb = 2000
+
+[[limits.tier]]
+min_cost = 200
+time_seconds = 2400
+
+[[limits.tier]]
+min_cost = 600
+time_seconds = 3600
+
+[[tasks]]
+kind = "computation"
+groups = ["cm-method"]
+exclude_tags = ["heavy"]
+procs = 6
+limits = { memory_mb = 5000 }

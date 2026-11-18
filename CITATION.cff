@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below. The results have not been independently reviewed."
+title: "Derived isogenies of ordinary K3 surfaces as a class-group action: a negative result for isogeny-based cryptography"
+type: software
+authors:
+  - family-names: Dare
+    given-names: Christopher
+date-released: 2026-11-15
+version: "1.0-draft"
+license: [MIT, CC-BY-4.0]
+repository-code: "https://github.com/chris-dare-dev/k3-derived-isogenies"
+keywords:
+  - K3 surfaces
+  - complex multiplication
+  - class group action
+  - isogeny-based cryptography
+  - CSIDH
+  - abelian fourfolds
+  - derived equivalences
+abstract: >-
+  Does the CM class-group action on ordinary K3 surfaces over finite fields,
+  through twisted derived equivalences, give a new hard problem for
+  cryptography? In the six-line family (Picard number 16) it does not: it
+  reduces to a CSIDH-type class-group action on abelian fourfolds with
+  multiplication by Z[i], with a group of about 0.01 q^2 elements, steps that
+  cost about l^4, and one bit leaking through a quadratic character for about
+  one polynomial in six. Notes, scripts and a ledger that recomputes every
+  headline number from the stored results.

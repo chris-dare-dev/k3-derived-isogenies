@@ -1,0 +1,31 @@
+# The reduction to abelian fourfolds and the group G (notes 13 to 16, 18 and 21): the group sizes to
+# q = 100,003, the fourfold of every surface built as a Prym variety (F_p for p = 11, 13; F_25), the
+# class-group dictionary, the six re-derivation checks of note 18 and the fourfold forms over F_p with the
+# shorter inverting runs.  About 1.5 hours of processor time; under an hour on this batch's 2 x 6 processes.
+# The full Prym run over p <= 37 (half an hour on 14 processes), F_49 (44 minutes) and the three longest
+# inverting runs are in heavy.toml.
+
+name = "fourfold"
+
+[scheduler]
+workers = 2
+memory_budget_mb = 8000
+
+[limits]
+time_seconds = 600
+memory_mb = 1500
+
+[[limits.tier]]
+min_cost = 100
+time_seconds = 2400
+
+[[limits.tier]]
+min_cost = 600
+time_seconds = 5400
+
+[[tasks]]
+kind = "computation"
+groups = ["group-size", "fourfold"]
+exclude_tags = ["heavy"]
+procs = 6
+limits = { memory_mb = 4000 }

@@ -1,0 +1,14 @@
+[project]
+name = "k3-derived-isogenies"
+version = "1.0"
+description = "Notes, scripts and batches behind 'Derived isogenies of ordinary K3 surfaces as a class-group action'"
+requires-python = ">=3.11"
+license = "MIT"
+# The scheduler (taskbatch/) and the task registry (k3tasks/) use the standard library only.  The
+# scripts in experiments/ need numpy and cypari2: see experiments/requirements.txt.
+dependencies = []
+
+# What the scheduler (taskbatch/) is told about this repository: see taskbatch/PROTOCOL.md.
+[tool.taskbatch]
+runner = ["{python}", "-I", "runners/task_runner.py"]
+description_keys = []
