@@ -17,9 +17,24 @@ from pathlib import Path
 from typing import Any
 
 from taskbatch import report as scheduler_report
+from taskbatch.report import load_manifest
 from taskbatch.store import ResultStore
 
 ORDER = ["reproduced", "differs", "checked", "ran", "timeout", "memory", "error", "crashed", "unsupported", "not run"]
+
+
+def _cell(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float):
+        return f"{value:g}"
+    return str(value).replace("|", "\\|")
+
+
+def _table(header: list[str], rows: list[list[Any]]) -> list[str]:
+    lines = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
+    lines += ["| " + " | ".join(_cell(item) for item in row) + " |" for row in rows]
+    return [*lines, ""]
 
 
 def verdict(record: dict[str, Any] | None) -> str:
@@ -42,6 +57,8 @@ def _differences(record: dict[str, Any]) -> str:
         expected = (record.get("predicted") or {}).get(key)
         if key.startswith(("expect ", "lines ")) and value != expected:
             parts.append(f"{key}: {value}, expected {expected}")
+        elif value == "identical" and expected != value:
+            parts.append(f"{key}: identical, predicted {expected}")
     if detail.get("work_dir"):
         parts.append(f"work directory {detail['work_dir']}")
     return "; ".join(parts)
@@ -57,7 +74,7 @@ def _peak(record: dict[str, Any] | None) -> float | None:
 
 def reproduction_lines(run_dir: Path) -> list[str]:
     latest = ResultStore(run_dir / "results.jsonl").latest()
-    manifest = scheduler_report.load_manifest(run_dir)
+    manifest = load_manifest(run_dir)
     ids = [task["id"] for task in manifest] or sorted(latest)
     rows = []
     counts: Counter[str] = Counter()
@@ -79,15 +96,15 @@ def reproduction_lines(run_dir: Path) -> list[str]:
         )
     summary = ", ".join(f"{counts[word]} {word}" for word in ORDER if counts[word])
     lines = ["## Reproduction", "", f"{summary}.", ""]
-    lines += scheduler_report._table(["task", "group", "verdict", "compared with", "wall (s)", "peak (MB)"], rows)
+    lines += _table(["task", "group", "verdict", "compared with", "wall (s)", "peak (MB)"], rows)
     problems = [(task_id, latest[task_id]) for task_id in ids if task_id in latest and verdict(latest[task_id]) == "differs"]
     if problems:
         lines += ["## What differs", ""]
-        lines += scheduler_report._table(["task", "difference"], [[f"`{t}`", _differences(r)] for t, r in problems])
+        lines += _table(["task", "difference"], [[f"`{t}`", _differences(r)] for t, r in problems])
     caveats = [(t, latest[t]["detail"]["caveat"]) for t in ids if t in latest and latest[t].get("detail", {}).get("caveat")]
     if caveats:
         lines += ["## Caveats", ""]
-        lines += scheduler_report._table(["task", "caveat"], [[f"`{t}`", c] for t, c in caveats])
+        lines += _table(["task", "caveat"], [[f"`{t}`", c] for t, c in caveats])
     return lines
 
 

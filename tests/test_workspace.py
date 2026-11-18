@@ -126,6 +126,16 @@ class Workspace(unittest.TestCase):
         self.assertEqual(result["differences"]["toy.log"]["rerun"], "toy total 7 (#s)")
         self.assertTrue(Path(result["work_dir"]).is_dir())
 
+    def test_a_control_ends_as_a_mismatch_and_leaves_no_work_directory(self) -> None:
+        execution = execute(toy(), self.places, 1)
+        result = evaluate(toy(), execution, self.places, control={"toy.log": "differs"})
+        self.assertEqual((result["status"], result["agrees"], result["verdict"]), ("mismatch", False, "differs"))
+        self.assertEqual(result["value"]["toy.log"], "identical")
+        self.assertEqual(result["predicted"]["toy.log"], "differs")
+        finish(execution, result, keep=False, discard=True)
+        self.assertNotIn("work_dir", result)
+        self.assertFalse(execution.work_dir.exists())
+
     def test_checked_by_output_lines(self) -> None:
         result = self.run_toy(toy(checks=(), counts=((r"^toy total", 1), (r"never", 0))))
         self.assertEqual(result["verdict"], "checked")

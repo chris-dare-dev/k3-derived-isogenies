@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from k3tasks import registry
-from k3tasks.tasks import expand_batch
+from k3tasks.tasks import expand_batch, run_task
 from taskbatch.config import load_config
 from taskbatch.model import Task
 
@@ -30,6 +30,8 @@ class Batches(unittest.TestCase):
             config, tasks = expanded(path)
             self.assertTrue(tasks, path.name)
             for payload in tasks:
+                if payload["kind"] == "synthetic":
+                    continue  # these are stopped at their limits on purpose
                 limits = config.limits_for(Task.from_payload(payload))
                 with self.subTest(batch=path.stem, task=payload["id"]):
                     self.assertGreaterEqual(limits.time_seconds, TIME_MARGIN * payload["cost"] + 60)
@@ -89,6 +91,43 @@ class Expansion(unittest.TestCase):
         tasks = expand_batch({"tasks": [{"kind": "computation", "ids": ["n27/ledger"], "procs": 8}]})
         self.assertEqual(tasks[0]["procs"], 1)
 
+    def test_a_control_is_the_same_computation_with_a_wrong_prediction(self) -> None:
+        plain, control = expand_batch({"tasks": [
+            {"kind": "computation", "ids": ["n27/ledger"]},
+            {"kind": "computation", "ids": ["n27/ledger"], "control": {"predicted": {"sixlines_ledger.log": "differs"}}},
+        ]})
+        self.assertEqual(plain["predicted"], {"sixlines_ledger.log": "identical"})
+        self.assertEqual(plain["compared"], [{"file": "sixlines_ledger.log", "mode": "exact"}])
+        self.assertNotIn("control", plain)
+        self.assertEqual(control["id"], "n27/ledger!control")
+        self.assertEqual((control["group"], control["control"]), ("negative control", True))
+        self.assertEqual(control["predicted"], {"sixlines_ledger.log": "differs"})
+        self.assertEqual(control["command"], plain["command"])
+
+    def test_the_negative_control_batch_holds_controls_only(self) -> None:
+        _, tasks = expanded(BATCHES / "negative-control.toml")
+        self.assertEqual(len(tasks), 3)
+        for task in tasks:
+            self.assertTrue(task["control"] and task["id"].endswith("!control"), task["id"])
+            self.assertNotEqual(task["predicted"], registry.get(task["id"].removesuffix("!control")).predicted())
+
+    def test_controls_and_synthetic_tasks_stay_in_their_own_batches(self) -> None:
+        for path in sorted(BATCHES.glob("*.toml")):
+            for task in expanded(path)[1]:
+                if task.get("control"):
+                    self.assertEqual(path.stem, "negative-control", task["id"])
+                if task["kind"] == "synthetic":
+                    self.assertEqual(path.stem, "limits-demo", task["id"])
+
+    def test_synthetic_tasks(self) -> None:
+        tasks = expand_batch({"tasks": [{"kind": "synthetic", "items": [
+            {"name": "sleeps", "sleep_seconds": 5}, {"name": "holds", "allocate_mb": 3},
+        ]}]})  # fmt: skip
+        self.assertEqual([t["id"] for t in tasks], ["synthetic/sleeps", "synthetic/holds"])
+        self.assertEqual({t["group"] for t in tasks}, {"synthetic"})
+        result = run_task(tasks[1])
+        self.assertEqual((result["status"], result["value"], result["agrees"]), ("ok", 3, None))
+
     def test_refusals(self) -> None:
         for table in (
             {"kind": "synthetic", "ids": ["n27/ledger"]},
@@ -99,6 +138,13 @@ class Expansion(unittest.TestCase):
             {"kind": "computation", "ids": ["n99/*"]},
             {"kind": "computation", "notes": [1]},
             {"kind": "computation", "notes": ["2"]},
+            {"kind": "computation", "ids": ["n27/ledger"], "control": {"predicted": 3}},
+            {"kind": "computation", "ids": ["n27/ledger"], "control": {"predicted": {"another.log": "differs"}}},
+            {"kind": "computation", "ids": ["n27/ledger"], "control": {"value": 1}},
+            {"kind": "census", "ids": ["n27/ledger"]},
+            {"kind": "synthetic", "items": [{"sleep_seconds": 1}]},
+            {"kind": "synthetic", "items": [{"name": "a", "colour": "red"}]},
+            {"kind": "synthetic", "items": [{"name": "a"}, {"name": "a"}]},
         ):
             with self.subTest(table=table), self.assertRaises(ValueError):
                 expand_batch({"tasks": [table]})

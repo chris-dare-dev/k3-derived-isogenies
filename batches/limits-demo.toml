@@ -1,0 +1,28 @@
+# What a time limit and a memory limit look like in the records: the ledger next to two synthetic
+# tasks, one that sleeps past its time limit and one that allocates past its memory limit.  Both are
+# stopped and recorded (`timeout`, `memory`); the ledger is computed.  `run` ends with status 3.
+# The synthetic tasks compute nothing and belong to no claim.
+
+name = "limits-demo"
+
+[scheduler]
+workers = 3
+memory_budget_mb = 2400
+
+[limits]
+time_seconds = 120
+memory_mb = 300
+
+[[tasks]]
+kind = "computation"
+ids = ["n27/ledger"]
+limits = { memory_mb = 1000 }
+
+[[tasks]]
+kind = "synthetic"
+limits = { time_seconds = 3 }
+items = [{ name = "sleeps-past-its-time-limit", sleep_seconds = 300 }]
+
+[[tasks]]
+kind = "synthetic"
+items = [{ name = "allocates-past-its-memory-limit", allocate_mb = 1000, sleep_seconds = 300 }]

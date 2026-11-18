@@ -27,6 +27,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from .compare import IDENTICAL, compare, sha256
 from .registry import STDERR, STDOUT, Computation
@@ -161,8 +162,22 @@ def produced_path(execution: Execution, produced: str) -> Path:
     return execution.work_dir / produced
 
 
-def evaluate(computation: Computation, execution: Execution, places: Places) -> dict:
-    """The result line of the runner protocol, from what the command produced."""
+def shown(path: Path) -> str:
+    """A path as records and messages give it: relative to the repository when it is inside."""
+    try:
+        return str(path.relative_to(REPOSITORY))
+    except ValueError:
+        return str(path)
+
+
+def evaluate(
+    computation: Computation, execution: Execution, places: Places, control: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    """The result line of the runner protocol, from what the command produced.
+
+    `control` replaces parts of what is predicted, for a negative control: a task whose prediction is
+    wrong on purpose and which must therefore end as a mismatch.
+    """
     value: dict[str, object] = {}
     predicted: dict[str, object] = {}
     differences: dict[str, object] = {}
@@ -194,6 +209,8 @@ def evaluate(computation: Computation, execution: Execution, places: Places) -> 
         value[key] = sum(1 for line in lines if re.search(pattern, line))
         predicted[key] = count
     digests.setdefault("stdout", sha256(execution.stdout))
+    if control:
+        predicted |= control
 
     agrees = value == predicted if predicted else None
     if agrees is False:
@@ -220,13 +237,14 @@ def evaluate(computation: Computation, execution: Execution, places: Places) -> 
     }
 
 
-def finish(execution: Execution, result: dict, keep: bool) -> dict:
-    """Deletes the work directory of a reproduced computation; otherwise names it in the result."""
-    if keep or result["status"] != "ok":
-        try:
-            result["work_dir"] = str(execution.work_dir.relative_to(REPOSITORY))
-        except ValueError:
-            result["work_dir"] = str(execution.work_dir)
+def finish(execution: Execution, result: dict[str, Any], keep: bool, discard: bool = False) -> dict[str, Any]:
+    """Deletes the work directory of a reproduced computation; otherwise names it in the result.
+
+    With `discard` it is deleted whatever the result: a negative control differs on purpose, and there is
+    nothing in its work directory to inspect.
+    """
+    if keep or (result["status"] != "ok" and not discard):
+        result["work_dir"] = shown(execution.work_dir)
     else:
         shutil.rmtree(execution.work_dir, ignore_errors=True)
     return result
