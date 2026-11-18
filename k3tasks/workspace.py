@@ -175,6 +175,7 @@ def evaluate(computation: Computation, execution: Execution, places: Places) -> 
             check.mode,
             ignore_keys=check.ignore_keys,
             strip_prefixes=prefixes,
+            unstored_tail=check.unstored_tail,
         )
         value[check.label] = outcome.verdict
         predicted[check.label] = IDENTICAL

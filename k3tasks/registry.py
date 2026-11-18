@@ -20,7 +20,7 @@ import fnmatch
 from dataclasses import dataclass, field
 from typing import Any
 
-from .compare import MODES
+from .compare import IDENTICAL, MODES
 
 STDOUT = "@stdout"
 STDERR = "@stderr"
@@ -55,6 +55,8 @@ class Check:
     stored: str
     mode: str
     ignore_keys: tuple[str, ...] = DEFAULT_IGNORE
+    # last lines of the command's output that the stored log is known to lack (mode text-contained)
+    unstored_tail: int = 0
 
     @property
     def label(self) -> str:
@@ -107,6 +109,13 @@ class Computation:
     def command(self, procs: int | None = None) -> str:
         return " ".join(["python", "-I", self.script, *self.argv(procs or self.procs)])
 
+    def predicted(self) -> dict[str, Any]:
+        """What a rerun is expected to give: each stored file identical, each line of the output there."""
+        expected: dict[str, Any] = {check.label: IDENTICAL for check in self.checks}
+        expected |= {f"expect /{pattern}/": "found" for pattern in self.expect}
+        expected |= {f"lines /{pattern}/": count for pattern, count in self.counts}
+        return expected
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "note": self.note,
@@ -123,10 +132,10 @@ class Computation:
 _REGISTRY: dict[str, Computation] = {}
 
 
-def _check(produced: str, stored: str | tuple[str, str], default_mode: str) -> Check:
+def _check(produced: str, stored: str | tuple[str, str], default_mode: str, unstored_tail: int = 0) -> Check:
     if isinstance(stored, tuple):
-        return Check(produced, stored[0], stored[1])
-    return Check(produced, stored, default_mode)
+        return Check(produced, stored[0], stored[1], unstored_tail=unstored_tail)
+    return Check(produced, stored, default_mode, unstored_tail=unstored_tail)
 
 
 def C(  # noqa: N802 - reads as a table
@@ -139,8 +148,9 @@ def C(  # noqa: N802 - reads as a table
     memory_mb: int = 500,
     worker_mb: int = 300,
     stdout: str | tuple[str, str] | None = None,
+    stdout_unstored_tail: int = 0,
     stderr: str | tuple[str, str] | None = None,
-    outputs: dict[str, str | tuple[str, str]] | None = None,
+    outputs: dict[str, str | tuple[str, ...] | tuple[str, str, tuple[str, ...]]] | None = None,
     expect: tuple[str, ...] = (),
     counts: dict[str, int] | None = None,
     writes: tuple[str, ...] = (),
@@ -152,12 +162,12 @@ def C(  # noqa: N802 - reads as a table
     note = int(id.split("/")[0].lstrip("n"))
     checks = []
     if stdout is not None:
-        checks.append(_check(STDOUT, stdout, "text"))
+        checks.append(_check(STDOUT, stdout, "text", stdout_unstored_tail))
     if stderr is not None:
         checks.append(_check(STDERR, stderr, "text"))
     for produced, target in (outputs or {}).items():
         # a mode alone compares the file with the stored file of the same name
-        checks.append(Check(produced, produced, target) if isinstance(target, str) else Check(produced, *target))
+        checks.append(Check(produced, produced, target) if isinstance(target, str) else Check(produced, *target))  # type: ignore[arg-type]
     computation = Computation(
         id=id,
         note=note,
@@ -413,9 +423,10 @@ C("n26/cm-list-p41", "sixlines_cm.py", "--list --out sixlines_cm_p41.jsonl sixli
   stdout="sixlines_cm_p41.log", outputs={"sixlines_cm_p41.jsonl": "records"}, group=G)
 C("n26/dyadic", "sixlines_delta41.py", "dyadic", 1, caveat="no stored log", group=G)
 C("n26/selfcheck", "sixlines_delta41.py", "selfcheck --n 3 --workers {procs}", 120, procs=6, stdout=_D41_LOG, group=G)
-C("n26/list", "sixlines_delta41.py", "list", 1, stdout=_D41_LOG, group=G,
-  caveat="the stored log lists surfaces 0 to 10 of the e1 = 22 torsor and lacks the line of surface 11, "
-         "which `list` prints: this one differs until the log is completed")
+C("n26/list", "sixlines_delta41.py", "list", 1, stdout=_D41_LOG, stdout_unstored_tail=1, group=G,
+  caveat="the stored log has the first 31 of the 32 lines that `list` prints: it lists surfaces 0 to 10 of the "
+         "e1 = 22 torsor, which its own heading gives 12 surfaces, and lacks the line of surface 11.  The 31 "
+         "lines are compared; the last line of the rerun is not")
 C("n26/prym", "sixlines_delta41.py", "prym --pairs 0 --workers {procs}", 6 * 60, procs=14,
   outputs={"sixlines_prym_p41.jsonl": "records"}, group=G)
 C("n26/validate", "sixlines_delta41.py", "validate --n 2", 120, stdout=_D41_LOG, group=G)
@@ -462,7 +473,12 @@ C("n28/extra", "sixlines_leakage.py", "extra --workers {procs}", 12 * 60, procs=
 # Note 29: characters of order 3 ---------------------------------------------------------------------------
 
 G = "order-3"
+# The script writes the key identified_by in every record since the q = 43 reruns of section 7.4.  Of the
+# 18 stored records two have it: the run with --identify-by-coordinate and the 4,500-digit run with --mix.
+# For those two the key is compared; for every other run the stored record predates the key.
 _COSETS3 = {"sixlines_order3_cosets.jsonl": ("sixlines_order3_cosets.jsonl", "records-subset")}
+_NO_KEY = ("the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the "
+           "stored record of this run lacks, so that key is not compared")
 C("n29/enumerate-p43", "sixlines.py", "enumerate --p 43 --out sixlines_p43.jsonl --procs {procs}", 25 * 60, procs=14,
   worker_mb=200, outputs={"sixlines_p43.jsonl": "records"}, tags=HEAVY, group=G)
 C("n29/cm-list-p43", "sixlines_cm.py", "--list --out sixlines_cm_p43.jsonl sixlines_p43.jsonl", 15,
@@ -473,9 +489,7 @@ _EARLY_COSETS = {"sixlines_order3_cosets.jsonl": ("sixlines_order3_cosets.jsonl"
 for _args, _s in (("23 2 1 1 --digits 700", 60), ("29 6 1 1 --digits 700", 90), ("29 2 1 1 --digits 1200", 300)):
     _q, _e = _args.split()[:2]
     C(f"n29/cosets-{_q}-{_e}", "sixlines_order3.py", f"cosets {_args}", _s, memory_mb=1000, outputs=_EARLY_COSETS,
-      caveat="no log was kept of this run; the script now writes the key identified_by, added for the "
-      "q = 43 reruns of section 7.4, which the stored record of this early run lacks, so that key is not compared",
-      group=G)
+      caveat="no log was kept of this run; " + _NO_KEY, group=G)
 for _args, _log, _s, _procs in (
     ("37 2 1 1 --digits 1200 2000", "sixlines_order3_cosets_37.log", 600, 6),
     ("37 6 1 1 --digits 1200 2000", "sixlines_order3_cosets_37.log", 600, 6),
@@ -489,18 +503,18 @@ for _args, _log, _s, _procs in (
     _q, _e = _args.split()[:2]
     _digits = "-".join(_args.split("--digits ")[1].split())
     C(f"n29/cosets-{_q}-{_e}-{_digits}", "sixlines_order3.py", f"cosets {_args} --workers {{procs}}", _s,
-      procs=_procs, memory_mb=1500, worker_mb=1000, stdout=(_log, "text-contained"), outputs=_COSETS3,
-      tags=HEAVY, group=G)
+      procs=_procs, memory_mb=1500, worker_mb=1000, stdout=(_log, "text-contained"), outputs=_EARLY_COSETS,
+      caveat=_NO_KEY, tags=HEAVY, group=G)
 for _name, _extra, _log in (
     ("mix", "--digits 3000 --mix 0 2 -1 1 0", "sixlines_order3_cosets_43_2_mix.log"),
     ("coord", "--digits 3000 --mix 0 2 -1 1 0 --identify-by-coordinate", "sixlines_order3_cosets_43_2_coord.log"),
     ("mix4500", "--digits 4500 --mix 0 2 -1 1 0", "sixlines_order3_cosets_43_2_mix4500.log"),
 ):
     C(f"n29/cosets-43-2-{_name}", "sixlines_order3.py", f"cosets 43 2 1 1 {_extra} --workers {{procs}}", 1260, procs=4,
-      memory_mb=1500, worker_mb=1000, stdout=_log, outputs=_COSETS3,
+      memory_mb=1500, worker_mb=1000, stdout=_log, outputs=_EARLY_COSETS if _name == "mix" else _COSETS3,
       caveat="the stored run read the period points of the 3000/4500-digit run from sixlines_order3_points/, "
       "which is not in the archive; the rerun computes them again, so it takes longer and its log may differ "
-      "in the lines about the cache", tags=HEAVY, group=G)
+      "in the lines about the cache" + ("; " + _NO_KEY if _name == "mix" else ""), tags=HEAVY, group=G)
 C("n29/labelcheck", "sixlines_order3.py", "labelcheck", 1, stdout="sixlines_order3_labelcheck.log", group=G)
 C("n29/features", "sixlines_order3.py", "features", 12, memory_mb=800, stdout="sixlines_order3_features.log",
   outputs={"sixlines_order3_features.json": ("sixlines_order3_features.json", "json")}, group=G)
@@ -599,6 +613,8 @@ def validate() -> list[str]:
                 problems.append(f"{c.id}: unknown mode {check.mode}")
             if check.produced == STDERR and c.merge_stderr:
                 problems.append(f"{c.id}: compares the standard error, but it is merged into the output")
+            if check.unstored_tail and (check.mode != "text-contained" or not c.caveat):
+                problems.append(f"{c.id}: lines are left out of a comparison without the mode or the caveat for it")
         if c.parallel and c.procs < 2:
             problems.append(f"{c.id}: takes {{procs}} but records one process")
         if not c.parallel and c.procs != 1:

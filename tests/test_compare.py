@@ -85,6 +85,19 @@ class Modes(unittest.TestCase):
         self.assertEqual(outcome.note["line"], 2)
         self.assertEqual(outcome.note["stored"], "B 1 (#s)")
 
+    def test_text_contained_without_lines_the_stored_log_lacks(self) -> None:
+        stored = "first command\nsurface 0\nsurface 1\nsecond command\n"
+        produced, kept = self.files("surface 0\nsurface 1\nsurface 2\n", stored)
+        self.assertEqual(compare(produced, kept, "text-contained").verdict, DIFFERS)
+        outcome = compare(produced, kept, "text-contained", unstored_tail=1)
+        self.assertEqual(outcome.verdict, IDENTICAL)
+        self.assertEqual(outcome.note, {"at_line": 2, "last_lines_not_compared": 1})
+        # the lines that are compared must still be there
+        produced, kept = self.files("surface 0\nsurface 9\nsurface 2\n", stored)
+        outcome = compare(produced, kept, "text-contained", unstored_tail=1)
+        self.assertEqual(outcome.verdict, DIFFERS)
+        self.assertEqual(outcome.note["last_lines_not_compared"], 1)
+
     def test_records_in_any_order_without_times(self) -> None:
         produced = json.dumps({"a": 1, "seconds": 3}) + "\n" + json.dumps({"a": 2, "seconds": 1}) + "\n"
         stored = json.dumps({"a": 2, "seconds": 9}) + "\n" + json.dumps({"seconds": 8, "a": 1}) + "\n"

@@ -5,7 +5,9 @@ A comparison has a mode, chosen per stored file in the registry:
     exact            the bytes are the same
     text             the same text once run times are blanked out (see `normalise_text`)
     text-contained   the normalised text of the rerun is a contiguous part of the stored text: the stored
-                     log holds the output of several commands, and the rerun is one of them
+                     log holds the output of several commands, and the rerun is one of them.  Where a
+                     stored log is known to lack the last lines of the command's output, the registry
+                     says how many (`unstored_tail`), and those lines of the rerun are not compared
     records          a file of JSON lines with the same records, in any order, once the keys that hold
                      run times are dropped
     records-subset   every record of the rerun is in the stored file (which holds more: several runs
@@ -123,8 +125,13 @@ def compare(
     *,
     ignore_keys: tuple[str, ...] = (),
     strip_prefixes: tuple[str, ...] = (),
+    unstored_tail: int = 0,
 ) -> Comparison:
-    """Compares a produced file with a stored one in the given mode."""
+    """Compares a produced file with a stored one in the given mode.
+
+    `unstored_tail` (mode text-contained only) is the number of last lines of the rerun that the stored
+    log is known to lack; they are left out of the comparison, and the note of the result says so.
+    """
     if mode not in MODES:
         raise ValueError(f"unknown comparison mode {mode!r}")
     if not produced.exists():
@@ -147,10 +154,13 @@ def compare(
         if mode == "text":
             same = mine == theirs
             return Comparison(IDENTICAL if same else DIFFERS, digest, {} if same else _first_difference(mine, theirs))
+        left_out = {"last_lines_not_compared": unstored_tail} if unstored_tail else {}
+        if unstored_tail:
+            mine = mine[: max(len(mine) - unstored_tail, 0)]
         start = _find_block(mine, theirs)
         if start is not None:
-            return Comparison(IDENTICAL, digest, {"at_line": start + 1})
-        return Comparison(DIFFERS, digest, _best_block_difference(mine, theirs))
+            return Comparison(IDENTICAL, digest, {"at_line": start + 1} | left_out)
+        return Comparison(DIFFERS, digest, _best_block_difference(mine, theirs) | left_out)
 
     if mode == "json":
         mine_doc = _drop_keys(json.loads(produced.read_text(encoding="utf-8")), keys)

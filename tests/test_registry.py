@@ -47,6 +47,30 @@ class Registry(unittest.TestCase):
         logs = {name for name in archive_manifest() if name.endswith(".log")}
         self.assertEqual(sorted(logs - compared - not_outputs), [])
 
+    def test_lines_left_out_of_a_comparison_are_stated(self) -> None:
+        left_out = [(c.id, check.unstored_tail) for c in registry.all_computations() for check in c.checks
+                    if check.unstored_tail]  # fmt: skip
+        self.assertEqual(left_out, [("n26/list", 1)])
+        self.assertIn("the last line of the rerun is not", registry.get("n26/list").caveat)
+
+    def test_the_key_added_after_the_early_coset_runs_is_compared_where_it_is_stored(self) -> None:
+        # of the stored records of note 29's coset runs, only two have the key identified_by
+        compared = {
+            c.id for c in registry.select(ids=["n29/cosets-*"])
+            if any("identified_by" not in check.ignore_keys for check in c.checks if check.mode == "records-subset")
+        }  # fmt: skip
+        self.assertEqual(compared, {"n29/cosets-43-2-coord", "n29/cosets-43-2-mix4500"})
+        for c in registry.select(ids=["n29/cosets-*"]):
+            if c.id not in compared:
+                self.assertIn("identified_by", c.caveat, c.id)
+
+    def test_predicted_names_every_comparison(self) -> None:
+        self.assertEqual(registry.get("n27/ledger").predicted(), {"sixlines_ledger.log": "identical"})
+        check = registry.get("n14/prym-check-17").predicted()
+        self.assertEqual(check[r"lines /^\s*pair .*\bequal$/"], 18)
+        self.assertEqual(registry.get("n02/selftest").predicted(), {"expect /selftest passed/": "found"})
+        self.assertEqual(registry.get("n13/groupsize-41").predicted(), {})
+
     def test_note_matches_id(self) -> None:
         for c in registry.all_computations():
             self.assertTrue(c.id.startswith(f"n{c.note:02d}/"), c.id)
