@@ -1,0 +1,430 @@
+{
+ "batch": "audits",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines_leakage.py audit --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_leakage.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_leakage.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 193.5,
+   "expected_memory_mb": 4200,
+   "group": "leakage",
+   "id": "n28/audit",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 28,
+   "predicted": {
+    "sixlines_leakage.jsonl": "identical",
+    "sixlines_leakage.log": "identical"
+   },
+   "procs": 8,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py audit --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_order3_audit.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 70.0,
+   "expected_memory_mb": 4200,
+   "group": "order-3",
+   "id": "n29/audit",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3.jsonl": "identical",
+    "sixlines_order3_audit.log": "identical"
+   },
+   "procs": 8,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py audit --workers 7 --features sixlines_order3_features_q43.json --out sixlines_order3_q43.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_order3_q43.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_q43.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 70,
+   "expected_memory_mb": 5800,
+   "group": "order-3",
+   "id": "n29/audit-q43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_q43.jsonl": "identical",
+    "sixlines_order3_q43.log": "identical"
+   },
+   "procs": 7,
+   "set": 0
+  },
+  {
+   "caveat": "no log was kept of this run; the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 23 2 1 1 --digits 700",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 1000,
+   "group": "order-3",
+   "id": "n29/cosets-23-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 3000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": "no log was kept of this run; the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 29 6 1 1 --digits 700",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 90,
+   "expected_memory_mb": 1000,
+   "group": "order-3",
+   "id": "n29/cosets-29-6",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 3000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": "no log was kept of this run; the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 29 2 1 1 --digits 1200",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 300,
+   "expected_memory_mb": 1000,
+   "group": "order-3",
+   "id": "n29/cosets-29-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 3000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical"
+   },
+   "procs": 1,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_leakage.py features",
+   "compared": [
+    {
+     "file": "sixlines_leakage_features.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_leakage_features.json",
+     "mode": "json"
+    }
+   ],
+   "cost": 4,
+   "expected_memory_mb": 800,
+   "group": "leakage",
+   "id": "n28/features",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 28,
+   "predicted": {
+    "sixlines_leakage_features.json": "identical",
+    "sixlines_leakage_features.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cm.py --list --out sixlines_cm_p43.jsonl sixlines_p43.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_cm_p43.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_cm_p43.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 15,
+   "expected_memory_mb": 500,
+   "group": "order-3",
+   "id": "n29/cm-list-p43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_cm_p43.jsonl": "identical",
+    "sixlines_cm_p43.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py fields",
+   "compared": [
+    {
+     "file": "sixlines_order3_fields.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 10,
+   "expected_memory_mb": 500,
+   "group": "order-3",
+   "id": "n29/fields",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_fields.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py labelcheck",
+   "compared": [
+    {
+     "file": "sixlines_order3_labelcheck.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "order-3",
+   "id": "n29/labelcheck",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_labelcheck.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py features",
+   "compared": [
+    {
+     "file": "sixlines_order3_features.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_features.json",
+     "mode": "json"
+    }
+   ],
+   "cost": 12,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/features",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_features.json": "identical",
+    "sixlines_order3_features.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py selfcheck",
+   "compared": [
+    {
+     "file": "sixlines_order3_selfcheck.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 3,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/selfcheck",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_selfcheck.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py features --with-43 --out sixlines_order3_features_q43.json",
+   "compared": [
+    {
+     "file": "sixlines_order3_features_q43.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_features_q43.json",
+     "mode": "json"
+    }
+   ],
+   "cost": 12,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/features-q43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_features_q43.json": "identical",
+    "sixlines_order3_features_q43.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py selfcheck --features sixlines_order3_features_q43.json",
+   "compared": [
+    {
+     "file": "sixlines_order3_selfcheck_q43.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 3,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/selfcheck-q43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_selfcheck_q43.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3_holdout43.py",
+   "compared": [
+    {
+     "file": "sixlines_order3_holdout43.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 5,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/holdout43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_holdout43.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  }
+ ]
+}

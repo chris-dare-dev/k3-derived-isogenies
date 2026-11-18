@@ -1,0 +1,933 @@
+{
+ "batch": "lattices",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py selftest",
+   "compared": [],
+   "cost": 4,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n02/selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cm.py --list --out sixlines_cm.jsonl sixlines_p7.jsonl sixlines_p11.jsonl sixlines_p13.jsonl sixlines_p17.jsonl sixlines_p19.jsonl sixlines_p23.jsonl sixlines_p29.jsonl sixlines_p31.jsonl sixlines_p37.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_cm.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_cm.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n02/cm-list",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_cm.jsonl": "identical",
+    "sixlines_cm.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_fq.py selftest",
+   "compared": [],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n03/fq-selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 3,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cm.py --list --neighbours --out sixlines_neighbours.jsonl sixlines_p13.jsonl sixlines_p17.jsonl sixlines_p19.jsonl sixlines_p23.jsonl sixlines_p29.jsonl sixlines_p31.jsonl sixlines_p37.jsonl sixlines_q25.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_neighbours.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_neighbours.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 180,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n03/neighbours",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 1800
+   },
+   "note": 3,
+   "predicted": {
+    "sixlines_neighbours.jsonl": "identical",
+    "sixlines_neighbours.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cm.py --list --neighbours --out sixlines_q49_cm.jsonl sixlines_q49.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_q49_cm.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_q49_cm.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 300,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n03/q49-cm",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 1800
+   },
+   "note": 3,
+   "predicted": {
+    "sixlines_q49_cm.jsonl": "identical",
+    "sixlines_q49_cm.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms.py selftest",
+   "compared": [],
+   "cost": 3,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/forms-selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 5 --out sixlines_p5.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_p5.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 2,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/enumerate-p5",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "sixlines_p5.jsonl": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms.py enumerate --p 5 --out sixlines_forms_p5.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_forms_p5.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_forms_p5.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 20,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/forms-enumerate-p5",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "sixlines_forms_p5.jsonl": "identical",
+    "sixlines_forms_p5.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms.py compare sixlines_forms_p5.jsonl sixlines_q25.jsonl --split sixlines_p5.jsonl --out sixlines_forms_p5_compare.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_forms_p5_compare.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_forms_p5_compare.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/forms-compare-p5",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "sixlines_forms_p5_compare.jsonl": "identical",
+    "sixlines_forms_p5_compare.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_types.py sixlines_neighbours.jsonl sixlines_q25.jsonl --out sixlines_types_q25.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_types_q25.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_types_q25.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/types-q25",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "sixlines_types_q25.jsonl": "identical",
+    "sixlines_types_q25.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms.py enumerate --p 7 --out sixlines_forms_p7.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_forms_p7.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_forms_p7.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/forms-enumerate-p7",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "sixlines_forms_p7.jsonl": "identical",
+    "sixlines_forms_p7.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms.py compare sixlines_forms_p7.jsonl sixlines_q49.jsonl --split sixlines_p7.jsonl --out sixlines_forms_p7_compare.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_forms_p7_compare.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_forms_p7_compare.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/forms-compare-p7",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "sixlines_forms_p7_compare.jsonl": "identical",
+    "sixlines_forms_p7_compare.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_types.py sixlines_q49_cm.jsonl sixlines_q49.jsonl --out sixlines_types_q49.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_types_q49.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_types_q49.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n04/types-q49",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 4,
+   "predicted": {
+    "sixlines_types_q49.jsonl": "identical",
+    "sixlines_types_q49.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py selftest",
+   "compared": [],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n05/nonsplit-selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 5,
+   "predicted": {
+    "expect /selftest passed/": "found"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py lattices --list --out sixlines_nonsplit_lat_small.jsonl sixlines_forms_p5.jsonl sixlines_forms_p7.jsonl sixlines_nonsplit_p11.jsonl sixlines_nonsplit_p13.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_lat_small.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_lat_small.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 30,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n05/nonsplit-lattices-small",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_lat_small.jsonl": "identical",
+    "sixlines_nonsplit_lat_small.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py lattices --list --out sixlines_nonsplit_lat_p17.jsonl sixlines_nonsplit_p17.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_lat_p17.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_lat_p17.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n05/nonsplit-lattices-p17",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 600
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_lat_p17.jsonl": "identical",
+    "sixlines_nonsplit_lat_p17.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py lattices --list --out sixlines_nonsplit_lat_p19.jsonl sixlines_nonsplit_p19.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_lat_p19.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_lat_p19.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 120,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n05/nonsplit-lattices-p19",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 1800
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_lat_p19.jsonl": "identical",
+    "sixlines_nonsplit_lat_p19.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py lattices --list --out sixlines_nonsplit_lat_p23.jsonl sixlines_nonsplit_p23.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_lat_p23.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_lat_p23.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 480,
+   "expected_memory_mb": 500,
+   "group": "lattices",
+   "id": "n05/nonsplit-lattices-p23",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1500,
+    "time_seconds": 3600
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_lat_p23.jsonl": "identical",
+    "sixlines_nonsplit_lat_p23.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 7 --out sixlines_p7.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p7.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 2.7,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p7",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p7.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 11 --out sixlines_p11.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p11.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 4.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p11",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p11.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 13 --out sixlines_p13.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p13.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 6.7,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p13",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p13.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 17 --out sixlines_p17.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p17.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 13.3,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p17",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p17.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 19 --out sixlines_p19.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p19.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 20.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p19",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p19.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 23 --out sixlines_p23.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p23.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 40.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p23",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p23.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 29 --out sixlines_p29.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p29.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 120.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p29",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 1800
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p29.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 31 --out sixlines_p31.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p31.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 173.3,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p31",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 1800
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p31.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 37 --out sixlines_p37.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_p37.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 560.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n02/enumerate-p37",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 3600
+   },
+   "note": 2,
+   "predicted": {
+    "sixlines_p37.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_fq.py enumerate --p 5 --out sixlines_q25.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_q25.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 80.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n03/enumerate-q25",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 3,
+   "predicted": {
+    "sixlines_q25.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py enumerate --p 11 --out sixlines_nonsplit_p11.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_p11.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_p11.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 10.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n05/nonsplit-enumerate-p11",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_p11.jsonl": "identical",
+    "sixlines_nonsplit_p11.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py enumerate --p 13 --out sixlines_nonsplit_p13.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_p13.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_p13.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 20.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n05/nonsplit-enumerate-p13",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_p13.jsonl": "identical",
+    "sixlines_nonsplit_p13.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py enumerate --p 17 --out sixlines_nonsplit_p17.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_p17.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_p17.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 120.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n05/nonsplit-enumerate-p17",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 1800
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_p17.jsonl": "identical",
+    "sixlines_nonsplit_p17.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py enumerate --p 19 --out sixlines_nonsplit_p19.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_p19.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_p19.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 240.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n05/nonsplit-enumerate-p19",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 1800
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_p19.jsonl": "identical",
+    "sixlines_nonsplit_p19.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_nonsplit.py enumerate --p 23 --out sixlines_nonsplit_p23.jsonl --procs 6",
+   "compared": [
+    {
+     "file": "sixlines_nonsplit_p23.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_nonsplit_p23.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 1320.0,
+   "expected_memory_mb": 1700,
+   "group": "lattices",
+   "id": "n05/nonsplit-enumerate-p23",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 3600
+   },
+   "note": 5,
+   "predicted": {
+    "sixlines_nonsplit_p23.jsonl": "identical",
+    "sixlines_nonsplit_p23.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  }
+ ]
+}

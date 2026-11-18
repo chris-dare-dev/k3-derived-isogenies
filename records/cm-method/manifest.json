@@ -1,0 +1,350 @@
+{
+ "batch": "cm-method",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cmmethod.py selftest --digits 60",
+   "compared": [
+    {
+     "file": "sixlines_cmmethod_selftest.log",
+     "mode": "exact"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "cm-method",
+   "id": "n20/selftest",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 900
+   },
+   "note": 20,
+   "predicted": {
+    "sixlines_cmmethod_selftest.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cmmethod.py sweep 29 --select 29,10 --digits-list 1200 --primes 6 --all-subsets --workers 1 --out sixlines_cmmethod.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_cmmethod_rerun2.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_cmmethod.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 720,
+   "expected_memory_mb": 1500,
+   "group": "cm-method",
+   "id": "n20/sweep-rerun2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 3600
+   },
+   "note": 20,
+   "predicted": {
+    "sixlines_cmmethod.jsonl": "identical",
+    "sixlines_cmmethod_rerun2.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": "its output was not kept",
+   "command": "python -I sixlines_cmmethod.py points 17 2 1 1 --digits 30 --maximal",
+   "compared": [],
+   "cost": 120,
+   "expected_memory_mb": 500,
+   "group": "cm-method",
+   "id": "n20/points-maximal",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 900
+   },
+   "note": 20,
+   "predicted": null,
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": "its output was not kept",
+   "command": "python -I sixlines_cmmethod.py points 17 2 1 1 --digits 30 --nolevel",
+   "compared": [],
+   "cost": 120,
+   "expected_memory_mb": 500,
+   "group": "cm-method",
+   "id": "n20/points-nolevel",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 900
+   },
+   "note": 20,
+   "predicted": null,
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": "its output was not kept",
+   "command": "python -I sixlines_cmmethod.py action 23 2 1 1 --digits 700 --primes 3 --all-subsets",
+   "compared": [],
+   "cost": 300,
+   "expected_memory_mb": 1500,
+   "group": "cm-method",
+   "id": "n20/action-23",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 20,
+   "predicted": null,
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": "a rerun quoted in note 25 section 2; its output was not kept",
+   "command": "python -I sixlines_cmmethod.py sweep 17 23 --select 17,2 23,10 --digits-list 300 700 --primes 3 --all-subsets --maxn 8 --workers 2 --out sixlines_cmmethod_17_23.jsonl",
+   "compared": [],
+   "cost": 300,
+   "expected_memory_mb": 2500,
+   "group": "cm-method",
+   "id": "n25/rerun-sweep-17-23",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 25,
+   "predicted": null,
+   "procs": 2,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta_labels.py run 37 18 1 1 --digits 1200 --primes 8 --workers 6 --out sixlines_delta_labels.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_delta_labels.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_delta_labels.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 193.7,
+   "expected_memory_mb": 3500,
+   "group": "cm-method",
+   "id": "n24/delta-labels-37-18",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 900
+   },
+   "note": 24,
+   "predicted": {
+    "sixlines_delta_labels.jsonl": "identical",
+    "sixlines_delta_labels.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta_labels.py run 29 2 1 1 --digits 1200 --primes 8 --workers 6 --out sixlines_delta_labels.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_delta_labels.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_delta_labels.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 254.3,
+   "expected_memory_mb": 3500,
+   "group": "cm-method",
+   "id": "n24/delta-labels-29-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 24,
+   "predicted": {
+    "sixlines_delta_labels.jsonl": "identical",
+    "sixlines_delta_labels.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta_labels.py run 37 2 1 1 --digits 2000 --primes 8 --workers 6 --out sixlines_delta_labels.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_delta_labels.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_delta_labels.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 921.7,
+   "expected_memory_mb": 3500,
+   "group": "cm-method",
+   "id": "n24/delta-labels-37-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 3600
+   },
+   "note": 24,
+   "predicted": {
+    "sixlines_delta_labels.jsonl": "identical",
+    "sixlines_delta_labels.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py theta",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 15,
+   "expected_memory_mb": 500,
+   "group": "cm-method",
+   "id": "n25/review2-theta",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 900
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py galois 37 18 1 1 --digits 1200 --workers 6 --out sixlines_review2.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_review2.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 80.0,
+   "expected_memory_mb": 3500,
+   "group": "cm-method",
+   "id": "n25/review2-galois-37-18",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 900
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.jsonl": "identical",
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py galois 29 2 1 1 --digits 1200 --workers 6 --out sixlines_review2.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_review2.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 120.0,
+   "expected_memory_mb": 3500,
+   "group": "cm-method",
+   "id": "n25/review2-galois-29-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 900
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.jsonl": "identical",
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py galois 37 2 1 1 --digits 2000 --workers 6 --out sixlines_review2.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_review2.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 480.0,
+   "expected_memory_mb": 3500,
+   "group": "cm-method",
+   "id": "n25/review2-galois-37-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.jsonl": "identical",
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  }
+ ]
+}

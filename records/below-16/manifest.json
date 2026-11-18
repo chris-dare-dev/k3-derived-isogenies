@@ -1,0 +1,119 @@
+{
+ "batch": "below-16",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family e8a2 --p 5 --count 1500 --control --workers 6 --out ellk3_e8a2_p5_control.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_e8a2_p5_control.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_e8a2_p5_control.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60.0,
+   "expected_memory_mb": 2900,
+   "group": "below-16",
+   "id": "n22/e8a2-p5-control",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 1800
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_e8a2_p5_control.jsonl": "identical",
+    "ellk3_e8a2_p5_control.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family e8 --p 5 --count 600 --control --workers 6 --out ellk3_e8_p5_control.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_e8_p5_control.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_e8_p5_control.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 30.0,
+   "expected_memory_mb": 2900,
+   "group": "below-16",
+   "id": "n22/e8-p5-control",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 1800
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_e8_p5_control.jsonl": "identical",
+    "ellk3_e8_p5_control.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --graph ellk3_e8a2_p5.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_e8a2_graph.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 10,
+   "expected_memory_mb": 500,
+   "group": "below-16",
+   "id": "n22/graph-e8a2-p5",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_e8a2_graph.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --graph ellk3_e8a2_p7.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_e8a2_graph.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 10,
+   "expected_memory_mb": 500,
+   "group": "below-16",
+   "id": "n22/graph-e8a2-p7",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 4000,
+    "time_seconds": 600
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_e8a2_graph.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  }
+ ]
+}

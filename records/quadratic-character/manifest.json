@@ -1,0 +1,613 @@
+{
+ "batch": "quadratic-character",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines_characters.py surfaces --out sixlines_characters.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_characters.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_characters.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 20,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n19/characters-surfaces",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 19,
+   "predicted": {
+    "sixlines_characters.jsonl": "identical",
+    "sixlines_characters.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_characters.py genus --workers 6 --max-q 10007 --out sixlines_characters_genus.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_characters_genus.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_characters_genus.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 53.3,
+   "expected_memory_mb": 2300,
+   "group": "quadratic-character",
+   "id": "n19/characters-genus",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 19,
+   "predicted": {
+    "sixlines_characters_genus.jsonl": "identical",
+    "sixlines_characters_genus.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_characters.py dyadic sixlines_characters_genus.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_characters_dyadic.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 5,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n19/characters-dyadic",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 19,
+   "predicted": {
+    "sixlines_characters_dyadic.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py stored",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n25/review2-stored",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py levels",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n25/review2-levels",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py pairing 29 2 3 12 27 1 3 --seed 3",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 10,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n25/review2-pairing",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_review2.py delta --tw 3 --seed 2026 --workers 6 --out sixlines_review2.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_review2.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_review2.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 80.0,
+   "expected_memory_mb": 2300,
+   "group": "quadratic-character",
+   "id": "n25/review2-delta",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 25,
+   "predicted": {
+    "sixlines_review2.jsonl": "identical",
+    "sixlines_review2.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": "the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not",
+   "command": "python -I sixlines_jacobian.py --validate-set --workers 4 --out sixlines_jacobian_validate.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_jacobian_validate.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_jacobian_validate.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 300,
+   "expected_memory_mb": 2900,
+   "group": "quadratic-character",
+   "id": "n23/jacobian-validate",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 23,
+   "predicted": {
+    "sixlines_jacobian_validate.jsonl": "identical",
+    "sixlines_jacobian_validate.log": "identical"
+   },
+   "procs": 4,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_jacobian.py --lattice",
+   "compared": [
+    {
+     "file": "sixlines_jacobian_lattice.log",
+     "mode": "text"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n23/jacobian-lattice",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 23,
+   "predicted": {
+    "sixlines_jacobian_lattice.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": "the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not",
+   "command": "python -I sixlines_jacobian.py --levels --workers 4 --out sixlines_jacobian_levels.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_jacobian_levels.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_jacobian_levels.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 420,
+   "expected_memory_mb": 2900,
+   "group": "quadratic-character",
+   "id": "n23/jacobian-levels",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 23,
+   "predicted": {
+    "sixlines_jacobian_levels.jsonl": "identical",
+    "sixlines_jacobian_levels.log": "identical"
+   },
+   "procs": 4,
+   "set": 0
+  },
+  {
+   "caveat": "a rerun quoted in note 25 section 2; its output was not kept",
+   "command": "python -I sixlines_jacobian.py --one 29 2 3 5 20 1 2",
+   "compared": [],
+   "cost": 30,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n23/jacobian-one-29",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 23,
+   "predicted": null,
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cm.py --list --out sixlines_cm_p41.jsonl sixlines_p41.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_cm_p41.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_cm_p41.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 11,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n26/cm-list-p41",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_cm_p41.jsonl": "identical",
+    "sixlines_cm_p41.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": "no stored log",
+   "command": "python -I sixlines_delta41.py dyadic",
+   "compared": [],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n26/dyadic",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 26,
+   "predicted": null,
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py selfcheck --n 3 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_delta41.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 120,
+   "expected_memory_mb": 2300,
+   "group": "quadratic-character",
+   "id": "n26/selfcheck",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": "the stored log has the first 31 of the 32 lines that `list` prints: it lists surfaces 0 to 10 of the e1 = 22 torsor, which its own heading gives 12 surfaces, and lacks the line of surface 11.  The 31 lines are compared; the last line of the rerun is not",
+   "command": "python -I sixlines_delta41.py list",
+   "compared": [
+    {
+     "file": "sixlines_delta41.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n26/list",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py prym --pairs 0 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_prym_p41.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 840.0,
+   "expected_memory_mb": 2300,
+   "group": "quadratic-character",
+   "id": "n26/prym",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 3600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_prym_p41.jsonl": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py validate --n 2",
+   "compared": [
+    {
+     "file": "sixlines_delta41.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 120,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n26/validate",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py compare",
+   "compared": [
+    {
+     "file": "sixlines_delta41_compare.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_delta41_compare.json",
+     "mode": "json"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n26/compare",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41_compare.json": "identical",
+    "sixlines_delta41_compare.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py cosets 37 18 1 1 --digits 1200 --primes 3 --frob-primes 2 --workers 6 --out sixlines_delta41_signs.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_delta41_signs.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_delta41_signs.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 420.0,
+   "expected_memory_mb": 3500,
+   "group": "quadratic-character",
+   "id": "n26/signs-cosets-37-18",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41_signs.jsonl": "identical",
+    "sixlines_delta41_signs.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py cosets 29 2 1 1 --digits 1200 --primes 3 --frob-primes 2 --workers 6 --out sixlines_delta41_signs.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_delta41_signs.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_delta41_signs.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 420.0,
+   "expected_memory_mb": 3500,
+   "group": "quadratic-character",
+   "id": "n26/signs-cosets-29-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41_signs.jsonl": "identical",
+    "sixlines_delta41_signs.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py cosets 37 2 1 1 --digits 2000 --primes 3 --frob-primes 2 --workers 6 --out sixlines_delta41_signs.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_delta41_signs.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_delta41_signs.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 420.0,
+   "expected_memory_mb": 3500,
+   "group": "quadratic-character",
+   "id": "n26/signs-cosets-37-2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 2400
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41_signs.jsonl": "identical",
+    "sixlines_delta41_signs.log": "identical"
+   },
+   "procs": 6,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py signs",
+   "compared": [
+    {
+     "file": "sixlines_delta41_compare.log",
+     "mode": "text-contained"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "quadratic-character",
+   "id": "n26/signs",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 5000,
+    "time_seconds": 600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41_compare.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  }
+ ]
+}

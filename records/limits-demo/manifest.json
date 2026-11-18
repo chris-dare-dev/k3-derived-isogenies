@@ -1,0 +1,63 @@
+{
+ "batch": "limits-demo",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines_ledger.py",
+   "compared": [
+    {
+     "file": "sixlines_ledger.log",
+     "mode": "exact"
+    }
+   ],
+   "cost": 1,
+   "expected_memory_mb": 500,
+   "group": "ledger",
+   "id": "n27/ledger",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 1000,
+    "time_seconds": 120
+   },
+   "note": 27,
+   "predicted": {
+    "sixlines_ledger.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "allocate_mb": 0,
+   "cost": 0,
+   "expected_memory_mb": 0,
+   "fail": false,
+   "group": "synthetic",
+   "id": "synthetic/sleeps-past-its-time-limit",
+   "kind": "synthetic",
+   "limits": {
+    "memory_mb": 300,
+    "time_seconds": 3
+   },
+   "procs": 1,
+   "set": 1,
+   "sleep_seconds": 300
+  },
+  {
+   "allocate_mb": 1000,
+   "cost": 0,
+   "expected_memory_mb": 1000,
+   "fail": false,
+   "group": "synthetic",
+   "id": "synthetic/allocates-past-its-memory-limit",
+   "kind": "synthetic",
+   "limits": {
+    "memory_mb": 300,
+    "time_seconds": 120
+   },
+   "procs": 1,
+   "set": 2,
+   "sleep_seconds": 300
+  }
+ ]
+}

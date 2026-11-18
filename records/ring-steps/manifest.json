@@ -1,0 +1,253 @@
+{
+ "batch": "ring-steps",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines_rational.py --out sixlines_rational.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_rational.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_rational.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 180,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n06/rational",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 900
+   },
+   "note": 6,
+   "predicted": {
+    "sixlines_rational.jsonl": "identical",
+    "sixlines_rational.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_vertical.py --out sixlines_vertical.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_vertical.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_vertical.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 180,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n07/vertical",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 900
+   },
+   "note": 7,
+   "predicted": {
+    "sixlines_vertical.jsonl": "identical",
+    "sixlines_vertical.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_levels.py --out sixlines_levels.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_levels.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_levels.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 5,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n08/levels",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 900
+   },
+   "note": 8,
+   "predicted": {
+    "sixlines_levels.jsonl": "identical",
+    "sixlines_levels.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_ramified.py --out sixlines_ramified.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_ramified.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_ramified.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 120,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n09/ramified",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 900
+   },
+   "note": 9,
+   "predicted": {
+    "sixlines_ramified.jsonl": "identical",
+    "sixlines_ramified.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_deep.py --out sixlines_deep.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_deep.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_deep.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 780,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n10/deep",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 3600
+   },
+   "note": 10,
+   "predicted": {
+    "sixlines_deep.jsonl": "identical",
+    "sixlines_deep.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_rank6.py --out sixlines_rank6.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_rank6.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_rank6.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 240,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n11/rank6",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 900
+   },
+   "note": 11,
+   "predicted": {
+    "sixlines_rank6.jsonl": "identical",
+    "sixlines_rank6.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_hermitian.py --out sixlines_hermitian.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_hermitian.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_hermitian.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 60,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n12/hermitian",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 900
+   },
+   "note": 12,
+   "predicted": {
+    "sixlines_hermitian.jsonl": "identical",
+    "sixlines_hermitian.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_hermitian.py --search 7,3 --out sixlines_hermitian_q7.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_hermitian_q7.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_hermitian_q7.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 420,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n12/hermitian-q7",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 2000,
+    "time_seconds": 3600
+   },
+   "note": 12,
+   "predicted": {
+    "sixlines_hermitian_q7.jsonl": "identical",
+    "sixlines_hermitian_q7.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  }
+ ]
+}
