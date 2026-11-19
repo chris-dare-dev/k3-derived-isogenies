@@ -24,7 +24,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from k3tasks import __version__
-from k3tasks.registry import validate
 from k3tasks.tasks import expand_batch, run_task
 from k3tasks.workspace import DATA_MARKER, Places, WorkspaceError
 
@@ -84,9 +83,6 @@ def main(arguments: list[str]) -> int:
                 result["scope_peak_mb"] = peak
             emit("@result", result)
         else:
-            problems = validate()
-            if problems:
-                raise ValueError("the registry is inconsistent: " + "; ".join(problems))
             tasks = expand_batch(request)
             for task in tasks:
                 emit("@task", task)

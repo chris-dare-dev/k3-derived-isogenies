@@ -11,29 +11,16 @@ from typing import Any
 from taskbatch.report import render
 from taskbatch.store import ResultStore
 
+from . import helpers
+
 
 def task(name: str, group: str = "pairs d2", **more: Any) -> dict[str, Any]:
     return {"id": name, "kind": "ext_pair", "group": group, "cost": 3} | more
 
 
 def record(name: str, status: str, **more: Any) -> dict[str, Any]:
-    base = {
-        "task_id": name,
-        "task": task(name),
-        "status": status,
-        "value": None,
-        "predicted": {"chi": 2},
-        "agrees": None,
-        "detail": {},
-        "error": None,
-        "wall_seconds": 1.5,
-        "peak_rss_mb": 120.0,
-        "limits": {"time_seconds": 60, "memory_mb": 500},
-        "log": None,
-        "runner": {"m2_version": "1.25.11"},
-        "code": {"commit": "abc123", "dirty": False},
-    }
-    return base | more
+    fields = {"predicted": {"chi": 2}, "runner": {"version": "1.0"}} | more
+    return dict(helpers.record(fields.pop("task", task(name)), status, **fields))
 
 
 class Report(unittest.TestCase):
@@ -58,13 +45,13 @@ class Report(unittest.TestCase):
                     "ok",
                     value={"dims": [1, 0, 1], "chi": 2},
                     agrees=True,
-                    detail={"method": "Hom sheaf"},
+                    detail={"method": "direct"},
                 ),
                 record("bad", "mismatch", value={"dims": [1, 0, 0], "chi": 1}, agrees=False),
                 record("slow", "timeout", wall_seconds=60.1),
                 record("big", "memory", peak_rss_mb=499.0),
                 record(
-                    "broken", "error", error="tasks.m2:1:1: error: no sheaf named X", log="logs/broken.log"
+                    "broken", "error", error="tasks.py:1:1: error: no object named X", log="logs/broken.log"
                 ),
                 record("none", "unsupported"),
             ],
@@ -73,7 +60,7 @@ class Report(unittest.TestCase):
 
         self.assertIn("# Results in example", report)
         self.assertIn("- code: abc123", report)
-        self.assertIn("- runner: m2_version 1.25.11", report)
+        self.assertIn("- runner: version 1.0", report)
         self.assertIn(
             "| group | tasks | ok | mismatch | unsupported | timeout | memory | error | not run |", report
         )
@@ -83,10 +70,10 @@ class Report(unittest.TestCase):
         self.assertIn("| `slow` | timeout | 3 | 60 | 500 | 60.1 | 120 |", report)
         self.assertIn("| `big` | memory | 3 | 60 | 500 | 1.5 | 499 |", report)
         self.assertIn(
-            "| `broken` | error | tasks.m2:1:1: error: no sheaf named X | logs/broken.log |", report
+            "| `broken` | error | tasks.py:1:1: error: no object named X | logs/broken.log |", report
         )
         self.assertIn("| `none` | chi 2 |", report)
-        self.assertIn("| `good` | chi 2, dims (1, 0, 1) | chi 2 | yes | Hom sheaf | 1.5 | 120 |", report)
+        self.assertIn("| `good` | chi 2, dims (1, 0, 1) | chi 2 | yes | direct | 1.5 | 120 |", report)
 
     def test_the_latest_record_of_a_task_counts(self) -> None:
         self.write([task("a")], [record("a", "timeout"), record("a", "ok", value=1, agrees=True)])

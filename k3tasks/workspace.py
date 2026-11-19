@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from . import expectation
 from .compare import IDENTICAL, compare, sha256
 from .registry import STDERR, STDOUT, Computation
 
@@ -180,8 +181,7 @@ def evaluate(
     `control` replaces parts of what is predicted, for a negative control: a task whose prediction is
     wrong on purpose and which must therefore end as a mismatch.
     """
-    value: dict[str, object] = {}
-    predicted: dict[str, object] = {}
+    value: dict[str, Any] = {}
     differences: dict[str, object] = {}
     digests: dict[str, str] = {}
     prefixes = (str(execution.work_dir), str(places.data.resolve()), str(places.scripts.resolve()))
@@ -195,7 +195,6 @@ def evaluate(
             unstored_tail=check.unstored_tail,
         )
         value[check.label] = outcome.verdict
-        predicted[check.label] = IDENTICAL
         if outcome.produced_sha256:
             digests[check.produced if not check.produced.startswith("@") else check.produced[1:]] = (
                 outcome.produced_sha256
@@ -204,33 +203,16 @@ def evaluate(
             differences[check.label] = {"mode": check.mode} | outcome.note
     output = execution.stdout.read_text(errors="replace")
     lines = output.splitlines()
-    for pattern in computation.expect:
-        key = f"expect /{pattern}/"
-        value[key] = "found" if any(re.search(pattern, line) for line in lines) else "absent"
-        predicted[key] = "found"
-    for pattern, count in computation.counts:
-        key = f"lines /{pattern}/"
-        value[key] = sum(1 for line in lines if re.search(pattern, line))
-        predicted[key] = count
+    value |= expectation.observed(lines, computation.expect, computation.counts)
     digests.setdefault("stdout", sha256(execution.stdout))
-    if control:
-        predicted |= control
-
-    agrees = value == predicted if predicted else None
-    if agrees is False:
-        verdict = "differs"
-    elif computation.checks:
-        verdict = "reproduced"
-    elif predicted:
-        verdict = "checked"
-    else:
-        verdict = "ran"
+    predicted = computation.predicted() | (control or {})
+    judgement = expectation.judge(value, predicted, files_compared=bool(computation.checks))
     return {
-        "status": "mismatch" if agrees is False else "ok",
+        "status": judgement.status,
         "value": value or None,
         "predicted": predicted or None,
-        "agrees": agrees,
-        "verdict": verdict,
+        "agrees": judgement.agrees,
+        "verdict": judgement.verdict,
         "method": computation.command(),
         "note": computation.note,
         "script_seconds": round(execution.seconds, 3),
@@ -241,13 +223,31 @@ def evaluate(
     }
 
 
-def finish(execution: Execution, result: dict[str, Any], keep: bool, discard: bool = False) -> dict[str, Any]:
-    """Deletes the work directory of a reproduced computation; otherwise names it in the result.
+def reproduce(
+    computation: Computation,
+    places: Places,
+    procs: int,
+    *,
+    control: dict[str, Any] | None = None,
+    keep: bool = False,
+) -> dict[str, Any]:
+    """Runs a computation in a work directory of its own and compares what it produced with the stored files.
 
-    With `discard` it is deleted whatever the result: a negative control differs on purpose, and there is
-    nothing in its work directory to inspect.
+    The result is the result line of the runner protocol.  The work directory is deleted when the rerun
+    reproduced everything it was compared with, and named in the result otherwise, or always with `keep`.
+    A command that fails leaves its work directory and is an error.  A negative control (see `evaluate`)
+    differs on purpose and there is nothing in its work directory to inspect, so it is deleted whatever
+    the result.
     """
-    if keep or (result["status"] != "ok" and not discard):
+    execution = execute(computation, places, procs)
+    if execution.exit_code != 0:
+        message = tail(execution.stdout if computation.merge_stderr else execution.stderr)
+        raise WorkspaceError(
+            f"{computation.script} exited with status {execution.exit_code}; work directory kept at "
+            f"{shown(execution.work_dir)}\n{message}"
+        )
+    result = evaluate(computation, execution, places, control)
+    if keep or (result["status"] != "ok" and control is None):
         result["work_dir"] = shown(execution.work_dir)
     else:
         shutil.rmtree(execution.work_dir, ignore_errors=True)

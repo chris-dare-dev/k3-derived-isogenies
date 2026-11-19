@@ -1,37 +1,21 @@
 """The report of a run directory: the scheduler's tables, then whether each computation was reproduced.
 
-Each task ends with one verdict:
-
-    reproduced   everything it was compared with is identical to the stored files
-    differs      something differs; the table says what, and the work directory was kept
-    checked      no stored file to compare with, but the lines its output must contain are there
-    ran          the command ran to the end and nothing was compared (its output was not kept)
-    timeout, memory, error, crashed   the scheduler's status: no verdict
-    not run      no record yet
+Each task stands under one word, its verdict or the scheduler's status (see `expectation.py`).
 """
 
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from taskbatch import report as scheduler_report
 from taskbatch.report import load_manifest
 from taskbatch.store import ResultStore
 
-ORDER = [
-    "reproduced",
-    "differs",
-    "checked",
-    "ran",
-    "timeout",
-    "memory",
-    "error",
-    "crashed",
-    "unsupported",
-    "not run",
-]
+from . import expectation
+from .tasks import TaskPayload
 
 
 def _cell(value: Any) -> str:
@@ -48,37 +32,15 @@ def _table(header: list[str], rows: list[list[Any]]) -> list[str]:
     return [*lines, ""]
 
 
-def verdict(record: dict[str, Any] | None) -> str:
-    if record is None:
-        return "not run"
-    if record["status"] in ("ok", "mismatch"):
-        return str(
-            record.get("detail", {}).get("verdict")
-            or ("differs" if record["status"] == "mismatch" else "ran")
-        )
-    return str(record["status"])
-
-
-def _differences(record: dict[str, Any]) -> str:
-    detail = record.get("detail", {})
-    parts = []
-    for label, note in (detail.get("differences") or {}).items():
-        if (record.get("value") or {}).get(label) == "identical":
-            continue
-        shown = ", ".join(f"{k} {v}" for k, v in note.items() if k != "mode")
-        parts.append(f"{label} ({note.get('mode')}): {shown}")
-    for key, value in (record.get("value") or {}).items():
-        expected = (record.get("predicted") or {}).get(key)
-        if key.startswith(("expect ", "lines ")) and value != expected:
-            parts.append(f"{key}: {value}, expected {expected}")
-        elif value == "identical" and expected != value:
-            parts.append(f"{key}: identical, predicted {expected}")
-    if detail.get("work_dir"):
-        parts.append(f"work directory {detail['work_dir']}")
+def _differences(record: Mapping[str, Any]) -> str:
+    parts = expectation.differences(record)
+    work_dir = record.get("detail", {}).get("work_dir")
+    if work_dir:
+        parts.append(f"work directory {work_dir}")
     return "; ".join(parts)
 
 
-def _peak(record: dict[str, Any] | None) -> float | None:
+def _peak(record: Mapping[str, Any] | None) -> float | None:
     """The task's peak memory: of all its processes together where its scope recorded it, else of its
     largest process."""
     if record is None:
@@ -95,29 +57,28 @@ def reproduction_lines(run_dir: Path) -> list[str]:
     counts: Counter[str] = Counter()
     for task_id in ids:
         record = latest.get(task_id)
-        task = record["task"] if record else next((t for t in manifest if t["id"] == task_id), {})
-        word = verdict(record)
+        listed = record["task"] if record else next((t for t in manifest if t["id"] == task_id), None)
+        task = cast("TaskPayload | None", listed)
+        word = expectation.verdict(record)
         counts[word] += 1
-        compared = ", ".join(
-            k for k in (record or {}).get("value") or {} if not k.startswith(("expect ", "lines "))
-        )
+        compared = ", ".join(expectation.compared_with(record))
         rows.append(
             [
                 f"`{task_id}`",
-                task.get("group", ""),
+                task["group"] if task else "",
                 word,
                 compared,
                 record["wall_seconds"] if record else None,
                 _peak(record),
             ]
         )
-    summary = ", ".join(f"{counts[word]} {word}" for word in ORDER if counts[word])
+    summary = ", ".join(f"{counts[word]} {word}" for word in expectation.ORDER if counts[word])
     lines = ["## Reproduction", "", f"{summary}.", ""]
     lines += _table(["task", "group", "verdict", "compared with", "wall (s)", "peak (MB)"], rows)
     problems = [
         (task_id, latest[task_id])
         for task_id in ids
-        if task_id in latest and verdict(latest[task_id]) == "differs"
+        if task_id in latest and expectation.verdict(latest[task_id]) == expectation.DIFFERS
     ]
     if problems:
         lines += ["## What differs", ""]

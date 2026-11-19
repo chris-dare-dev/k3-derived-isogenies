@@ -68,13 +68,6 @@ class Registry(unittest.TestCase):
             if c.id not in compared:
                 self.assertIn("identified_by", c.caveat, c.id)
 
-    def test_predicted_names_every_comparison(self) -> None:
-        self.assertEqual(registry.get("n27/ledger").predicted(), {"sixlines_ledger.log": "identical"})
-        check = registry.get("n14/prym-check-17").predicted()
-        self.assertEqual(check[r"lines /^\s*pair .*\bequal$/"], 18)
-        self.assertEqual(registry.get("n02/selftest").predicted(), {"expect /selftest passed/": "found"})
-        self.assertEqual(registry.get("n13/groupsize-41").predicted(), {})
-
     def test_note_matches_id(self) -> None:
         for c in registry.all_computations():
             self.assertTrue(c.id.startswith(f"n{c.note:02d}/"), c.id)

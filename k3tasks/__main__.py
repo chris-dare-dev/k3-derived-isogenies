@@ -14,22 +14,17 @@ import json
 import sys
 from pathlib import Path
 
-from taskbatch.config import ConfigError, load_config
-from taskbatch.model import Task
+from taskbatch.config import ConfigError
 
 from . import registry, report
-from .tasks import expand_batch
+from .tasks import plan_batch
 from .workspace import DATA_MARKER, Places, stored_files
 
 
 def _list(arguments: argparse.Namespace) -> int:
     if arguments.batch:
-        config = load_config(arguments.batch)
-        tasks = expand_batch(config.description)
-        rows = []
-        for task in tasks:
-            limits = config.limits_for(Task.from_payload(task))
-            rows.append((task, limits))
+        plan = plan_batch(arguments.batch)
+        rows = [(task, plan.limits(task)) for task in plan.tasks]
         header = ("id", "group", "procs", "expect s", "limit s", "expect MB", "limit MB")
         print("{:38} {:20} {:>5} {:>9} {:>8} {:>9} {:>8}".format(*header))
         for task, limits in rows:

@@ -37,7 +37,7 @@ RUN_DIR = results/$(basename $(notdir $(BATCH)))
 # or 3 when tasks are stopped at their limits on purpose
 EXPECT  ?= 0
 CHECKED   = taskbatch k3tasks runners tests tools
-FORMATTED = k3tasks runners tests tools
+FORMATTED = taskbatch k3tasks runners tests tools
 
 BATCHES ?= $(basename $(notdir $(BATCH)))
 

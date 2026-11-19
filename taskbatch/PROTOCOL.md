@@ -89,4 +89,4 @@ One JSON object per task that ended, appended to `results.jsonl` of the run dire
 
 ## Using the scheduler in another repository
 
-Copy the directory `taskbatch/` and the scheduler's tests (`tests/fake_runner.py`, `helpers.py`, `test_cli.py`, `test_config.py`, `test_report.py`, `test_runner.py`, `test_scheduler.py`, `test_settings.py`, `test_store.py`), add the `[tool.taskbatch]` table, and write a runner. The package came from `k3batch` in `k3-spherical-twists`; the protocol is the same, and what was specific to that repository (the `surfaces` key, the default runner) is now the two settings above.
+Copy the directory `taskbatch/` and the scheduler's tests (`tests/fake_runner.py`, `helpers.py`, `test_cli.py`, `test_config.py`, `test_record.py`, `test_report.py`, `test_runner.py`, `test_scheduler.py`, `test_settings.py`, `test_store.py`), add the `[tool.taskbatch]` table, and write a runner. The package came from `k3batch` in `k3-spherical-twists`; the protocol is the same, and what was specific to that repository (the `surfaces` key, the default runner) is now the two settings above.

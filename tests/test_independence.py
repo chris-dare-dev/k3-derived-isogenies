@@ -13,7 +13,7 @@ sys.path.insert(0, str(REPOSITORY / "tools"))
 import claims
 
 EXPERIMENTS = REPOSITORY / "experiments"
-HARNESS = {"k3tasks", "taskbatch", "runners", "task_runner", "claims", "tools"}
+HARNESS = {"k3tasks", "taskbatch", "runners", "task_runner", "claims", "adopt", "tools"}
 
 
 class Independence(unittest.TestCase):
@@ -26,11 +26,13 @@ class Independence(unittest.TestCase):
     def test_the_harness_imports_no_script_and_nothing_outside_the_standard_library(self) -> None:
         scripts = {path.stem for path in EXPERIMENTS.glob("*.py")}
         modules = [*(REPOSITORY / "k3tasks").glob("*.py"), *(REPOSITORY / "taskbatch").glob("*.py")]
-        modules += [REPOSITORY / "runners" / "task_runner.py", REPOSITORY / "tools" / "claims.py"]
+        modules += [REPOSITORY / "runners" / "task_runner.py", *(REPOSITORY / "tools").glob("*.py")]
         for module in modules:
             found = claims.imports(module)
             self.assertFalse(found & scripts, module.name)
-            self.assertLessEqual(found, sys.stdlib_module_names | {"k3tasks", "taskbatch"}, module.name)
+            self.assertLessEqual(
+                found, sys.stdlib_module_names | {"k3tasks", "taskbatch", "adopt"}, module.name
+            )
 
     def test_the_task_registry_uses_no_private_name_of_the_scheduler(self) -> None:
         for module in [*(REPOSITORY / "k3tasks").glob("*.py"), REPOSITORY / "runners" / "task_runner.py"]:

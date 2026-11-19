@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import re
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -15,6 +14,8 @@ from typing import Any
 from taskbatch.settings import REPOSITORY
 from taskbatch.store import ResultStore
 
+from . import helpers
+
 sys.path.insert(0, str(REPOSITORY / "tools"))
 
 import claims
@@ -23,17 +24,25 @@ import claims
 def record(
     task_id: str,
     status: str = "ok",
-    dirty: bool = False,
     day: str = "2026-11-17",
     verdict: str = "reproduced",
+    **payload: Any,
 ) -> dict[str, Any]:
-    return {
-        "task_id": task_id, "task": {"id": task_id}, "status": status,
-        "value": {"f.log": "identical" if status == "ok" else "differs"}, "predicted": {"f.log": "identical"},
-        "agrees": status == "ok", "wall_seconds": 0.5, "started_at": f"{day}T10:00:00+00:00",
-        "detail": {"verdict": verdict if status == "ok" else "differs"},
-        "code": {"commit": "a" * 40, "dirty": dirty},
-    }  # fmt: skip
+    """The record of a task of TASKS as it is now; `payload` changes the task it was computed for."""
+    known = {key: value for key, value in TASKS.get(task_id, {"kind": "k"}).items() if key != "batches"}
+    return dict(
+        helpers.record(
+            known | {"id": task_id} | payload,
+            status,
+            value={"f.log": "identical" if status == "ok" else "differs"},
+            predicted={"f.log": "identical"},
+            agrees=status == "ok",
+            wall_seconds=0.5,
+            started_at=f"{day}T10:00:00+00:00",
+            detail={"verdict": verdict if status == "ok" else "differs"},
+            code={"commit": "a" * 40, "dirty": False},
+        )
+    )
 
 
 def task(task_id: str, group: str, batch: str, **more: Any) -> dict[str, Any]:
@@ -168,6 +177,23 @@ class Registry(unittest.TestCase):
         page = claims.detail(REGISTRY, TASKS, {"n02/a": record("n02/a", status="mismatch")})
         self.assertIn("| differs: f.log differs |", page)
 
+    def test_a_record_of_a_task_that_changed_since_is_stale_and_supports_nothing(self) -> None:
+        old = record("n02/b", predicted={"f.log": "identical", "g.log": "identical"})
+        self.assertEqual(claims.standing(TASKS["n02/b"], old), "stale")
+        self.assertEqual(claims.standing(TASKS["n02/b"], record("n02/b", group="moved", set=3)), "ok")
+        latest = {"n02/a": record("n02/a"), "n02/b": old}
+        text = summary(LATTICES, latest)
+        self.assertIn("tasks: ok 1; stale 1 (of 2)", text)
+        self.assertNotIn("all", text)
+        self.assertIn(
+            "| `n02/b` | heavy | `f.log` (text): identical "
+            "| stale: recorded 2026-11-17 at `aaaaaaa` for the task as it was then |  |",
+            claims.detail(REGISTRY, TASKS, latest),
+        )
+        # a claim whose only records are stale names no day and no commit
+        text = summary(LATTICES, {"n02/b": old})
+        self.assertIn("tasks: stale 1; not re-run 1 (of 2); [tasks]", text)
+
     def test_stored_lines_named_as_evidence_are_checked_against_the_data(self) -> None:
         item = {"file": "f.log", "line": 2, "text": "162 agree"}
         registry = REGISTRY | {"claim": [LEDGER | {"evidence": [item]}]}
@@ -222,73 +248,7 @@ class Files(unittest.TestCase):
             self.assertEqual(set(trees), {json.loads(line)["code"]["commit"] for line in text.splitlines()})
 
 
-class Adoption(unittest.TestCase):
-    def test_only_records_of_committed_code_are_adopted(self) -> None:
-        with tempfile.TemporaryDirectory() as scratch:
-            run_dir = Path(scratch) / "trial"
-            run_dir.mkdir()
-            (run_dir / "manifest.json").write_text("{}")
-            (run_dir / "results.jsonl").write_text(json.dumps(record("t", dirty=True)) + "\n")
-            with self.assertRaisesRegex(claims.RegistryError, "uncommitted changes"):
-                claims.command_adopt([run_dir])
-            (run_dir / "results.jsonl").write_text("")
-            with self.assertRaisesRegex(claims.RegistryError, "no records"):
-                claims.command_adopt([run_dir])
-
-    def test_a_record_that_names_this_machine_is_not_adopted(self) -> None:
-        with tempfile.TemporaryDirectory() as scratch:
-            run_dir = Path(scratch) / "trial"
-            run_dir.mkdir()
-            (run_dir / "manifest.json").write_text("{}")
-            row = record("t") | {"error": f"work directory kept at {Path.home()}/somewhere"}
-            (run_dir / "results.jsonl").write_text(json.dumps(row) + "\n")
-            with self.assertRaisesRegex(claims.RegistryError, "names this machine or a directory outside"):
-                claims.command_adopt([run_dir])
-
-    def test_a_record_follows_its_commit_through_a_rewrite_of_the_messages(self) -> None:
-        def git(*arguments: str) -> str:
-            identity = ["-c", "user.name=t", "-c", "user.email=t@example.org", "-c", "commit.gpgsign=false"]
-            done = subprocess.run(
-                ["git", "-C", str(root), *identity, *arguments], capture_output=True, text=True
-            )
-            self.assertEqual(done.returncode, 0, done.stderr)
-            return done.stdout.strip()
-
-        with tempfile.TemporaryDirectory() as scratch:
-            root = Path(scratch) / "repository"
-            root.mkdir()
-            git("init", "-q")
-            (root / "code.py").write_text("1\n")
-            git("add", "code.py")
-            git("commit", "-q", "-m", "first, with a trailer")
-            before = git("rev-parse", "HEAD")
-            git("commit", "-q", "--amend", "-m", "first")  # the same tree under a new number
-            after = git("rev-parse", "HEAD")
-            (root / "code.py").write_text("2\n")
-            git("commit", "-q", "-am", "second")
-            head = git("rev-parse", "HEAD")
-            self.assertNotEqual(before, after)
-            run_dir = Path(scratch) / "results" / "trial"
-            run_dir.mkdir(parents=True)
-            (run_dir / "manifest.json").write_text("{}")
-            rows = [record("old") | {"code": {"commit": before, "dirty": False}}]
-            rows.append(record("new") | {"code": {"commit": head, "dirty": False}})
-            text = "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows)
-            (run_dir / "results.jsonl").write_text(text)
-            with unittest.mock.patch.multiple(claims, REPOSITORY=root, RECORDS=root / "records"):
-                claims.command_adopt([run_dir])
-                adopted = (root / "records" / "trial" / "results.jsonl").read_text().splitlines()
-                self.assertEqual(json.loads(adopted[0])["code"]["commit"], after)
-                self.assertEqual(json.loads(adopted[0]) | {"code": None}, rows[0] | {"code": None})
-                self.assertEqual(adopted[1], text.splitlines()[1])  # untouched, byte for byte
-                # next to the records: the tree of each commit they name
-                trees = json.loads((root / "records" / "trial" / "adopted.json").read_text())["trees"]
-                self.assertEqual(trees, {c: git("rev-parse", f"{c}^{{tree}}") for c in (after, head)})
-                # a commit that is nowhere in the repository cannot be placed
-                (run_dir / "results.jsonl").write_text(json.dumps(record("lost")) + "\n")
-                with self.assertRaisesRegex(claims.RegistryError, "not in this repository"):
-                    claims.command_adopt([run_dir])
-
+class Records(unittest.TestCase):
     def test_the_latest_record_of_a_task_wins_across_run_directories(self) -> None:
         with tempfile.TemporaryDirectory() as scratch:
             for name, day, status in (("a", "2026-11-17", "timeout"), ("b", "2026-11-18", "ok")):

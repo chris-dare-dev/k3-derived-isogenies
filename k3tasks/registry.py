@@ -21,7 +21,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-from .compare import IDENTICAL, MODES
+from . import expectation
+from .compare import MODES
 
 STDOUT = "@stdout"
 STDERR = "@stderr"
@@ -112,10 +113,7 @@ class Computation:
 
     def predicted(self) -> dict[str, Any]:
         """What a rerun is expected to give: each stored file identical, each line of the output there."""
-        expected: dict[str, Any] = {check.label: IDENTICAL for check in self.checks}
-        expected |= {f"expect /{pattern}/": "found" for pattern in self.expect}
-        expected |= {f"lines /{pattern}/": count for pattern, count in self.counts}
-        return expected
+        return expectation.predicted((check.label for check in self.checks), self.expect, self.counts)
 
     def as_dict(self) -> dict[str, Any]:
         return {

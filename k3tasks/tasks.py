@@ -32,14 +32,24 @@ A second kind computes nothing.  It shows what the scheduler's limits look like 
     items = [{ name = "sleeps", sleep_seconds = 300 }, { name = "allocates", allocate_mb = 1000 }]
 
 Controls and synthetic tasks belong to no claim.
+
+`expand_batch` gives the tasks of a batch description and `run_task` the result of one task: the two
+commands of the runner.  `plan_batch` reads a batch file as the scheduler does and gives its tasks with
+their limits, for everything else that needs the tasks of a batch.
 """
 
 from __future__ import annotations
 
 import time
-from typing import Any
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Literal, TypedDict
 
-from . import registry, workspace
+from taskbatch.config import BatchConfig, load_config
+from taskbatch.model import Limits, Task
+from taskbatch.settings import load_settings
+
+from . import expectation, registry, workspace
 
 TASK_KEYS = {
     "kind",
@@ -58,6 +68,57 @@ CONTROL_SUFFIX = "!control"
 CONTROL_GROUP = "negative control"
 
 
+class Compared(TypedDict):
+    """A stored file that a rerun is compared with, and how (compare.py)."""
+
+    file: str
+    mode: str
+
+
+class _Placed(TypedDict):
+    """What every task has: its place in the batch, and what it is expected to take."""
+
+    id: str
+    set: int  # index of its [[tasks]] table: the scheduler takes the limits of that table
+    group: str
+    cost: float  # expected seconds
+    procs: int
+    expected_memory_mb: int
+
+
+class _Control(TypedDict, total=False):
+    """What a negative control has besides: the parts of what is predicted that were replaced."""
+
+    control: bool
+    wrong_on_purpose: dict[str, Any]
+
+
+class ComputationTask(_Placed, _Control):
+    """One computation of the registry, or its negative control."""
+
+    kind: Literal["computation"]
+    keep_work: bool
+    command: str
+    note: int
+    predicted: dict[str, Any] | None  # keys and values as in expectation.py; None when nothing is compared
+    compared: list[Compared]
+    caveat: str | None
+
+
+class SyntheticTask(_Placed):
+    """A task that computes nothing: it sleeps, holds memory or fails."""
+
+    kind: Literal["synthetic"]
+    sleep_seconds: float
+    allocate_mb: float
+    fail: bool
+
+
+# A task as the scheduler hands it back to the runner and stores it in a record: the payload of
+# taskbatch/PROTOCOL.md.  The committed records hold these keys, so none is added, dropped or renamed.
+TaskPayload = ComputationTask | SyntheticTask
+
+
 def _list(table: dict[str, Any], key: str, kind: type) -> list[Any] | None:
     value = table.get(key)
     if value is None:
@@ -69,17 +130,24 @@ def _list(table: dict[str, Any], key: str, kind: type) -> list[Any] | None:
     return value
 
 
-def expand_batch(description: dict[str, Any]) -> list[dict[str, Any]]:
-    """The tasks of a batch description: one per selected computation."""
-    tasks: list[dict[str, Any]] = []
+def expand_batch(description: dict[str, Any]) -> list[TaskPayload]:
+    """The tasks of a batch description: one per selected computation.
+
+    Every way to the tasks of a batch passes here (the runner's `expand`, and `plan_batch` for a batch
+    file), so each of them refuses a registry that is not consistent.
+    """
+    problems = registry.validate()
+    if problems:
+        raise ValueError("the registry is inconsistent: " + "; ".join(problems))
+    tasks: list[TaskPayload] = []
     seen: set[str] = set()
     for index, table in enumerate(description.get("tasks", [])):
         if table.get("kind") == "synthetic":
-            for task in _synthetic(table, index):
-                if task["id"] in seen:
-                    raise ValueError(f"tasks[{index}]: two synthetic tasks are named {task['id']}")
-                seen.add(task["id"])
-                tasks.append(task)
+            for synthetic in _synthetic(table, index):
+                if synthetic["id"] in seen:
+                    raise ValueError(f"tasks[{index}]: two synthetic tasks are named {synthetic['id']}")
+                seen.add(synthetic["id"])
+                tasks.append(synthetic)
             continue
         if table.get("kind") != "computation":
             kind = table.get("kind")
@@ -121,7 +189,8 @@ def expand_batch(description: dict[str, Any]) -> list[dict[str, Any]]:
                 continue
             seen.add(task_id)
             procs = computation.procs if procs_cap is None else min(computation.procs, procs_cap)
-            task = {
+            predicted = computation.predicted()
+            task: ComputationTask = {
                 "id": task_id,
                 "kind": "computation",
                 "set": index,
@@ -132,29 +201,45 @@ def expand_batch(description: dict[str, Any]) -> list[dict[str, Any]]:
                 "keep_work": keep,
                 "command": computation.command(procs),
                 "note": computation.note,
-                "predicted": computation.predicted() or None,
+                "predicted": predicted or None,
                 "compared": [{"file": check.stored, "mode": check.mode} for check in computation.checks],
                 "caveat": computation.caveat or None,
             }
             if control:
-                unknown = set(control["predicted"]) - set(computation.predicted())
+                unknown = set(control["predicted"]) - set(predicted)
                 if unknown:
-                    gives = ", ".join(computation.predicted()) or "nothing"
+                    gives = ", ".join(predicted) or "nothing"
                     raise ValueError(
                         f"tasks[{index}]: the control predicts {sorted(unknown)[0]!r}, which "
                         f"{computation.id} does not give; it gives {gives}"
                     )
-                task |= {
-                    "group": CONTROL_GROUP,
-                    "control": True,
-                    "predicted": computation.predicted() | control["predicted"],
-                    "wrong_on_purpose": control["predicted"],
-                }
+                task["group"] = CONTROL_GROUP
+                task["control"] = True
+                task["predicted"] = predicted | control["predicted"]
+                task["wrong_on_purpose"] = control["predicted"]
             tasks.append(task)
     return tasks
 
 
-def _synthetic(table: dict[str, Any], index: int) -> list[dict[str, Any]]:
+@dataclass(frozen=True)
+class Plan:
+    """A batch file and its tasks."""
+
+    config: BatchConfig
+    tasks: list[TaskPayload]
+
+    def limits(self, task: TaskPayload) -> Limits:
+        """The limits the scheduler gives a task of the batch."""
+        return self.config.limits_for(Task.from_payload(dict(task)))
+
+
+def plan_batch(path: Path) -> Plan:
+    """The tasks of a batch file, read and expanded as the scheduler does it."""
+    config = load_config(path, description_keys=load_settings().description_keys)
+    return Plan(config, expand_batch(config.description))
+
+
+def _synthetic(table: dict[str, Any], index: int) -> list[SyntheticTask]:
     """Tasks that compute nothing: they sleep, hold memory or fail, to show the scheduler's limits."""
     unknown = set(table) - {"kind", "items"}
     if unknown:
@@ -162,7 +247,7 @@ def _synthetic(table: dict[str, Any], index: int) -> list[dict[str, Any]]:
     items = table.get("items")
     if not isinstance(items, list) or not all(isinstance(item, dict) and "name" in item for item in items):
         raise ValueError(f"tasks[{index}]: items must be a list of tables with a name")
-    tasks = []
+    tasks: list[SyntheticTask] = []
     for item in items:
         unknown = set(item) - SYNTHETIC_KEYS
         if unknown:
@@ -184,7 +269,7 @@ def _synthetic(table: dict[str, Any], index: int) -> list[dict[str, Any]]:
     return tasks
 
 
-def _run_synthetic(task: dict[str, Any]) -> dict[str, Any]:
+def _run_synthetic(task: SyntheticTask) -> dict[str, Any]:
     if task["fail"]:
         raise workspace.WorkspaceError("synthetic task asked to fail")
     held = bytearray(b"x") * (int(task["allocate_mb"]) << 20)
@@ -194,25 +279,20 @@ def _run_synthetic(task: dict[str, Any]) -> dict[str, Any]:
         "value": len(held) >> 20,
         "predicted": None,
         "agrees": None,
-        "verdict": "ran",
+        "verdict": expectation.RAN,
         "method": "synthetic",
     }
 
 
-def run_task(task: dict[str, Any], places: workspace.Places | None = None) -> dict[str, Any]:
+def run_task(task: TaskPayload, places: workspace.Places | None = None) -> dict[str, Any]:
     """Runs one computation and compares what it produced with the stored files."""
-    if task.get("kind") == "synthetic":
+    if task["kind"] == "synthetic":
         return _run_synthetic(task)
-    control = task.get("wrong_on_purpose") if task.get("control") else None
-    computation = registry.get(str(task["id"]).removesuffix(CONTROL_SUFFIX))
-    places = places or workspace.Places.from_environment()
-    procs = int(task.get("procs", computation.procs))
-    execution = workspace.execute(computation, places, procs)
-    if execution.exit_code != 0:
-        message = workspace.tail(execution.stderr if not computation.merge_stderr else execution.stdout)
-        raise workspace.WorkspaceError(
-            f"{computation.script} exited with status {execution.exit_code}; work directory kept at "
-            f"{workspace.shown(execution.work_dir)}\n{message}"
-        )
-    result = workspace.evaluate(computation, execution, places, control)
-    return workspace.finish(execution, result, keep=bool(task.get("keep_work")), discard=control is not None)
+    computation = registry.get(task["id"].removesuffix(CONTROL_SUFFIX))
+    return workspace.reproduce(
+        computation,
+        places or workspace.Places.from_environment(),
+        task["procs"],
+        control=task.get("wrong_on_purpose") if task.get("control") else None,
+        keep=task["keep_work"],
+    )

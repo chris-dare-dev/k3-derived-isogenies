@@ -52,7 +52,7 @@ Evidence labels: **[P]** read in the cited source; **[M]** recalled, not checked
 | [k3tasks/](k3tasks/) | The registry of computations (one per command of a note's *Reproduce* section), the work directories they run in, and the comparison of a rerun with the stored files |
 | [taskbatch/](taskbatch/) | The batch scheduler: one process per task, time and memory limits, one record per task, reports ([PROTOCOL.md](taskbatch/PROTOCOL.md)) |
 | [runners/](runners/) | `task_runner.py`, the command through which the scheduler expands batches and runs tasks |
-| [tools/](tools/) | `claims.py`: writes the generated tables, checks them, and adopts the records of a finished run |
+| [tools/](tools/) | `claims.py`: writes the generated tables and checks them; `adopt.py`: copies the records of a finished run into `records/` |
 | [tests/](tests/) | Unit tests of the scheduler, the registry, the batch files and the claim tables (standard library only) |
 | `Makefile`, `pyproject.toml` | `make test`, `make lint`, `make plan`, `make run`, `make report`, `make record`, `make tables`, `make check`; the settings of the scheduler, ruff and mypy |
 | `Dockerfile`, `.python-version` | Python 3.12 with the packages of `experiments/requirements.txt`, for machines without them |

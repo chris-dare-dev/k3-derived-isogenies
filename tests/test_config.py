@@ -38,7 +38,7 @@ special = true
 
 [[tasks]]
 kind = "pair"
-names = ["O", "M_H"]
+names = ["a", "b"]
 
 [[tasks]]
 kind = "synthetic"
@@ -79,7 +79,7 @@ class BatchFile(unittest.TestCase):
             {
                 "objects": [{"d": 2}, {"d": 3, "special": True}],
                 "tasks": [
-                    {"kind": "pair", "names": ["O", "M_H"]},
+                    {"kind": "pair", "names": ["a", "b"]},
                     {"kind": "synthetic", "items": [{"name": "idle"}]},
                 ],
             },

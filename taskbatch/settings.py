@@ -2,7 +2,7 @@
 
     [tool.taskbatch]
     runner = ["{python}", "runners/task_runner.py"]   # the default runner command
-    description_keys = ["surfaces"]                    # batch-file keys handed to the runner with "tasks"
+    description_keys = ["objects"]                     # batch-file keys handed to the runner with "tasks"
 
 `{python}` stands for the interpreter that runs the scheduler.  An argument that names a file of the
 repository is made absolute.  Both keys are optional: without `runner` every command needs `--runner`,
@@ -69,4 +69,6 @@ def load_settings(repository: Path = REPOSITORY) -> Settings:
     reserved = {"name", "scheduler", "limits", "tasks"} & set(keys)
     if reserved:
         raise SettingsError(f"[tool.taskbatch] description_keys cannot contain {sorted(reserved)[0]!r}")
-    return Settings(runner=None if runner is None else resolve_runner(runner, repository), description_keys=keys)
+    return Settings(
+        runner=None if runner is None else resolve_runner(runner, repository), description_keys=keys
+    )

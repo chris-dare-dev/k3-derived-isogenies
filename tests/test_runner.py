@@ -59,9 +59,9 @@ class Expansion(unittest.TestCase):
 
 class Results(unittest.TestCase):
     def test_the_command_hands_the_task_back_unchanged(self) -> None:
-        payload = {"id": "a", "kind": "k", "source": "M_H^dual(1H)"}
-        command = run_command(("M2", "--script", "runner.m2"), Task.from_payload(payload))
-        self.assertEqual(command[:4], ["M2", "--script", "runner.m2", "run"])
+        payload = {"id": "a", "kind": "k", "source": "a^dual(1)"}
+        command = run_command(("prog", "--script", "runner.x"), Task.from_payload(payload))
+        self.assertEqual(command[:4], ["prog", "--script", "runner.x", "run"])
         self.assertEqual(json.loads(command[4]), payload)
 
     def test_the_last_result_line_is_the_result(self) -> None:
@@ -74,10 +74,10 @@ class Results(unittest.TestCase):
     def test_error_messages_come_without_the_backtrace(self) -> None:
         output = (
             " -- setting random seed to 1\n"
-            "K3Twists/tasks.m2:153:60:(2):[8]: error: no sheaf named X\n"
-            "K3Twists/tasks.m2:173:29:(2):[7]: --back trace--\n"
+            "lib/tasks.x:153:60:(2):[8]: error: no object named X\n"
+            "lib/tasks.x:173:29:(2):[7]: --back trace--\n"
         )
-        self.assertEqual(error_lines(output), "K3Twists/tasks.m2:153:60:(2):[8]: error: no sheaf named X")
+        self.assertEqual(error_lines(output), "lib/tasks.x:153:60:(2):[8]: error: no object named X")
         self.assertEqual(error_lines("something odd\n"), "something odd")
 
 

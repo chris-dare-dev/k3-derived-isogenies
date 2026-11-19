@@ -15,7 +15,7 @@ The tables of the next three sections are generated: their rows are in [claims/c
 **Re-run under the scheduler** is computed from the records in [records/](records/). A task is one command of a note's *Reproduce* section, run again in a directory of its own and compared with the stored file it should reproduce ([README.md](README.md#running-a-batch)). The column reads:
 
 - **all N tasks ok**, when every task of the row has a record and none differs, with how many were *reproduced* (identical to every stored file they were compared with), *checked* (no stored file to compare with, but the output has the lines it must have) or *ran with nothing to compare* (the output of the original run was not kept), and the day and the commit of the records;
-- the count of tasks by status otherwise: `ok`, `mismatch`, `timeout`, `memory`, `error`, `crashed`, and `not re-run` for tasks without a record;
+- the count of tasks by status otherwise: `ok`, `mismatch`, `timeout`, `memory`, `error`, `crashed`, `stale` for a record of a task that has changed since it was computed (another command, or other stored files to compare with; such a record supports nothing), and `not re-run` for tasks without a record;
 - **not re-run**, when no task of the row has a record. The stored output is then the only support, and it is the original output, not a run of this repository;
 - **no task**, with the reason, when nothing in the batch files computes the row.
 

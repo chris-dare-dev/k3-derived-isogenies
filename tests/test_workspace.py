@@ -16,7 +16,7 @@ from pathlib import Path
 from unittest import mock
 
 from k3tasks.registry import STDOUT, Check, Computation
-from k3tasks.workspace import Places, WorkspaceError, evaluate, execute, finish, prepare
+from k3tasks.workspace import Places, WorkspaceError, evaluate, execute, prepare, reproduce
 
 TOY_SCRIPT = textwrap.dedent(
     """
@@ -90,9 +90,7 @@ class Workspace(unittest.TestCase):
         self.assertEqual(after, self.stored_before, "a stored file was changed")
 
     def run_toy(self, computation: Computation, keep: bool = False) -> dict:
-        execution = execute(computation, self.places, 1)
-        self.assertEqual(execution.exit_code, 0, execution.stderr.read_text())
-        return finish(execution, evaluate(computation, execution, self.places), keep)
+        return reproduce(computation, self.places, 1, keep=keep)
 
     def test_work_directory_links_scripts_and_copies_inputs_but_not_outputs(self) -> None:
         work = prepare(toy(), self.places)
@@ -127,16 +125,17 @@ class Workspace(unittest.TestCase):
         self.assertTrue(Path(result["work_dir"]).is_dir())
 
     def test_a_control_ends_as_a_mismatch_and_leaves_no_work_directory(self) -> None:
-        execution = execute(toy(), self.places, 1)
-        result = evaluate(toy(), execution, self.places, control={"toy.log": "differs"})
+        result = reproduce(toy(), self.places, 1, control={"toy.log": "differs"})
         self.assertEqual(
             (result["status"], result["agrees"], result["verdict"]), ("mismatch", False, "differs")
         )
         self.assertEqual(result["value"]["toy.log"], "identical")
         self.assertEqual(result["predicted"]["toy.log"], "differs")
-        finish(execution, result, keep=False, discard=True)
         self.assertNotIn("work_dir", result)
-        self.assertFalse(execution.work_dir.exists())
+        self.assertEqual(list(self.places.work.iterdir()), [])
+        # kept when asked, like any other
+        result = reproduce(toy(), self.places, 1, control={"toy.log": "differs"}, keep=True)
+        self.assertTrue(Path(result["work_dir"]).is_dir())
 
     def test_checked_by_output_lines(self) -> None:
         result = self.run_toy(toy(checks=(), counts=((r"^toy total", 1), (r"never", 0))))
@@ -165,10 +164,16 @@ class Workspace(unittest.TestCase):
             result = self.run_toy(computation)
         self.assertEqual(result["verdict"], "checked")
 
-    def test_failure_is_reported(self) -> None:
-        execution = execute(toy("fail"), self.places, 1)
-        self.assertEqual(execution.exit_code, 3)
-        self.assertIn("asked to fail", execution.stderr.read_text())
+    def test_a_failing_command_is_an_error_that_keeps_its_work_directory(self) -> None:
+        with self.assertRaisesRegex(
+            WorkspaceError, r"toy.py exited with status 3; work directory kept at"
+        ) as raised:
+            reproduce(toy("fail"), self.places, 1)
+        self.assertIn("toy.py: error: asked to fail", str(raised.exception))
+        self.assertEqual(len(list(self.places.work.iterdir())), 1)
+        # with the standard error merged into the output, the message comes from there
+        with self.assertRaisesRegex(WorkspaceError, "asked to fail"):
+            reproduce(toy("fail", merge_stderr=True, checks=()), self.places, 1)
 
     def test_a_changed_stored_file_is_an_error(self) -> None:
         target = self.places.data / "toy.log"
