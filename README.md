@@ -172,9 +172,9 @@ A task's cost is the time its command took when its note was written, scaled to 
 | `below-16.toml` | note 22: the neighbour graphs and the two short controls | half a minute |
 | `negative-control.toml` | three tasks whose predictions are wrong on purpose: each must end `mismatch`, and the run ends with status 1 | seconds |
 | `limits-demo.toml` | the ledger next to a task that sleeps past its time limit and one that allocates past its memory limit: `timeout`, `memory`, and the run ends with status 3 | seconds |
-| `heavy.toml` | everything that takes from a quarter of an hour to several hours (the enumerations over F₄₉ and at q = 41 and 43, the full Prym runs, the long CM sweeps, the delta and coset runs at q = 41 and 43, the elliptic K3 runs), and the audits again: planned, not run by default | about 10 hours (estimated) |
+| `heavy.toml` | everything that takes from a quarter of an hour to several hours (the enumerations over F₄₉ and at q = 41 and 43, the full Prym runs, the long CM sweeps, the delta and coset runs at q = 41 and 43, the elliptic K3 runs), and the audits again: not run by default | 12 h 22 min (the one run, two workers) |
 
-The times are the wall times of one run on a 16-core machine, with each batch's own workers and processes. `heavy.toml` has not been run as a batch: the times its notes record add up to 19 hours, about 10 with its two workers.
+The times are the wall times of one run on a 16-core machine, with each batch's own workers and processes. `heavy.toml` was run once as a batch, in 12 h 22 min with its two workers; the times its notes record add up to 19 hours. Of its 47 tasks, 29 are ok; the 18 that are not are listed in [CLAIMS.md](CLAIMS.md#known-differences-between-reruns-and-stored-files).
 
 Every computation of the registry is in at least one batch, and the unit tests check that every task's limits are above its expected time and memory.
 

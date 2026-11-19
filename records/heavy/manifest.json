@@ -1,0 +1,1412 @@
+{
+ "batch": "heavy",
+ "tasks": [
+  {
+   "caveat": null,
+   "command": "python -I sixlines_leakage.py features",
+   "compared": [
+    {
+     "file": "sixlines_leakage_features.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_leakage_features.json",
+     "mode": "json"
+    }
+   ],
+   "cost": 4,
+   "expected_memory_mb": 800,
+   "group": "leakage",
+   "id": "n28/features",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 28,
+   "predicted": {
+    "sixlines_leakage_features.json": "identical",
+    "sixlines_leakage_features.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_leakage.py audit --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_leakage.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_leakage.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 193.5,
+   "expected_memory_mb": 4200,
+   "group": "leakage",
+   "id": "n28/audit",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 28,
+   "predicted": {
+    "sixlines_leakage.jsonl": "identical",
+    "sixlines_leakage.log": "identical"
+   },
+   "procs": 8,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py features",
+   "compared": [
+    {
+     "file": "sixlines_order3_features.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_features.json",
+     "mode": "json"
+    }
+   ],
+   "cost": 12,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/features",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_features.json": "identical",
+    "sixlines_order3_features.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py audit --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_order3_audit.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 70.0,
+   "expected_memory_mb": 4200,
+   "group": "order-3",
+   "id": "n29/audit",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3.jsonl": "identical",
+    "sixlines_order3_audit.log": "identical"
+   },
+   "procs": 8,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py features --with-43 --out sixlines_order3_features_q43.json",
+   "compared": [
+    {
+     "file": "sixlines_order3_features_q43.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_features_q43.json",
+     "mode": "json"
+    }
+   ],
+   "cost": 12,
+   "expected_memory_mb": 800,
+   "group": "order-3",
+   "id": "n29/features-q43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_features_q43.json": "identical",
+    "sixlines_order3_features_q43.log": "identical"
+   },
+   "procs": 1,
+   "set": 0
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_order3.py audit --workers 7 --features sixlines_order3_features_q43.json --out sixlines_order3_q43.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_order3_q43.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_q43.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 70,
+   "expected_memory_mb": 5800,
+   "group": "order-3",
+   "id": "n29/audit-q43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 1800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_q43.jsonl": "identical",
+    "sixlines_order3_q43.log": "identical"
+   },
+   "procs": 7,
+   "set": 0
+  },
+  {
+   "caveat": "the script was corrected after this sweep (note 20 section 7): the surfaces of a polynomial are now selected by e1 and e2, and the ratios with J3 were added, so the records of q = 31 and 37 and the log are expected to differ",
+   "command": "python -I sixlines_cmmethod.py sweep 17 19 23 29 31 37 --digits-list 300 700 1200 --primes 3 --all-subsets --maxn 8 --workers 4 --out sixlines_cmmethod.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_cmmethod.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_cmmethod.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 2700,
+   "expected_memory_mb": 4500,
+   "group": "cm-method",
+   "id": "n20/sweep",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 20,
+   "predicted": {
+    "sixlines_cmmethod.jsonl": "identical",
+    "sixlines_cmmethod.log": "identical"
+   },
+   "procs": 4,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_cmmethod.py sweep 29 31 37 --select 29,6 29,10 31,2 31,22 37,18 37,22 --digits-list 300 700 1200 --primes 6 --all-subsets --maxn 8 --workers 4 --out sixlines_cmmethod.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_cmmethod_rerun.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_cmmethod.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1800,
+   "expected_memory_mb": 4500,
+   "group": "cm-method",
+   "id": "n20/sweep-rerun",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 20,
+   "predicted": {
+    "sixlines_cmmethod.jsonl": "identical",
+    "sixlines_cmmethod_rerun.log": "identical"
+   },
+   "procs": 4,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py cosets 41 22 1 1 --digits 1200 2000 3000 --primes 8 --workers 4 --no-delta",
+   "compared": [
+    {
+     "file": "sixlines_delta41_cosets_22.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_delta41_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1800,
+   "expected_memory_mb": 5500,
+   "group": "quadratic-character",
+   "id": "n26/cosets-22",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41_cosets.jsonl": "identical",
+    "sixlines_delta41_cosets_22.log": "identical"
+   },
+   "procs": 4,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_delta41.py cosets 41 6 1 1 --digits 3000 4200 --primes 8 --workers 6 --no-delta",
+   "compared": [
+    {
+     "file": "sixlines_delta41_cosets_6.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_delta41_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 4160.0,
+   "expected_memory_mb": 7500,
+   "group": "quadratic-character",
+   "id": "n26/cosets-6",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 21600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41_cosets.jsonl": "identical",
+    "sixlines_delta41_cosets_6.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 37 2 1 1 --digits 1200 2000 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_37.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 600,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-37-2-1200-2000",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 3600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_37.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 37 6 1 1 --digits 1200 2000 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_37.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 600,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-37-6-1200-2000",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 3600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_37.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 41 22 1 1 --digits 2000 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_41.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 600,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-41-22-2000",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 3600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_41.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 41 2 1 1 --digits 2000 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_41.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 600,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-41-2-2000",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 3600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_41.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 43 14 1 1 --digits 2000 3000 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_43.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 900,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-43-14-2000-3000",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 3600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_43.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 43 22 1 1 --digits 2000 3000 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_43.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 900,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-43-22-2000-3000",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 3600
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_43.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 43 14 1 1 --digits 3000 4500 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_43_14.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1260,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-43-14-3000-4500",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_43_14.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 43 2 1 1 --digits 3000 4500 --workers 6",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_43_2.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1470.0,
+   "expected_memory_mb": 7500,
+   "group": "order-3",
+   "id": "n29/cosets-43-2-3000-4500",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_43_2.log": "identical"
+   },
+   "procs": 6,
+   "set": 1
+  },
+  {
+   "caveat": "the stored run read the period points of the 3000/4500-digit run from sixlines_order3_points/, which is not in the archive; the rerun computes them again, so it takes longer and its log may differ in the lines about the cache; the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the stored record of this run lacks, so that key is not compared",
+   "command": "python -I sixlines_order3.py cosets 43 2 1 1 --digits 3000 --mix 0 2 -1 1 0 --workers 4",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_43_2_mix.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1260,
+   "expected_memory_mb": 5500,
+   "group": "order-3",
+   "id": "n29/cosets-43-2-mix",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_43_2_mix.log": "identical"
+   },
+   "procs": 4,
+   "set": 1
+  },
+  {
+   "caveat": "the stored run read the period points of the 3000/4500-digit run from sixlines_order3_points/, which is not in the archive; the rerun computes them again, so it takes longer and its log may differ in the lines about the cache",
+   "command": "python -I sixlines_order3.py cosets 43 2 1 1 --digits 3000 --mix 0 2 -1 1 0 --identify-by-coordinate --workers 4",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_43_2_coord.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1260,
+   "expected_memory_mb": 5500,
+   "group": "order-3",
+   "id": "n29/cosets-43-2-coord",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_43_2_coord.log": "identical"
+   },
+   "procs": 4,
+   "set": 1
+  },
+  {
+   "caveat": "the stored run read the period points of the 3000/4500-digit run from sixlines_order3_points/, which is not in the archive; the rerun computes them again, so it takes longer and its log may differ in the lines about the cache",
+   "command": "python -I sixlines_order3.py cosets 43 2 1 1 --digits 4500 --mix 0 2 -1 1 0 --workers 4",
+   "compared": [
+    {
+     "file": "sixlines_order3_cosets_43_2_mix4500.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_order3_cosets.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1260,
+   "expected_memory_mb": 5500,
+   "group": "order-3",
+   "id": "n29/cosets-43-2-mix4500",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 8000,
+    "time_seconds": 10800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_order3_cosets.jsonl": "identical",
+    "sixlines_order3_cosets_43_2_mix4500.log": "identical"
+   },
+   "procs": 4,
+   "set": 1
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_fq.py enumerate --p 7 --out sixlines_q49.jsonl --procs 8 --reduced",
+   "compared": [
+    {
+     "file": "sixlines_q49.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_q49.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 8925.0,
+   "expected_memory_mb": 2500,
+   "group": "lattices",
+   "id": "n03/enumerate-q49",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 43200
+   },
+   "note": 3,
+   "predicted": {
+    "sixlines_q49.jsonl": "identical",
+    "sixlines_q49.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_ramified.py --search 7,3 --search 7,5 --out sixlines_ramified_q7.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_ramified_q7.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_ramified_q7.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 1800,
+   "expected_memory_mb": 1000,
+   "group": "ring-steps",
+   "id": "n09/ramified-q7",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 9,
+   "predicted": {
+    "sixlines_ramified_q7.jsonl": "identical",
+    "sixlines_ramified_q7.log": "identical"
+   },
+   "procs": 1,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_prym.py --workers 8 --out sixlines_prym.jsonl --run 5 7 11 13 17 19 23 29 31 37",
+   "compared": [
+    {
+     "file": "sixlines_prym.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_prym.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 3150.0,
+   "expected_memory_mb": 2900,
+   "group": "fourfold",
+   "id": "n14/prym-run",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 21600
+   },
+   "note": 14,
+   "predicted": {
+    "sixlines_prym.jsonl": "identical",
+    "sixlines_prym.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_prym_fq.py --workers 8 --select irreducible --pairs 3 --run 49 --out sixlines_prym_q49.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_prym_q49.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_prym_q49.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 4620.0,
+   "expected_memory_mb": 2900,
+   "group": "fourfold",
+   "id": "n16/prym-fq-q49",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 21600
+   },
+   "note": 16,
+   "predicted": {
+    "sixlines_prym_q49.jsonl": "identical",
+    "sixlines_prym_q49.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms_fp.py inverting 23 --pairs 2 --limit 150 --k 2 --workers 4 --out sixlines_forms_fp.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_forms_fp.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_forms_fp.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 960,
+   "expected_memory_mb": 1700,
+   "group": "fourfold",
+   "id": "n21/inverting-k2-23",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 21,
+   "predicted": {
+    "sixlines_forms_fp.jsonl": "identical",
+    "sixlines_forms_fp.log": "identical"
+   },
+   "procs": 4,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms_fp.py inverting 29 --pairs 2 --limit 60 --k 2 --workers 4 --out sixlines_forms_fp.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_forms_fp.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_forms_fp.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1140,
+   "expected_memory_mb": 1700,
+   "group": "fourfold",
+   "id": "n21/inverting-k2-29",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 21,
+   "predicted": {
+    "sixlines_forms_fp.jsonl": "identical",
+    "sixlines_forms_fp.log": "identical"
+   },
+   "procs": 4,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_forms_fp.py inverting 37 --pairs 2 --limit 20 --k 2 --workers 4 --out sixlines_forms_fp.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_forms_fp.log",
+     "mode": "text-contained"
+    },
+    {
+     "file": "sixlines_forms_fp.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1080,
+   "expected_memory_mb": 1700,
+   "group": "fourfold",
+   "id": "n21/inverting-k2-37",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 21,
+   "predicted": {
+    "sixlines_forms_fp.jsonl": "identical",
+    "sixlines_forms_fp.log": "identical"
+   },
+   "procs": 4,
+   "set": 2
+  },
+  {
+   "caveat": "the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not",
+   "command": "python -I sixlines_jacobian.py --character --pairs 3 --workers 4 --out sixlines_jacobian_character.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_jacobian_character.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_jacobian_character.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 3000,
+   "expected_memory_mb": 2900,
+   "group": "quadratic-character",
+   "id": "n23/jacobian-character",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 21600
+   },
+   "note": 23,
+   "predicted": {
+    "sixlines_jacobian_character.jsonl": "identical",
+    "sixlines_jacobian_character.log": "identical"
+   },
+   "procs": 4,
+   "set": 2
+  },
+  {
+   "caveat": "the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not; the stored run was made in two pieces and joined, so its log differs from one run's",
+   "command": "python -I sixlines_jacobian.py --character-extra sixlines_jacobian_character.jsonl --workers 4 --out sixlines_jacobian_character_extra.jsonl",
+   "compared": [
+    {
+     "file": "sixlines_jacobian_character_extra.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_jacobian_character_extra.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 2100,
+   "expected_memory_mb": 2900,
+   "group": "quadratic-character",
+   "id": "n23/jacobian-character-extra",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 23,
+   "predicted": {
+    "sixlines_jacobian_character_extra.jsonl": "identical",
+    "sixlines_jacobian_character_extra.log": "identical"
+   },
+   "procs": 4,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 41 --out sixlines_p41.jsonl --procs 8",
+   "compared": [
+    {
+     "file": "sixlines_p41.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 1785.0,
+   "expected_memory_mb": 2100,
+   "group": "quadratic-character",
+   "id": "n26/enumerate-p41",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_p41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading primary --pairs 6 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 2700.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-primary",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading primary --pairs 0 --surfaces 6:7 6:15 6:2 6:3 22:3 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1890.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-primary-surfaces",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading twist1 --per-surface 1 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 280.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-twist1",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading twist2 --per-surface 1 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 280.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-twist2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading seed --per-surface 1 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 280.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-seed",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading n16 --per-surface 1 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 280.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-n16",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading r2 --per-surface 1 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 280.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-r2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": "delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty file, so it recomputes every record of its reading",
+   "command": "python -I sixlines_delta41.py delta --reading cofactor --pairs 2 --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_delta41.jsonl",
+     "mode": "records-subset"
+    }
+   ],
+   "cost": 1155.0,
+   "expected_memory_mb": 4500,
+   "group": "quadratic-character",
+   "id": "n26/delta-cofactor",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 26,
+   "predicted": {
+    "sixlines_delta41.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines_leakage.py extra --workers 8",
+   "compared": [
+    {
+     "file": "sixlines_leakage_extra.log",
+     "mode": "text"
+    },
+    {
+     "file": "sixlines_leakage_extra.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 1080.0,
+   "expected_memory_mb": 4200,
+   "group": "leakage",
+   "id": "n28/extra",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 28,
+   "predicted": {
+    "sixlines_leakage_extra.jsonl": "identical",
+    "sixlines_leakage_extra.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I sixlines.py enumerate --p 43 --out sixlines_p43.jsonl --procs 8",
+   "compared": [
+    {
+     "file": "sixlines_p43.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 2625.0,
+   "expected_memory_mb": 2100,
+   "group": "order-3",
+   "id": "n29/enumerate-p43",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 29,
+   "predicted": {
+    "sixlines_p43.jsonl": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family e8a2 --p 5 --count 16000 --check2 5 --workers 8 --out ellk3_e8a2_p5.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_e8a2_p5.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_e8a2_p5.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 1035.0,
+   "expected_memory_mb": 3700,
+   "group": "below-16",
+   "id": "n22/e8a2-p5",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_e8a2_p5.jsonl": "identical",
+    "ellk3_e8a2_p5.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family e8a2 --p 7 --count 4000 --check2 5 --workers 8 --out ellk3_e8a2_p7.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_e8a2_p7.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_e8a2_p7.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 2430.0,
+   "expected_memory_mb": 3700,
+   "group": "below-16",
+   "id": "n22/e8a2-p7",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_e8a2_p7.jsonl": "identical",
+    "ellk3_e8a2_p7.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family e8 --p 5 --count 1200 --workers 8 --out ellk3_e8_p5.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_e8_p5.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_e8_p5.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 360.0,
+   "expected_memory_mb": 3700,
+   "group": "below-16",
+   "id": "n22/e8-p5",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_e8_p5.jsonl": "identical",
+    "ellk3_e8_p5.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family generic --p 5 --count 10 --check2 7 --bnf-limit 900 --workers 5 --out ellk3_generic_p5.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_generic_p5.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_generic_p5.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 648,
+   "expected_memory_mb": 2500,
+   "group": "below-16",
+   "id": "n22/generic-p5",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 3600
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_generic_p5.jsonl": "identical",
+    "ellk3_generic_p5.log": "identical"
+   },
+   "procs": 5,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family generic --p 5 --count 30 --seed 2 --check2 7 --bnf-limit 900 --workers 8 --out ellk3_generic_p5_seed2.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_generic_p5_seed2.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_generic_p5_seed2.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 1260.0,
+   "expected_memory_mb": 3700,
+   "group": "below-16",
+   "id": "n22/generic-p5-seed2",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_generic_p5_seed2.jsonl": "identical",
+    "ellk3_generic_p5_seed2.log": "identical"
+   },
+   "procs": 8,
+   "set": 2
+  },
+  {
+   "caveat": null,
+   "command": "python -I ellk3_two_neighbours.py --family generic --p 5 --count 10 --control --bnf-limit 60 --workers 5 --out ellk3_generic_p5_control.jsonl",
+   "compared": [
+    {
+     "file": "ellk3_generic_p5_control.log",
+     "mode": "text"
+    },
+    {
+     "file": "ellk3_generic_p5_control.jsonl",
+     "mode": "records"
+    }
+   ],
+   "cost": 1800,
+   "expected_memory_mb": 2500,
+   "group": "below-16",
+   "id": "n22/generic-p5-control",
+   "keep_work": false,
+   "kind": "computation",
+   "limits": {
+    "memory_mb": 6000,
+    "time_seconds": 10800
+   },
+   "note": 22,
+   "predicted": {
+    "ellk3_generic_p5_control.jsonl": "identical",
+    "ellk3_generic_p5_control.log": "identical"
+   },
+   "procs": 5,
+   "set": 2
+  }
+ ]
+}

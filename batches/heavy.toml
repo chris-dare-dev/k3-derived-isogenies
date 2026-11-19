@@ -1,9 +1,9 @@
-# Planned, not run by default.  Every computation of the notes that takes from about a quarter of an hour
+# Not run by default.  Every computation of the notes that takes from about a quarter of an hour
 # to several hours, and the two audits of notes 28 and 29 with the leakage audit's shuffled-label reruns:
 # the enumerations over F_49 and at q = 41 and 43, the full Prym runs, the long CM sweeps, the delta and
 # coset runs at q = 41 and 43, the long Jacobian runs, the inverting runs of note 21 and the elliptic K3
 # runs of note 22.  The wall times the notes record add up to about 19 hours; with two tasks at a time
-# and up to 8 processes each, the batch takes about 10 hours.
+# and up to 8 processes each, the one run on record took 12 h 22 min.
 #
 # Before running it, check `free -h` and lower --memory-budget below the memory available; the scheduler
 # refuses to start a budget above what is available unless given --overcommit.  A run can be stopped at any
