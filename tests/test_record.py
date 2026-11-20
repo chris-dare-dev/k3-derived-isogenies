@@ -134,6 +134,13 @@ class Answers(unittest.TestCase):
     def test_a_key_without_a_value_is_as_good_as_absent(self) -> None:
         self.assertTrue(answers({"task": dict(self.task)}, self.task | {"sample": None}))
 
+    def test_the_keys_a_runner_names_do_not_count_either(self) -> None:
+        older = self.task | {"caveat": "the first words", "procs": 2}
+        self.assertFalse(answers({"task": older}, self.task))
+        self.assertTrue(answers({"task": older}, self.task, ignore={"caveat", "procs"}))
+        # only the keys named are left out
+        self.assertFalse(answers({"task": older | {"bound": 4}}, self.task, ignore={"caveat", "procs"}))
+
     def test_another_predicted_value_or_another_computation_is_another_task(self) -> None:
         self.assertFalse(answers({"task": dict(self.task)}, self.task | {"predicted": {"n": 8}}))
         self.assertFalse(answers({"task": dict(self.task)}, self.task | {"bound": 4}))

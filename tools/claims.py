@@ -37,7 +37,7 @@ sys.path.insert(0, str(REPOSITORY))
 import adopt  # noqa: E402
 
 from k3tasks import expectation  # noqa: E402
-from k3tasks.tasks import ComputationTask, SyntheticTask, plan_batch  # noqa: E402
+from k3tasks.tasks import NOT_COMPUTED, ComputationTask, SyntheticTask, plan_batch  # noqa: E402
 from taskbatch.record import answers  # noqa: E402
 from taskbatch.store import ResultStore  # noqa: E402
 
@@ -108,7 +108,9 @@ def standing(task: ListedComputation | ListedSynthetic, record: dict[str, Any] |
     """Where a task stands in the tables: the status of its latest record, if that record still answers it."""
     if record is None:
         return NOT_RERUN
-    if not answers(record, {key: value for key, value in task.items() if key != "batches"}):
+    if not answers(
+        record, {key: value for key, value in task.items() if key != "batches"}, ignore=NOT_COMPUTED
+    ):
         return STALE
     return str(record["status"])
 

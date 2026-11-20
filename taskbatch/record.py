@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import signal
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Collection, Mapping
 from typing import Any, NotRequired, TypedDict, cast
 
 from .model import RUNNER_STATUSES, Limits, Status, Task
@@ -108,16 +108,20 @@ def make_record(
     return cast(Record, record | dict(stamp or {}))
 
 
-def answers(record: Mapping[str, Any], task: Mapping[str, Any]) -> bool:
+def answers(record: Mapping[str, Any], task: Mapping[str, Any], *, ignore: Collection[str] = ()) -> bool:
     """Whether a record was computed for this task as it is now.
 
     The task of the record and `task` must agree on every key that has a value, apart from the place of
-    the task in its batch (`set`, `group`, `cost`).  A record computed by another command, or compared
-    with another predicted value, says nothing about the task as it is now.
+    the task in its batch (`set`, `group`, `cost`) and the keys in `ignore`.  A record computed by another
+    command, or compared with another predicted value, says nothing about the task as it is now.
+
+    `ignore` is for the keys of a payload that the runner knows do not change what is computed: the
+    scheduler cannot tell them from the others, because the rest of a payload is the runner's business.
     """
+    left_out = PLACEMENT | frozenset(ignore)
 
     def essential(payload: Mapping[str, Any]) -> dict[str, Any]:
-        kept = {key: value for key, value in payload.items() if key not in PLACEMENT and value is not None}
+        kept = {key: value for key, value in payload.items() if key not in left_out and value is not None}
         return cast(dict[str, Any], json.loads(json.dumps(kept, sort_keys=True)))
 
     return essential(record["task"]) == essential(task)

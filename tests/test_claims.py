@@ -194,6 +194,26 @@ class Registry(unittest.TestCase):
         text = summary(LATTICES, {"n02/b": old})
         self.assertIn("tasks: stale 1; not re-run 1 (of 2); [tasks]", text)
 
+    def test_a_changed_caveat_or_estimate_leaves_the_record_standing(self) -> None:
+        task = TASKS["n02/b"]
+        for changed in (
+            {"caveat": "words written before the rerun"},
+            {"note": 3},
+            {"procs": 2},
+            {"expected_memory_mb": 500},
+            {"keep_work": True},
+        ):
+            with self.subTest(changed=changed):
+                self.assertEqual(claims.standing(task, record("n02/b", **changed)), "ok")
+        # what the task computes, and what it is compared with, still make a record stale
+        for changed in (
+            {"command": "python other.py"},
+            {"compared": [{"file": "f.log", "mode": "exact"}]},
+            {"predicted": {"f.log": "identical", "g.log": "identical"}},
+        ):
+            with self.subTest(changed=changed):
+                self.assertEqual(claims.standing(task, record("n02/b", **changed)), "stale")
+
     def test_stored_lines_named_as_evidence_are_checked_against_the_data(self) -> None:
         item = {"file": "f.log", "line": 2, "text": "162 agree"}
         registry = REGISTRY | {"claim": [LEDGER | {"evidence": [item]}]}

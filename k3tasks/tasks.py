@@ -67,6 +67,14 @@ SYNTHETIC_KEYS = {"name", "cost", "sleep_seconds", "allocate_mb", "fail"}
 CONTROL_SUFFIX = "!control"
 CONTROL_GROUP = "negative control"
 
+# Keys of a task that do not change what it computes or what it is compared with: the words of its
+# caveat, the number of its note, how many processes and how much memory it is expected to take, and
+# whether its work directory is kept.  A record computed before one of them changed still answers the
+# task (taskbatch.record.answers); a change to any other key does not.  `command` and `compared` stay
+# out of this set: the command carries the worker count a script is given, and the files compared with
+# are what a claim rests on.
+NOT_COMPUTED = frozenset({"caveat", "note", "procs", "expected_memory_mb", "keep_work"})
+
 
 class Compared(TypedDict):
     """A stored file that a rerun is compared with, and how (compare.py)."""
