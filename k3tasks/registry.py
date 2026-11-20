@@ -569,7 +569,8 @@ for _name, _args, _core_hours, _procs in (
 ):
     _file = "ellk3_" + _name.replace("-", "_")
     C(f"n22/{_name}", "ellk3_two_neighbours.py", f"{_args} --workers {{procs}} --out {_file}.jsonl",
-      round(_core_hours * 3600 / _procs), procs=_procs, worker_mb=400, stdout=f"{_file}.log",
+      round(_core_hours * 3600 / _procs), procs=_procs, worker_mb=900 if _name in ("e8a2-p5", "e8a2-p7") else 400,
+      stdout=f"{_file}.log",
       outputs={f"{_file}.jsonl": "records"}, tags=HEAVY if _core_hours > 0.2 else (), group=G)
 for _p in (5, 7):
     C(f"n22/graph-e8a2-p{_p}", "ellk3_two_neighbours.py", f"--graph ellk3_e8a2_p{_p}.jsonl", 10,

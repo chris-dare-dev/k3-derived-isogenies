@@ -48,6 +48,15 @@ tags = ["heavy"]
 procs = 6
 limits = { memory_mb = 8000 }
 
+# the two elliptic K3 runs of note 22 with the most points: a worker takes about 900 MB, and with 8 workers
+# the 6000 MB of the table below were not enough (both ended at their first run on the kernel's kill)
+[[tasks]]
+kind = "computation"
+ids = ["n22/e8a2-p5", "n22/e8a2-p7"]
+tags = ["heavy"]
+procs = 8
+limits = { time_seconds = 7200, memory_mb = 10000 }
+
 [[tasks]]
 kind = "computation"
 tags = ["heavy"]
