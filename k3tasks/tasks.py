@@ -83,6 +83,14 @@ class Compared(TypedDict):
     mode: str
 
 
+class Seeded(TypedDict):
+    """Stored records a written file starts with (registry.Seed)."""
+
+    file: str
+    field: str
+    value: str
+
+
 class _Placed(TypedDict):
     """What every task has: its place in the batch, and what it is expected to take."""
 
@@ -111,6 +119,7 @@ class ComputationTask(_Placed, _Control):
     predicted: dict[str, Any] | None  # keys and values as in expectation.py; None when nothing is compared
     compared: list[Compared]
     caveat: str | None
+    seeds: list[Seeded] | None  # None when the rerun starts from nothing; absent from older records
 
 
 class SyntheticTask(_Placed):
@@ -212,6 +221,8 @@ def expand_batch(description: dict[str, Any]) -> list[TaskPayload]:
                 "predicted": predicted or None,
                 "compared": [{"file": check.stored, "mode": check.mode} for check in computation.checks],
                 "caveat": computation.caveat or None,
+                "seeds": [Seeded(file=s.file, field=s.field, value=s.value) for s in computation.seeds]
+                or None,
             }
             if control:
                 unknown = set(control["predicted"]) - set(predicted)

@@ -15,8 +15,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from k3tasks.registry import STDOUT, Check, Computation
-from k3tasks.workspace import Places, WorkspaceError, evaluate, execute, prepare, reproduce
+from k3tasks.registry import STDOUT, Check, Computation, Seed
+from k3tasks.workspace import Places, WorkspaceError, evaluate, execute, prepare, reproduce, seed
 
 TOY_SCRIPT = textwrap.dedent(
     """
@@ -36,6 +36,15 @@ TOY_SCRIPT = textwrap.dedent(
     if mode == "start":
         import multiprocessing
         print("start", multiprocessing.get_start_method(), __name__)
+    if mode in ("extend", "clobber"):
+        path = os.path.join(HERE, "toy_seeded.jsonl")
+        seeded = [json.loads(line) for line in open(path)] if os.path.exists(path) else []
+        if mode == "clobber":
+            open(path, "w").close()
+        else:
+            with open(path, "a") as fh:
+                for r in seeded:
+                    fh.write(json.dumps({"reading": "b", "n": r["n"] * 10}) + "\\n")
     total = sum(r["n"] for r in rows) + (1 if mode == "wrong" else 0)
     print(toy_helper.banner(), "total", total, "(0.%d s)" % len(mode))
     with open(os.path.join(HERE, "toy_output.jsonl"), "a") as fh:
@@ -48,6 +57,15 @@ STORED = {
     "toy_input.jsonl": "".join(json.dumps({"n": n}) + "\n" for n in (1, 2, 3)),
     "toy_output.jsonl": "".join(json.dumps({"n": n, "seconds": 99}) + "\n" for n in (2, 4, 6)),
     "toy.log": "toy total 6 (5.1 s)\n",
+    "toy_seeded.jsonl": "".join(
+        json.dumps(r) + "\n"
+        for r in (
+            {"reading": "a", "n": 1},
+            {"reading": "b", "n": 10},
+            {"reading": "a", "n": 3},
+            {"reading": "b", "n": 30},
+        )
+    ),
     "sixlines_ledger.log": "marker\n",
 }
 
@@ -182,6 +200,43 @@ class Workspace(unittest.TestCase):
             execute(computation, self.places, 1)
         target.write_text(STORED["toy.log"])  # undo, for tearDown
         os.utime(target)
+
+    def seeded(self, mode: str) -> Computation:
+        return toy(
+            mode,
+            checks=(Check("toy_seeded.jsonl", "toy_seeded.jsonl", "records-subset"),),
+            expect=(),
+            seeds=(Seed("toy_seeded.jsonl", "reading", "a"),),
+            caveat="starts from the stored records of reading a",
+        )
+
+    def test_a_seeded_file_starts_with_the_records_the_condition_selects(self) -> None:
+        computation = self.seeded("ok")
+        work = prepare(computation, self.places)
+        self.assertFalse((work / "toy_seeded.jsonl").exists())  # written by the computation: not copied
+        seeded = seed(computation, self.places, work)
+        wanted = [json.dumps({"reading": "a", "n": 1}), json.dumps({"reading": "a", "n": 3})]
+        self.assertEqual(seeded, {"toy_seeded.jsonl": wanted})
+        self.assertEqual((work / "toy_seeded.jsonl").read_text(), "".join(line + "\n" for line in wanted))
+        # the stored file is untouched (tearDown checks every byte)
+
+    def test_only_what_a_seeded_run_appends_is_compared(self) -> None:
+        result = self.run_toy(self.seeded("extend"))
+        self.assertEqual((result["status"], result["verdict"]), ("ok", "reproduced"))
+        self.assertEqual(result["seeded"], {"toy_seeded.jsonl": 2})
+        self.assertEqual(result["differences"]["toy_seeded.jsonl"]["records"], 2)
+
+    def test_a_seeded_run_that_appends_nothing_is_not_a_result(self) -> None:
+        result = self.run_toy(self.seeded("ok"))
+        self.assertEqual(result["status"], "mismatch")
+        self.assertEqual(result["differences"]["toy_seeded.jsonl"]["why"], "the rerun wrote no records")
+
+    def test_a_command_that_removes_its_seed_is_an_error(self) -> None:
+        with self.assertRaisesRegex(WorkspaceError, "no longer starts with the 2 records"):
+            self.run_toy(self.seeded("clobber"))
+
+    def test_an_unseeded_computation_says_nothing_of_seeds(self) -> None:
+        self.assertNotIn("seeded", self.run_toy(toy()))
 
     def test_missing_data_is_explained(self) -> None:
         (self.places.data / "sixlines_ledger.log").unlink()

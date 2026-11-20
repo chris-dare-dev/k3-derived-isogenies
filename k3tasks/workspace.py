@@ -19,13 +19,14 @@ inspection otherwise (or always, with `keep_work`).
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
 import subprocess
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -104,6 +105,45 @@ class Execution:
     stderr: Path
     exit_code: int
     seconds: float
+    # a seeded file (registry.Seed) by name: the number of records it started with, and the file of what the
+    # command appended to them, which is what is compared with the stored file
+    seeded: dict[str, int] = field(default_factory=dict)
+    appended: dict[str, Path] = field(default_factory=dict)
+
+
+def seed(computation: Computation, places: Places, work_dir: Path) -> dict[str, list[str]]:
+    """Writes the seeded files of a computation into its work directory; the lines of each, by file name.
+
+    A seed takes the lines of the stored file whose record has the stated value in the stated field, as
+    they stand.  A stored line that is not a record with that field is not taken.
+    """
+    seeded: dict[str, list[str]] = {}
+    for item in computation.seeds:
+        taken = []
+        for line in (places.data / item.file).read_text(encoding="utf-8").splitlines():
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(record, dict) and record.get(item.field) == item.value:
+                taken.append(line)
+        (work_dir / item.file).write_text("".join(line + "\n" for line in taken), encoding="utf-8")
+        seeded.setdefault(item.file, []).extend(taken)
+    return seeded
+
+
+def split_appended(work_dir: Path, name: str, lines: list[str]) -> Path:
+    """Writes what a command appended to a seeded file, without the seed, next to it; returns that file.
+
+    The command must have left the seed where it was.  A run that appended nothing gives an empty file, so
+    a seed is never mistaken for a result.
+    """
+    now = (work_dir / name).read_text(encoding="utf-8").splitlines() if (work_dir / name).exists() else []
+    if now[: len(lines)] != lines:
+        raise WorkspaceError(f"{name} no longer starts with the {len(lines)} records it was seeded with")
+    target = work_dir / f"{name}.appended"
+    target.write_text("".join(line + "\n" for line in now[len(lines) :]), encoding="utf-8")
+    return target
 
 
 def prepare(computation: Computation, places: Places) -> Path:
@@ -134,6 +174,7 @@ def execute(computation: Computation, places: Places, procs: int) -> Execution:
     """Runs the computation's command in a fresh work directory; the stored files are not touched."""
     before = _signature(stored_files(places.data))
     work_dir = prepare(computation, places)
+    seeds = seed(computation, places, work_dir)
     stdout, stderr = work_dir / "_stdout.txt", work_dir / "_stderr.txt"
     script = [str(work_dir / computation.script), *computation.argv(procs)]
     command = [places.python, "-I", *(["-c", FORK_LAUNCHER] if computation.needs_fork else []), *script]
@@ -154,7 +195,21 @@ def execute(computation: Computation, places: Places, procs: int) -> Execution:
         raise WorkspaceError(
             f"stored file {changed[0]} changed while the computation ran ({len(changed)} in all)"
         )
-    return Execution(work_dir, stdout, stderr, done.returncode, seconds)
+    # a command that failed has nothing to compare, and its own error is what is reported
+    appended = (
+        {name: split_appended(work_dir, name, lines) for name, lines in seeds.items()}
+        if done.returncode == 0
+        else {}
+    )
+    return Execution(
+        work_dir,
+        stdout,
+        stderr,
+        done.returncode,
+        seconds,
+        seeded={name: len(lines) for name, lines in seeds.items()},
+        appended=appended,
+    )
 
 
 def produced_path(execution: Execution, produced: str) -> Path:
@@ -162,7 +217,7 @@ def produced_path(execution: Execution, produced: str) -> Path:
         return execution.stdout
     if produced == STDERR:
         return execution.stderr
-    return execution.work_dir / produced
+    return execution.appended.get(produced, execution.work_dir / produced)
 
 
 def shown(path: Path) -> str:
@@ -220,6 +275,7 @@ def evaluate(
         "digests": digests,
         "differences": differences,
         "caveat": computation.caveat or None,
+        **({"seeded": execution.seeded} if execution.seeded else {}),
     }
 
 

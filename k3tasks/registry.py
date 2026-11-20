@@ -66,6 +66,19 @@ class Check:
 
 
 @dataclass(frozen=True)
+class Seed:
+    """Stored records that a written file starts with, for a command that reads the file it appends to.
+
+    The records of `file` whose `field` is `value` are copied, as they are, into the work directory
+    before the command runs.  Only what the command appends after them is compared with the stored file.
+    """
+
+    file: str
+    field: str
+    value: str
+
+
+@dataclass(frozen=True)
 class Computation:
     id: str
     note: int
@@ -83,6 +96,7 @@ class Computation:
     merge_stderr: bool = False  # the stored log was written with 2>&1
     caveat: str = ""  # what is known to differ, or why nothing is compared
     tags: tuple[str, ...] = field(default=())
+    seeds: tuple[Seed, ...] = ()  # stored records a written file starts with (see Seed)
 
     @property
     def needs_fork(self) -> bool:
@@ -156,6 +170,7 @@ def C(
     merge_stderr: bool = False,
     caveat: str = "",
     tags: tuple[str, ...] = (),
+    seeds: tuple[Seed, ...] = (),
     group: str,
 ) -> Computation:
     note = int(id.split("/")[0].lstrip("n"))
@@ -184,6 +199,7 @@ def C(
         merge_stderr=merge_stderr,
         caveat=caveat,
         tags=tags,
+        seeds=seeds,
     )
     if id in _REGISTRY:
         raise ValueError(f"two computations with the id {id}")
@@ -432,6 +448,10 @@ C("n26/validate", "sixlines_delta41.py", "validate --n 2", 120, stdout=_D41_LOG,
 _DELTA = {"sixlines_delta41.jsonl": ("sixlines_delta41.jsonl", "records-subset")}
 _DELTA_NOTE = ("delta appends to sixlines_delta41.jsonl and skips what is there; the rerun starts from an empty "
                "file, so it recomputes every record of its reading")
+_DELTA_SEED = (Seed("sixlines_delta41.jsonl", "reading", "primary"),)
+_DELTA_SEEDED_NOTE = ("delta appends to sixlines_delta41.jsonl and skips what is there; this reading chooses its pairs "
+                      "from the records of the primary reading, so the rerun starts from the stored primary records "
+                      "and only the records it appends are compared with the stored file")
 C("n26/delta-primary", "sixlines_delta41.py", "delta --reading primary --pairs 6 --workers {procs}", 30 * 60,
   procs=12, worker_mb=500, outputs=_DELTA, caveat=_DELTA_NOTE, tags=HEAVY, group=G)
 C("n26/delta-primary-surfaces", "sixlines_delta41.py",
@@ -439,9 +459,10 @@ C("n26/delta-primary-surfaces", "sixlines_delta41.py",
   worker_mb=500, outputs=_DELTA, caveat=_DELTA_NOTE, tags=HEAVY, group=G)
 for _reading in ("twist1", "twist2", "seed", "n16", "r2"):
     C(f"n26/delta-{_reading}", "sixlines_delta41.py", f"delta --reading {_reading} --per-surface 1 --workers {{procs}}",
-      160, procs=14, worker_mb=500, outputs=_DELTA, caveat=_DELTA_NOTE, tags=HEAVY, group=G)
+      160, procs=14, worker_mb=500, outputs=_DELTA, caveat=_DELTA_SEEDED_NOTE, seeds=_DELTA_SEED, tags=HEAVY,
+      group=G)
 C("n26/delta-cofactor", "sixlines_delta41.py", "delta --reading cofactor --pairs 2 --workers {procs}", 11 * 60,
-  procs=14, worker_mb=500, outputs=_DELTA, caveat=_DELTA_NOTE, tags=HEAVY, group=G)
+  procs=14, worker_mb=500, outputs=_DELTA, caveat=_DELTA_SEEDED_NOTE, seeds=_DELTA_SEED, tags=HEAVY, group=G)
 _COSETS41 = {"sixlines_delta41_cosets.jsonl": ("sixlines_delta41_cosets.jsonl", "records-subset")}
 C("n26/cosets-22", "sixlines_delta41.py", "cosets 41 22 1 1 --digits 1200 2000 3000 --primes 8 --workers {procs} --no-delta",
   30 * 60, procs=4, memory_mb=1500, worker_mb=1000, stdout="sixlines_delta41_cosets_22.log", outputs=_COSETS41,
@@ -614,6 +635,12 @@ def validate() -> list[str]:
                 problems.append(f"{c.id}: compares the standard error, but it is merged into the output")
             if check.unstored_tail and (check.mode != "text-contained" or not c.caveat):
                 problems.append(f"{c.id}: lines are left out of a comparison without the mode or the caveat for it")
+        compared = {check.produced: check for check in c.checks}
+        for seed in c.seeds:
+            if seed.file not in compared or compared[seed.file].mode not in ("records", "records-subset"):
+                problems.append(f"{c.id}: seeds {seed.file}, which it does not compare as records")
+            if not c.caveat:
+                problems.append(f"{c.id}: seeds {seed.file} without a caveat that says so")
         if c.parallel and c.procs < 2:
             problems.append(f"{c.id}: takes {{procs}} but records one process")
         if not c.parallel and c.procs != 1:
