@@ -6,6 +6,7 @@ task, and its keys say how the task behaves:
     cost         the task's cost
     sleep        seconds to sleep
     allocate_mb  megabytes to hold while it sleeps
+    worker_mb    megabytes that a process it starts holds: the task waits for it, then exits with status 1
     exit         exit with this status and an error message instead of a result
     signal       end by this signal instead of printing a result
     silent       exit with status 0 without printing a result
@@ -19,6 +20,7 @@ from __future__ import annotations
 import json
 import os
 import signal
+import subprocess
 import sys
 import time
 
@@ -50,6 +52,11 @@ def note(journal: str | None, word: str, task: dict) -> None:
 def run(task: dict, journal: str | None) -> None:
     note(journal, "start", task)
     held = bytearray(b"x") * (int(task.get("allocate_mb", 0)) << 20)
+    if "worker_mb" in task:
+        hold = f"import time; held = bytearray(b'x') * ({int(task['worker_mb'])} << 20); time.sleep(30)"
+        subprocess.run([sys.executable, "-c", hold], check=False)
+        time.sleep(5)  # long enough to be ended from outside, if the process manager does so
+        sys.exit(1)
     time.sleep(float(task.get("sleep", 0)))
     note(journal, "end", task)
     if "exit" in task:

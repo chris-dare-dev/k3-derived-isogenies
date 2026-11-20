@@ -79,7 +79,7 @@ The runner decides only those three statuses. The scheduler decides the others f
 |---|---|
 | a result line with one of the three statuses, exit status 0 | that status |
 | wall time over the limit; the scheduler kills the process | `timeout` |
-| over the memory limit (killed by the control group, or by the scheduler when it polls) | `memory` |
+| over the memory limit (the control group killed the task process or a process of it, or the scheduler did when it polls) | `memory` |
 | exit status above 0 | `error`, with the last lines of the log that mention an error (lines containing `--back trace--` are dropped) |
 | ended by a signal for another reason, or exit status 0 without a readable result line | `crashed` |
 

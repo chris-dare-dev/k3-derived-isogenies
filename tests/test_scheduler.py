@@ -187,6 +187,12 @@ class Scheduling(SchedulerCase):
 class OutcomesUnderCgroupLimits(Outcomes):
     guard_class = CgroupGuard
 
+    def test_a_worker_killed_for_memory_makes_the_task_a_memory_task(self) -> None:
+        # the kernel kills the worker, not the task process, which ends on its own (an error, or the signal
+        # the scope's manager sends it); the scope still says why
+        self.run_batch(fake_config([{"name": "worker-hog", "worker_mb": 400}, {"name": "fails", "exit": 3}]))
+        self.assertEqual(self.statuses(), {"worker-hog": "memory", "fails": "error"})
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -19,7 +19,11 @@ def printed(**result: Any) -> str:
 
 
 def never() -> bool:
-    raise AssertionError("the memory guard is asked only about a process someone else killed")
+    raise AssertionError("the memory guard is asked only about a task that ended abnormally")
+
+
+def not_killed() -> bool:
+    return False
 
 
 class Classify(unittest.TestCase):
@@ -43,20 +47,25 @@ class Classify(unittest.TestCase):
         found = classify("", -signal.SIGKILL, stopped=None, killed_for_memory=lambda: True)
         self.assertEqual(found, (Status.MEMORY, {}, None))
 
+    def test_a_task_that_ends_on_its_own_after_a_worker_was_killed_is_a_memory_stop(self) -> None:
+        for ended in (-signal.SIGTERM, 1):  # the signal of the scope's manager, or an error of its own
+            found = classify("", ended, stopped=None, killed_for_memory=lambda: True)
+            self.assertEqual(found, (Status.MEMORY, {}, None))
+
     def test_another_kill_is_a_crash(self) -> None:
         found = classify("", -signal.SIGKILL, stopped=None, killed_for_memory=lambda: False)
         self.assertEqual(found, (Status.CRASHED, {}, "ended by signal SIGKILL"))
-        found = classify("", -signal.SIGSEGV, stopped=None, killed_for_memory=never)
+        found = classify("", -signal.SIGSEGV, stopped=None, killed_for_memory=not_killed)
         self.assertEqual(found, (Status.CRASHED, {}, "ended by signal SIGSEGV"))
 
     def test_a_failing_exit_status_is_an_error_with_the_lines_that_say_why(self) -> None:
         output = "starting\nlib.py:3: error: no object named X\n"
-        found = classify(output, 1, stopped=None, killed_for_memory=never)
+        found = classify(output, 1, stopped=None, killed_for_memory=not_killed)
         self.assertEqual(found, (Status.ERROR, {}, "lib.py:3: error: no object named X"))
-        self.assertEqual(classify("", 7, stopped=None, killed_for_memory=never)[2], "exit status 7")
+        self.assertEqual(classify("", 7, stopped=None, killed_for_memory=not_killed)[2], "exit status 7")
 
     def test_a_result_is_not_read_after_a_failing_exit_status(self) -> None:
-        found = classify(printed(status="ok", value=3), 1, stopped=None, killed_for_memory=never)
+        found = classify(printed(status="ok", value=3), 1, stopped=None, killed_for_memory=not_killed)
         self.assertEqual(found[0], Status.ERROR)
 
     def test_ending_well_without_a_result_is_a_crash(self) -> None:

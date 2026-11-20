@@ -53,14 +53,17 @@ def classify(
     """How a task ended, the result its runner printed, and the message to show for a failure.
 
     `exit_code` is negative for a signal.  `stopped` is the limit at which the scheduler killed the
-    process, if it did.  `killed_for_memory` is asked only about a process that someone else killed.
+    process, if it did.  `killed_for_memory` is asked about a task that ended abnormally without
+    a result, and says whether the kernel killed a process of it at its memory limit.  The task process
+    itself need not have been the one killed: a worker can be, and the process that started it then ends
+    on its own, with an error or the signal the scope's manager sends it.
     """
     result = parse_result(output) if exit_code == 0 else None
     if stopped is not None:
         return stopped, {}, None
     if result is not None and result.get("status") in RUNNER_STATUSES:
         return Status(result["status"]), result, None
-    if exit_code == -signal.SIGKILL and killed_for_memory():
+    if exit_code != 0 and killed_for_memory():
         return Status.MEMORY, {}, None
     if exit_code > 0:
         return Status.ERROR, {}, error_lines(output) or f"exit status {exit_code}"
