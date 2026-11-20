@@ -1,12 +1,12 @@
 # The registry of claims: every row of the claim tables of CLAIMS.md.
 #
 # tools/claims.py writes the tables of CLAIMS.md, the file claims/RECORDS.md and the "Main results" table
-# of README.md from this file, from the batch files (which tasks exist) and from the records in records/.
+# of GUIDE.md from this file, from the batch files (which tasks exist) and from the records in records/.
 # `make check` fails if the committed tables differ from what it writes.
 #
 # A table has a heading of CLAIMS.md and its columns.  A claim has an id, its table and the cells of its
 # row in the order of the columns (Markdown, as printed).  The cells of the table `main` are the rows of
-# the README's "Main results"; those of the table `ledger` are the columns ID, Statement, Source and Class
+# the guide's "Main results"; those of the table `ledger` are the columns ID, Statement, Source and Class
 # of the ledger of note 27 (docs/27-hypothesis-ledger.md, section 2), word for word: a test compares them.
 #
 # The tasks of a claim are the tasks of the registry groups named in `groups` and the tasks whose ids

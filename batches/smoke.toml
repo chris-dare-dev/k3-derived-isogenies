@@ -1,4 +1,4 @@
-# The three checks of the README's "Reproducing" section, and a few more that take seconds: the ledger
+# The three checks of the guide's "Reproducing" section, and a few more that take seconds: the ledger
 # rerun (byte for byte against the stored log), the theta-constant self-test of the CM method, the
 # fourfold of one surface over F_17, the self-tests of the enumeration scripts, and the reruns of note 29's
 # small steps against their stored logs.  About half a minute on one core; needs the stored results

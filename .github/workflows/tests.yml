@@ -19,7 +19,7 @@ jobs:
       - run: make lint
 
   # The scheduler, the task registry, the batch files and the claim tables: standard library only, no
-  # data archive.  `make check` fails if CLAIMS.md, claims/RECORDS.md or the README's table of main
+  # data archive.  `make check` fails if CLAIMS.md, claims/RECORDS.md or the guide's table of main
   # results is not what the claim registry and the records give.
   unit-tests:
     runs-on: ubuntu-latest

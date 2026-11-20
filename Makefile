@@ -14,7 +14,7 @@
 #                                      not know makes the working tree differ from its commit.  To record
 #                                      several batches in one go, `make run` each and then `make adopt`
 #   make adopt BATCHES="smoke audits"  copy the records of finished runs into records/
-#   make tables                        write the generated tables of CLAIMS.md, README.md and claims/RECORDS.md
+#   make tables                        write the generated tables of CLAIMS.md, GUIDE.md and claims/RECORDS.md
 #   make check                         is the registry consistent, are the data installed, and are those
 #                                      tables what the claim registry and the records give?
 #   make list                          every computation of the registry

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """claims.py -- the claim tables, written from the claim registry, the batch files and the records.
 
-Usage:  python3 tools/claims.py tables              write the generated parts of CLAIMS.md and README.md,
+Usage:  python3 tools/claims.py tables              write the generated parts of CLAIMS.md and GUIDE.md,
                                                      and claims/RECORDS.md
         python3 tools/claims.py check               fail if they are not what `tables` writes, if the claim
                                                      registry and the batch files do not fit together, or if
@@ -390,7 +390,7 @@ def detail(registry: dict[str, Any], tasks: Tasks, latest: dict[str, dict[str, A
         "until the task is run again.",
         "",
         'A task is one command of a note\'s *Reproduce* section. "Compared with" names the stored files of the data '
-        "archive ([DATA.md](../DATA.md)) and the mode of each comparison ([README.md](../README.md#what-a-task-does)), "
+        "archive ([DATA.md](../DATA.md)) and the mode of each comparison ([GUIDE.md](../GUIDE.md#what-a-task-does)), "
         "or the lines its output must contain. The verdict is **reproduced** when everything compared is identical, "
         "**checked** when there is no stored file but the output has the lines it must have, **ran** when the command "
         "ended and nothing was compared, and **differs** otherwise. A record names the day it was computed and the "
@@ -429,7 +429,7 @@ def blocks(
             **{slug: claims_table(slug, registry, tasks, latest) for slug in registry["table"]},
             "shared": shared,
         },
-        REPOSITORY / "README.md": {"main": plain_table("main", registry)},
+        REPOSITORY / "GUIDE.md": {"main": plain_table("main", registry)},
     }
 
 
