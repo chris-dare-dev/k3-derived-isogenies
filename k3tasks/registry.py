@@ -106,6 +106,11 @@ class Computation:
         return self.script in FORK_SCRIPTS
 
     @property
+    def needs_data(self) -> bool:
+        """False for a computation that reads no stored result and is compared with none (NO_DATA)."""
+        return "no-data" not in self.tags
+
+    @property
     def parallel(self) -> bool:
         return any("{procs}" in argument for argument in self.args)
 
@@ -215,6 +220,10 @@ def C(
 
 PASSED = (r"selftest passed",)
 HEAVY = ("heavy",)
+# A computation that reads no stored result and is compared with none: it runs without the data archive,
+# and its work directory never holds a stored file.  The tag is given only to a computation that has been
+# run that way.
+NO_DATA = ("no-data",)
 
 # Note 27: the ledger ----------------------------------------------------------------------------
 
@@ -223,7 +232,7 @@ C("n27/ledger", "sixlines_ledger.py", [], 1, stdout=("sixlines_ledger.log", "exa
 # Notes 2 to 5: six-line surfaces and Hermitian lattices ---------------------------------------------
 
 G = "lattices"
-C("n02/selftest", "sixlines.py", "selftest", 4, expect=PASSED, group=G)
+C("n02/selftest", "sixlines.py", "selftest", 4, expect=PASSED, tags=NO_DATA, group=G)
 _ENUMERATE = {7: 2, 11: 3, 13: 5, 17: 10, 19: 15, 23: 30, 29: 90, 31: 130, 37: 420}
 for _p, _s in _ENUMERATE.items():
     C(f"n02/enumerate-p{_p}", "sixlines.py", f"enumerate --p {_p} --out sixlines_p{_p}.jsonl --procs {{procs}}",
@@ -231,7 +240,7 @@ for _p, _s in _ENUMERATE.items():
 _SPLIT = " ".join(f"sixlines_p{p}.jsonl" for p in (7, 11, 13, 17, 19, 23, 29, 31, 37))
 C("n02/cm-list", "sixlines_cm.py", f"--list --out sixlines_cm.jsonl {_SPLIT}", 60,
   stdout="sixlines_cm.log", outputs={"sixlines_cm.jsonl": "records"}, group=G)
-C("n03/fq-selftest", "sixlines_fq.py", "selftest", 1, expect=PASSED, group=G)
+C("n03/fq-selftest", "sixlines_fq.py", "selftest", 1, expect=PASSED, tags=NO_DATA, group=G)
 C("n03/enumerate-q25", "sixlines_fq.py", "enumerate --p 5 --out sixlines_q25.jsonl --procs {procs}", 60,
   procs=8, worker_mb=200, outputs={"sixlines_q25.jsonl": "records"}, group=G)
 _NEIGHBOURS = " ".join(f"sixlines_p{p}.jsonl" for p in (13, 17, 19, 23, 29, 31, 37)) + " sixlines_q25.jsonl"
@@ -242,7 +251,7 @@ C("n03/enumerate-q49", "sixlines_fq.py", "enumerate --p 7 --out sixlines_q49.jso
   outputs={"sixlines_q49.jsonl": "records"}, tags=HEAVY, group=G)
 C("n03/q49-cm", "sixlines_cm.py", "--list --neighbours --out sixlines_q49_cm.jsonl sixlines_q49.jsonl", 300,
   stdout="sixlines_q49_cm.log", outputs={"sixlines_q49_cm.jsonl": "records"}, group=G)
-C("n04/forms-selftest", "sixlines_forms.py", "selftest", 3, expect=PASSED, group=G)
+C("n04/forms-selftest", "sixlines_forms.py", "selftest", 3, expect=PASSED, tags=NO_DATA, group=G)
 C("n04/enumerate-p5", "sixlines.py", "enumerate --p 5 --out sixlines_p5.jsonl", 2,
   outputs={"sixlines_p5.jsonl": "records"}, group=G)
 for _p, _q, _lat, _s in ((5, "q25", "sixlines_neighbours.jsonl", 20), (7, "q49", "sixlines_q49_cm.jsonl", 60)):
@@ -254,7 +263,7 @@ for _p, _q, _lat, _s in ((5, "q25", "sixlines_neighbours.jsonl", 20), (7, "q49",
       outputs={f"sixlines_forms_p{_p}_compare.jsonl": "records"}, group=G)
     C(f"n04/types-{_q}", "sixlines_types.py", f"{_lat} sixlines_{_q}.jsonl --out sixlines_types_{_q}.jsonl", 60,
       stdout=f"sixlines_types_{_q}.log", outputs={f"sixlines_types_{_q}.jsonl": "records"}, group=G)
-C("n05/nonsplit-selftest", "sixlines_nonsplit.py", "selftest", 1, expect=PASSED, group=G)
+C("n05/nonsplit-selftest", "sixlines_nonsplit.py", "selftest", 1, expect=PASSED, tags=NO_DATA, group=G)
 for _p, _s in {11: 5, 13: 10, 17: 60, 19: 120, 23: 660}.items():
     C(f"n05/nonsplit-enumerate-p{_p}", "sixlines_nonsplit.py",
       f"enumerate --p {_p} --out sixlines_nonsplit_p{_p}.jsonl --procs {{procs}}", _s, procs=12, worker_mb=200,
@@ -440,13 +449,13 @@ C("n23/jacobian-character-extra", "sixlines_jacobian.py",
   caveat=_JAC_RANDOM + "; the stored run was made in two pieces and joined, so its log differs from one run's",
   tags=HEAVY, group=G)
 C("n23/jacobian-one-29", "sixlines_jacobian.py", "--one 29 2 3 5 20 1 2", 30,
-  caveat="a rerun quoted in note 25 section 2; its output was not kept", group=G)
+  caveat="a rerun quoted in note 25 section 2; its output was not kept", tags=NO_DATA, group=G)
 _D41_LOG = ("sixlines_delta41.log", "text-contained")
 C("n26/enumerate-p41", "sixlines.py", "enumerate --p 41 --out sixlines_p41.jsonl --procs {procs}", 17 * 60, procs=14,
   worker_mb=200, outputs={"sixlines_p41.jsonl": "records"}, tags=HEAVY, group=G)
 C("n26/cm-list-p41", "sixlines_cm.py", "--list --out sixlines_cm_p41.jsonl sixlines_p41.jsonl", 11,
   stdout="sixlines_cm_p41.log", outputs={"sixlines_cm_p41.jsonl": "records"}, group=G)
-C("n26/dyadic", "sixlines_delta41.py", "dyadic", 1, caveat="no stored log", group=G)
+C("n26/dyadic", "sixlines_delta41.py", "dyadic", 1, caveat="no stored log", tags=NO_DATA, group=G)
 C("n26/selfcheck", "sixlines_delta41.py", "selfcheck --n 3 --workers {procs}", 120, procs=6, stdout=_D41_LOG, group=G)
 C("n26/list", "sixlines_delta41.py", "list", 1, stdout=_D41_LOG, stdout_unstored_tail=1, group=G,
   caveat="the stored log has the first 31 of the 32 lines that `list` prints: it lists surfaces 0 to 10 of the "
@@ -683,4 +692,6 @@ def validate() -> list[str]:
             problems.append(f"{c.id}: records {c.procs} processes but takes no {{procs}}")
         if not c.checks and not c.expect and not c.counts and not c.caveat:
             problems.append(f"{c.id}: nothing is checked and no caveat says why")
+        if not c.needs_data and (c.checks or c.seeds):
+            problems.append(f"{c.id}: tagged no-data, but it is compared with a stored file or starts from one")
     return problems

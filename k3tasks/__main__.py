@@ -20,7 +20,7 @@ from taskbatch.config import ConfigError
 
 from . import registry, report
 from .tasks import plan_batch
-from .workspace import DATA_MARKER, Places, stored_files
+from .workspace import Places, installed, stored_files
 
 
 def _list(arguments: argparse.Namespace) -> int:
@@ -44,7 +44,7 @@ def _list(arguments: argparse.Namespace) -> int:
         checks = ", ".join(f"{k.stored} ({k.mode})" for k in c.checks) or (
             "output lines" if c.expect or c.counts else "-"
         )
-        tag = " [heavy]" if "heavy" in c.tags else ""
+        tag = "".join(f" [{name}]" for name in c.tags)
         memory = c.expected_memory_mb(c.procs)
         print(f"{c.id:38} {c.group:20} {c.procs:5d} {c.seconds:9g} {memory:9d}  {checks}{tag}")
     print(f"\n{len(chosen)} computations")
@@ -66,7 +66,7 @@ def _check(arguments: argparse.Namespace) -> int:
     for problem in problems:
         print(f"registry: {problem}")
     print(f"{len(registry.all_computations())} computations in {len(registry.GROUPS)} groups")
-    if (places.data / DATA_MARKER).exists():
+    if installed(places):
         stored = {p.name for p in stored_files(places.data)}
         named = {check.stored for c in registry.all_computations() for check in c.checks}
         missing = sorted(named - stored)
@@ -78,6 +78,20 @@ def _check(arguments: argparse.Namespace) -> int:
         print(f"stored results: not installed in {places.data} (see DATA.md, or make data)")
     print(f"scripts run with: {places.python}")
     return 1 if problems else 0
+
+
+def _data(arguments: argparse.Namespace) -> int:
+    places = Places.from_environment()
+    if installed(places):
+        print(f"stored results: installed in {places.data}")
+        return 0
+    free = sum(1 for c in registry.all_computations() if not c.needs_data)
+    print(
+        f"k3tasks: the stored results are not installed in {places.data}: `make data` unpacks the data "
+        f"archive (DATA.md).  `make no-data` runs the {free} computations that need none.",
+        file=sys.stderr,
+    )
+    return 1
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -99,9 +113,11 @@ def main(argv: list[str] | None = None) -> int:
         help="warn if the run names any of the words in FILE, one per line (- for standard input)",
     )  # fmt: skip
     commands.add_parser("check", help="check the registry and the installed data")
+    commands.add_parser("data", help="say whether the stored results are installed; status 1 if not")
     arguments = parser.parse_args(argv)
     try:
-        return {"list": _list, "report": _report, "check": _check}[arguments.command](arguments)
+        commands_by_name = {"list": _list, "report": _report, "check": _check, "data": _data}
+        return commands_by_name[arguments.command](arguments)
     except (ConfigError, ValueError, json.JSONDecodeError) as problem:
         print(f"k3tasks: {problem}", file=sys.stderr)
         return 2

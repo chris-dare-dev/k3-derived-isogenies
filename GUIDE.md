@@ -112,7 +112,7 @@ make run BATCH=batches/smoke.toml
 make report BATCH=batches/smoke.toml
 ```
 
-`make venv` installs numpy and cypari2 in `~/.cache/k3-derived-isogenies/venv`, which runs the scripts (`K3_PYTHON` names another interpreter). `make data` checks the archive in `dist/` against its SHA-256 and unpacks it into `experiments/`, adding files only (see [DATA.md](DATA.md)). `plan` lists the tasks a run would compute, with their expected times and limits, and computes nothing. `run` computes every task that has no record yet; a run can be stopped with Ctrl-C and continued later. `report` prints the scheduler's tables and the reproduction table. Through make it also warns if the run names this machine's name or a directory outside the repository, which `make adopt` would refuse (`k3tasks report RUN --private-words FILE` takes the words from a file, `-` for standard input). The same commands without make are `python3 -m taskbatch plan|run batches/smoke.toml` and `python3 -m k3tasks report results/smoke`. The scheduler and the registry need the standard library only; `make test` runs their unit tests.
+`make venv` installs numpy and cypari2 in `~/.cache/k3-derived-isogenies/venv`, which runs the scripts (`K3_PYTHON` names another interpreter). With that and nothing else, `make no-data` runs the computations that need no stored results; every other task reads the stored results or is compared with them, and ends as an error until they are installed, which `make smoke` says in one line before it starts. `make data` checks the archive in `dist/` against its SHA-256 and unpacks it into `experiments/`, adding files only (see [DATA.md](DATA.md)). `plan` lists the tasks a run would compute, with their expected times and limits, and computes nothing. `run` computes every task that has no record yet; a run can be stopped with Ctrl-C and continued later. `report` prints the scheduler's tables and the reproduction table. Through make it also warns if the run names this machine's name or a directory outside the repository, which `make adopt` would refuse (`k3tasks report RUN --private-words FILE` takes the words from a file, `-` for standard input). The same commands without make are `python3 -m taskbatch plan|run batches/smoke.toml` and `python3 -m k3tasks report results/smoke`. The scheduler and the registry need the standard library only; `make test` runs their unit tests.
 
 ### What a task does
 
@@ -164,6 +164,7 @@ A task's cost is the time its command took when its note was written, scaled to 
 
 | File | Content | Time |
 |---|---|---|
+| `no-data.toml` | the six computations that read no stored result and are compared with none: the self-tests of the four enumeration scripts and two short reruns. Runs on a fresh clone, before `make data` | about a minute |
 | `smoke.toml` | the ledger (byte for byte), the CM self-test, the fourfold over F₁₇, the self-tests of the enumeration scripts, and small reruns of notes 8, 25 and 29 | about 10 seconds |
 | `lattices.toml` | notes 2 to 5: enumerations over F_p (p ≤ 37) and F₂₅, lattice counts, neighbour steps, forms over the prime field, non-split counts | about 30 minutes |
 | `ring-steps.toml` | notes 6 to 12: the lattice graphs of ring-changing steps | 9 minutes |

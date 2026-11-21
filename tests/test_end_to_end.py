@@ -115,6 +115,20 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(record["status"], "error")
         self.assertIn("exited with status 1", record["error"])
 
+    def test_a_computation_that_needs_no_stored_result_runs_without_any(self) -> None:
+        # n02/selftest is tagged no-data: `sixlines.py selftest`, checked by a line of its output
+        (self.scripts / "sixlines_ledger.log").unlink()
+        (self.scripts / "sixlines.py").write_text("print('selftest passed')\n")
+        self.batch.write_text(BATCH.replace('ids = ["n27/ledger"]', 'ids = ["n27/ledger", "n02/selftest"]'))
+        (self.scripts / "sixlines_ledger.py").write_text(LEDGER.format(suffix=""))
+        done = self.taskbatch("run")
+        self.assertEqual(done.returncode, 1)
+        records = {record["task_id"]: record for record in self.records()}
+        self.assertEqual(records["n02/selftest"]["status"], "ok")
+        self.assertEqual(records["n02/selftest"]["detail"]["verdict"], "checked")
+        self.assertEqual(records["n27/ledger"]["status"], "error")
+        self.assertIn("not installed", records["n27/ledger"]["error"])
+
     def test_missing_data_is_an_error(self) -> None:
         (self.scripts / "sixlines_ledger.py").write_text(LEDGER.format(suffix=""))
         (self.scripts / "sixlines_ledger.log").unlink()
