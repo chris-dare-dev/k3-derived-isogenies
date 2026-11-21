@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import re
 import unittest
+from dataclasses import replace
 from pathlib import Path
+from unittest import mock
 
 from k3tasks import registry
 from k3tasks.registry import STDERR, STDOUT
@@ -56,6 +58,31 @@ class Registry(unittest.TestCase):
                     if check.unstored_tail]  # fmt: skip
         self.assertEqual(left_out, [("n26/list", 1)])
         self.assertIn("the last line of the rerun is not", registry.get("n26/list").caveat)
+
+    def test_blurred_text_is_stated_and_only_where_the_original_script_wrote_the_log(self) -> None:
+        blurred = {c.id for c in registry.all_computations() for check in c.checks if check.blur}
+        self.assertEqual(
+            blurred,
+            {
+                "n29/cosets-37-2-1200-2000",
+                "n29/cosets-37-6-1200-2000",
+                "n29/cosets-41-22-2000",
+                "n29/cosets-41-2-2000",
+            },
+        )
+        for task_id in blurred:
+            self.assertIn("is not compared", registry.get(task_id).caveat)
+            self.assertIn("note 29 section 9", registry.get(task_id).caveat)
+
+    def test_a_blur_that_is_not_an_expression_or_has_no_caveat_is_refused(self) -> None:
+        original = registry.get("n29/cosets-41-2-2000")
+        for check, caveat, wanted in (
+            (replace(original.checks[0], blur="("), original.caveat, "not a regular expression"),
+            (original.checks[0], "", "without the mode or the caveat"),
+        ):
+            changed = replace(original, checks=(check, *original.checks[1:]), caveat=caveat)
+            with mock.patch.dict(registry._REGISTRY, {original.id: changed}):
+                self.assertTrue(any(wanted in problem for problem in registry.validate()), wanted)
 
     def test_the_key_added_after_the_early_coset_runs_is_compared_where_it_is_stored(self) -> None:
         # of the stored records of note 29's coset runs, only two have the key identified_by

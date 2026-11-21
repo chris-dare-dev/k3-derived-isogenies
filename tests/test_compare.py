@@ -105,6 +105,20 @@ class Modes(unittest.TestCase):
         self.assertEqual(outcome.verdict, DIFFERS)
         self.assertEqual(outcome.note["last_lines_not_compared"], 1)
 
+    def test_blurred_text_is_not_compared_and_the_rest_still_is(self) -> None:
+        stored = "  chart J2: denominators [2, 5, 12345]~, roots mod 37: 10, squarefree: False\nnext line\n"
+        rerun = "  chart J2: denominators: primes below 10^6 [2, 5], cofactors of [87] digits; roots mod 37: 10, squarefree: False (0.2 s)\nnext line\n"
+        pattern = r"denominators.*?roots mod|(?:(?<=squarefree: True)|(?<=squarefree: False))(?: \(#s\))?$"
+        self.assertEqual(compare(*self.files(rerun, stored), "text-contained").verdict, DIFFERS)
+        self.assertEqual(
+            compare(*self.files(rerun, stored), "text-contained", blur=pattern).verdict, IDENTICAL
+        )
+        # what carries the content of the line is still compared
+        other = rerun.replace("roots mod 37: 10", "roots mod 37: 8")
+        self.assertEqual(compare(*self.files(other, stored), "text-contained", blur=pattern).verdict, DIFFERS)
+        other = rerun.replace("squarefree: False", "squarefree: True")
+        self.assertEqual(compare(*self.files(other, stored), "text-contained", blur=pattern).verdict, DIFFERS)
+
     def test_records_in_any_order_without_times(self) -> None:
         produced = json.dumps({"a": 1, "seconds": 3}) + "\n" + json.dumps({"a": 2, "seconds": 1}) + "\n"
         stored = json.dumps({"a": 2, "seconds": 9}) + "\n" + json.dumps({"seconds": 8, "a": 1}) + "\n"

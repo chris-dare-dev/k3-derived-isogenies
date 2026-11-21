@@ -17,6 +17,7 @@ results; it writes there and never into `experiments/` (see `workspace.py`).
 from __future__ import annotations
 
 import fnmatch
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
@@ -59,6 +60,8 @@ class Check:
     ignore_keys: tuple[str, ...] = DEFAULT_IGNORE
     # last lines of the command's output that the stored log is known to lack (mode text-contained)
     unstored_tail: int = 0
+    # what a regular expression matches in a log is not compared (modes text and text-contained)
+    blur: str = ""
 
     @property
     def label(self) -> str:
@@ -145,10 +148,12 @@ class Computation:
 _REGISTRY: dict[str, Computation] = {}
 
 
-def _check(produced: str, stored: str | tuple[str, str], default_mode: str, unstored_tail: int = 0) -> Check:
+def _check(
+    produced: str, stored: str | tuple[str, str], default_mode: str, unstored_tail: int = 0, blur: str = ""
+) -> Check:
     if isinstance(stored, tuple):
-        return Check(produced, stored[0], stored[1], unstored_tail=unstored_tail)
-    return Check(produced, stored, default_mode, unstored_tail=unstored_tail)
+        return Check(produced, stored[0], stored[1], unstored_tail=unstored_tail, blur=blur)
+    return Check(produced, stored, default_mode, unstored_tail=unstored_tail, blur=blur)
 
 
 def C(
@@ -162,6 +167,7 @@ def C(
     worker_mb: int = 300,
     stdout: str | tuple[str, str] | None = None,
     stdout_unstored_tail: int = 0,
+    stdout_blur: str = "",
     stderr: str | tuple[str, str] | None = None,
     outputs: Mapping[str, str | tuple[Any, ...]] | None = None,
     expect: tuple[str, ...] = (),
@@ -176,7 +182,7 @@ def C(
     note = int(id.split("/")[0].lstrip("n"))
     checks = []
     if stdout is not None:
-        checks.append(_check(STDOUT, stdout, "text", stdout_unstored_tail))
+        checks.append(_check(STDOUT, stdout, "text", stdout_unstored_tail, stdout_blur))
     if stderr is not None:
         checks.append(_check(STDERR, stderr, "text"))
     for produced, target in (outputs or {}).items():
@@ -361,8 +367,12 @@ C("n20/sweep", "sixlines_cmmethod.py",
   "sweep 17 19 23 29 31 37 --digits-list 300 700 1200 --primes 3 --all-subsets --maxn 8 --workers {procs} "
   "--out sixlines_cmmethod.jsonl", 45 * 60, procs=4, worker_mb=1000, stdout="sixlines_cmmethod.log", outputs=_CMJ,
   caveat="the script was corrected after this sweep (note 20 section 7): the surfaces of a polynomial are now "
-  "selected by e1 and e2, and the ratios with J3 were added, so the records of q = 31 and 37 and the log are "
-  "expected to differ", tags=HEAVY, group=G)
+  "selected by e1 and e2, and the ratios with J3 were added.  A rerun with the work directory kept shows that "
+  "this reaches every q, not only 31 and 37: the log differs from its line 6 (q = 19 comes with another "
+  "polynomial and the chart is named on the coordinate line); of the 24 records of the rerun that are not "
+  "stored, 23 differ from a stored record only in that the stored record lacks the key chart, which the script "
+  "now writes for J2 too, and one (q = 29, e = [6, 87, -10092], chart J3) counts 18 ideals and 3 primes where "
+  "the stored record counts 36 and 6.  The task is expected to end as `differs`", tags=HEAVY, group=G)
 C("n20/sweep-rerun", "sixlines_cmmethod.py",
   "sweep 29 31 37 --select 29,6 29,10 31,2 31,22 37,18 37,22 --digits-list 300 700 1200 --primes 6 --all-subsets "
   "--maxn 8 --workers {procs} --out sixlines_cmmethod.jsonl", 30 * 60, procs=4, worker_mb=1000,
@@ -497,6 +507,22 @@ G = "order-3"
 # 18 stored records two have it: the run with --identify-by-coordinate and the 4,500-digit run with --mix.
 # For those two the key is compared; for every other run the stored record predates the key.
 _COSETS3 = {"sixlines_order3_cosets.jsonl": ("sixlines_order3_cosets.jsonl", "records-subset")}
+# The progress line of a chart.  The logs of q = 37 and 41 were written by the original script and list every
+# denominator; the script of this repository replaces Torsor._setup_chart (patch_setup_chart in
+# sixlines_order3.py, note 29 section 9) so that it factors only over the primes below 10^6 and prints the
+# cofactor sizes.  Whole-log diffs of four reruns (2026-11-20) showed no other difference once the run
+# times, which every text comparison blanks, were set aside.  That patched line also ends with the time it
+# took, which the original line lacks; the blank left by the comparison is not compared either.  The numbers
+# of roots and the squarefree flag, which carry the content of the line, are still compared.
+_DENOMINATORS = (
+    r"denominators.*?roots mod"
+    r"|(?:(?<=squarefree: True)|(?<=squarefree: False))(?: \(#s\))?$"  # the time of the patched line
+)
+_DENOMINATORS_NOTE = (
+    "the progress line of each chart lists the denominators in the stored log and, in the script here, only "
+    "the factors below 10^6 and the sizes of the cofactors (note 29 section 9), so the part of that line "
+    "from 'denominators' to 'roots mod', and the time it ends with, is not compared"
+)
 _NO_KEY = ("the script now writes the key identified_by, added for the q = 43 reruns of section 7.4, which the "
            "stored record of this run lacks, so that key is not compared")
 C("n29/enumerate-p43", "sixlines.py", "enumerate --p 43 --out sixlines_p43.jsonl --procs {procs}", 25 * 60, procs=14,
@@ -522,9 +548,11 @@ for _args, _log, _s, _procs in (
 ):
     _q, _e = _args.split()[:2]
     _digits = "-".join(_args.split("--digits ")[1].split())
+    _original = _q in ("37", "41")  # logs of the original script (see _DENOMINATORS)
     C(f"n29/cosets-{_q}-{_e}-{_digits}", "sixlines_order3.py", f"cosets {_args} --workers {{procs}}", _s,
-      procs=_procs, memory_mb=1500, worker_mb=1000, stdout=(_log, "text-contained"), outputs=_EARLY_COSETS,
-      caveat=_NO_KEY, tags=HEAVY, group=G)
+      procs=_procs, memory_mb=1500, worker_mb=1000, stdout=(_log, "text-contained"),
+      stdout_blur=_DENOMINATORS if _original else "", outputs=_EARLY_COSETS,
+      caveat=_NO_KEY + ("; " + _DENOMINATORS_NOTE if _original else ""), tags=HEAVY, group=G)
 for _name, _extra, _log in (
     ("mix", "--digits 3000 --mix 0 2 -1 1 0", "sixlines_order3_cosets_43_2_mix.log"),
     ("coord", "--digits 3000 --mix 0 2 -1 1 0 --identify-by-coordinate", "sixlines_order3_cosets_43_2_coord.log"),
@@ -636,6 +664,13 @@ def validate() -> list[str]:
                 problems.append(f"{c.id}: compares the standard error, but it is merged into the output")
             if check.unstored_tail and (check.mode != "text-contained" or not c.caveat):
                 problems.append(f"{c.id}: lines are left out of a comparison without the mode or the caveat for it")
+            if check.blur:
+                try:
+                    re.compile(check.blur)
+                except re.error as problem:
+                    problems.append(f"{c.id}: the blurred part of {check.stored} is not a regular expression: {problem}")
+                if check.mode not in ("text", "text-contained") or not c.caveat:
+                    problems.append(f"{c.id}: text is blurred in a comparison without the mode or the caveat for it")
         compared = {check.produced: check for check in c.checks}
         for seed in c.seeds:
             if seed.file not in compared or compared[seed.file].mode not in ("records", "records-subset"):

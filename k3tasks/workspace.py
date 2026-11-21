@@ -248,6 +248,7 @@ def evaluate(
             ignore_keys=check.ignore_keys,
             strip_prefixes=prefixes,
             unstored_tail=check.unstored_tail,
+            blur=check.blur,
         )
         value[check.label] = outcome.verdict
         if outcome.produced_sha256:

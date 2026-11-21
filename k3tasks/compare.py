@@ -60,14 +60,16 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def normalise_text(text: str, strip_prefixes: tuple[str, ...] = ()) -> list[str]:
+def normalise_text(text: str, strip_prefixes: tuple[str, ...] = (), blur: str = "") -> list[str]:
     """The lines of a log with run times blanked out and the given path prefixes removed.
 
     The prefixes are the absolute paths of the work directory and the stored data, so that a script
     that prints the path of a file it wrote prints the same line wherever it ran.  Lines written by the
     shell's `time` and by `/usr/bin/time -v` around a stored log are dropped, and so is PARI's notice of
-    its stack size.  The items of a printed dict of counts are put in sorted order.
+    its stack size.  The items of a printed dict of counts are put in sorted order.  What the regular
+    expression `blur` matches, if given, is replaced by an ellipsis, in every line.
     """
+    blurred = re.compile(blur) if blur else None
     lines = []
     for line in text.splitlines():
         if _SHELL_TIME.match(line) or _GNU_TIME.match(line) or _PARI_STACK.match(line):
@@ -76,7 +78,8 @@ def normalise_text(text: str, strip_prefixes: tuple[str, ...] = ()) -> list[str]
             if prefix:
                 line = line.replace(prefix.rstrip("/") + "/", "")
         line = _JSON_SECONDS.sub(r'"\1": #', _DURATION.sub("#s", line))
-        lines.append(_COUNT_DICT.sub(_sorted_counts, line).rstrip())
+        line = _COUNT_DICT.sub(_sorted_counts, line).rstrip()
+        lines.append(blurred.sub("…", line) if blurred else line)
     while lines and not lines[-1]:
         lines.pop()
     return lines
@@ -126,11 +129,14 @@ def compare(
     ignore_keys: tuple[str, ...] = (),
     strip_prefixes: tuple[str, ...] = (),
     unstored_tail: int = 0,
+    blur: str = "",
 ) -> Comparison:
     """Compares a produced file with a stored one in the given mode.
 
     `unstored_tail` (mode text-contained only) is the number of last lines of the rerun that the stored
     log is known to lack; they are left out of the comparison, and the note of the result says so.
+    `blur` (modes text and text-contained) is a regular expression whose matches are replaced in both
+    texts before they are compared.
     """
     if mode not in MODES:
         raise ValueError(f"unknown comparison mode {mode!r}")
@@ -155,8 +161,8 @@ def compare(
         return Comparison(IDENTICAL if same else DIFFERS, digest, note)
 
     if mode in ("text", "text-contained"):
-        mine = normalise_text(produced.read_text(errors="replace"), strip_prefixes)
-        theirs = normalise_text(stored.read_text(errors="replace"), strip_prefixes)
+        mine = normalise_text(produced.read_text(errors="replace"), strip_prefixes, blur)
+        theirs = normalise_text(stored.read_text(errors="replace"), strip_prefixes, blur)
         if mode == "text":
             same = mine == theirs
             return Comparison(
