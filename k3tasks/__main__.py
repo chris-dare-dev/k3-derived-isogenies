@@ -1,7 +1,8 @@
 """Command line of the task registry.
 
     python3 -m k3tasks list [--batch FILE] [--group G] [--note N]   the computations, with times and limits
-    python3 -m k3tasks report RUN_DIR [--full]      the scheduler's report and the reproduction table
+    python3 -m k3tasks report RUN_DIR [--full] [--private-words FILE]
+                                                    the scheduler's report and the reproduction table
     python3 -m k3tasks check                        is the registry consistent, are the data installed?
 
 Planning and running go through the scheduler: `python3 -m taskbatch plan|run batches/<name>.toml`.
@@ -14,6 +15,7 @@ import json
 import sys
 from pathlib import Path
 
+from taskbatch.cli import read_words
 from taskbatch.config import ConfigError
 
 from . import registry, report
@@ -53,7 +55,8 @@ def _report(arguments: argparse.Namespace) -> int:
     if not (arguments.run_dir / "results.jsonl").exists():
         print(f"k3tasks: no results.jsonl in {arguments.run_dir}", file=sys.stderr)
         return 2
-    sys.stdout.write(report.render(arguments.run_dir, full=arguments.full))
+    words = read_words(arguments.private_words)
+    sys.stdout.write(report.render(arguments.run_dir, full=arguments.full, private=words))
     return 0
 
 
@@ -91,6 +94,10 @@ def main(argv: list[str] | None = None) -> int:
     rep = commands.add_parser("report", help="the report of a run directory, with the reproduction table")
     rep.add_argument("run_dir", type=Path)
     rep.add_argument("--full", action="store_true")
+    rep.add_argument(
+        "--private-words", metavar="FILE",
+        help="warn if the run names any of the words in FILE, one per line (- for standard input)",
+    )  # fmt: skip
     commands.add_parser("check", help="check the registry and the installed data")
     arguments = parser.parse_args(argv)
     try:

@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from typing import Any
 
-from taskbatch.report import render
+from taskbatch.report import mentions, render
 from taskbatch.store import ResultStore
 
 from . import helpers
@@ -34,6 +34,23 @@ class Report(unittest.TestCase):
             for entry in records:
                 store.append(entry)
         (self.run_dir / "manifest.json").write_text(json.dumps({"tasks": tasks}))
+
+    def test_a_run_that_names_a_private_word_is_warned_about_without_repeating_it(self) -> None:
+        row = record("good", "ok", detail={"work_dir": "/home/somebody/scratch/work"})
+        self.write([task("good")], [row])
+        words = ["/HOME/somebody", "elsewhere-host", ""]
+        self.assertEqual(mentions(self.run_dir, words), ["/HOME/somebody"])
+        report = render(self.run_dir, private=words)
+        self.assertIn("**Warning: the records or the manifest contain 1 of the 3 private words given", report)
+        self.assertNotIn("somebody", report)
+        self.assertNotIn("Warning", render(self.run_dir))
+        self.assertNotIn("Warning", render(self.run_dir, private=["elsewhere-host"]))
+
+    def test_the_manifest_counts_as_part_of_the_run(self) -> None:
+        self.write([task("good", note="made on loom-7")], [record("good", "ok")])
+        self.assertEqual(mentions(self.run_dir, ["loom-7"]), ["loom-7"])
+        (self.run_dir / "manifest.json").unlink()
+        self.assertEqual(mentions(self.run_dir, ["loom-7"]), [])
 
     def test_every_outcome_has_its_place(self) -> None:
         names = ["good", "bad", "slow", "big", "broken", "none", "waiting"]

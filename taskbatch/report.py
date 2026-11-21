@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -50,8 +51,27 @@ def load_manifest(run_dir: Path) -> list[dict[str, Any]]:
     return tasks
 
 
-def render(run_dir: Path, *, full: bool = False) -> str:
-    """The report of a run directory, as Markdown."""
+def mentions(run_dir: Path, words: Iterable[str]) -> list[str]:
+    """The words, of those given, that the records or the manifest of a run directory contain.
+
+    The scheduler knows no word of its own: what must not be written down (a machine's name, a home
+    directory) is for the caller to say.  The match ignores case."""
+    text = ""
+    for name in ("results.jsonl", "manifest.json"):
+        path = run_dir / name
+        if path.exists():
+            text += path.read_text(encoding="utf-8")
+    text = text.lower()
+    return [word for word in words if word and word.lower() in text]
+
+
+def render(run_dir: Path, *, full: bool = False, private: Iterable[str] = ()) -> str:
+    """The report of a run directory, as Markdown.
+
+    `private` are words the run must not contain; if it does, the report starts with a warning that counts
+    them and does not repeat them, since a report is often pasted."""
+    given = list(private)
+    found = mentions(run_dir, given)
     store = ResultStore(run_dir / "results.jsonl")
     latest = store.latest()
     manifest = load_manifest(run_dir)
@@ -67,6 +87,12 @@ def render(run_dir: Path, *, full: bool = False) -> str:
     records = sorted(latest.values(), key=lambda r: (r["task"].get("group", ""), r["task_id"]))
 
     lines = [f"# Results in {run_dir.name}", ""]
+    if found:
+        lines += [
+            f"**Warning: the records or the manifest contain {len(found)} of the {len(given)} private words "
+            "given (not repeated here).** They cannot be committed as they are.",
+            "",
+        ]
     lines += _provenance(records, store.unreadable_lines)
 
     lines += ["## Summary", ""]

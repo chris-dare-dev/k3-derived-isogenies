@@ -8,6 +8,9 @@ Usage:  python3 tools/claims.py tables              write the generated parts of
                                                      a stored line named as evidence is not what it says
         python3 tools/claims.py adopt RUN_DIR ...   copy the records of finished runs (results/<batch>)
                                                      into records/<batch>
+        python3 tools/claims.py words               print what a committed record must not name (this
+                                                     machine's name and directories), one per line; `make
+                                                     report` hands them to the report as a warning
 
 What is read:  claims/claims.toml (the claims and the tasks that bear on them), batches/*.toml (which tasks
 exist), records/<batch>/results.jsonl (what was computed here), the import statements of experiments/*.py
@@ -507,6 +510,9 @@ def main(arguments: list[str]) -> int:
             return command_tables()
         if arguments == ["check"]:
             return command_check()
+        if arguments == ["words"]:
+            print(*adopt.private_words(REPOSITORY), sep="\n")
+            return 0
         if len(arguments) >= 2 and arguments[0] == "adopt":
             return command_adopt([Path(argument) for argument in arguments[1:]])
     except (RegistryError, ValueError, OSError) as problem:

@@ -75,6 +75,10 @@ def _parser() -> argparse.ArgumentParser:
     rep.add_argument(
         "--full", action="store_true", help="list every computed value against its predicted value"
     )
+    rep.add_argument(
+        "--private-words", metavar="FILE",
+        help="warn if the run names any of the words in FILE, one per line (- for standard input)",
+    )  # fmt: skip
     return parser
 
 
@@ -226,10 +230,22 @@ def _append_json(path: Path, content: dict[str, Any]) -> None:
         handle.write(json.dumps(content, sort_keys=True) + "\n")
 
 
+def read_words(source: str | None) -> list[str]:
+    """The lines of a file, or of standard input for `-`, without the empty ones; none for no source."""
+    if source is None:
+        return []
+    try:
+        text = sys.stdin.read() if source == "-" else Path(source).read_text(encoding="utf-8")
+    except OSError as problem:
+        raise ConfigError(f"cannot read the words in {source}: {problem}") from problem
+    return [line for line in text.splitlines() if line.strip()]
+
+
 def _command_report(arguments: argparse.Namespace) -> int:
     if not (arguments.run_dir / "results.jsonl").exists():
         raise ConfigError(f"no results.jsonl in {arguments.run_dir}")
-    sys.stdout.write(report.render(arguments.run_dir, full=arguments.full))
+    words = read_words(arguments.private_words)
+    sys.stdout.write(report.render(arguments.run_dir, full=arguments.full, private=words))
     return EXIT_OK
 
 

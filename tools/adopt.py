@@ -26,6 +26,7 @@ REPOSITORY = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPOSITORY))
 
 from taskbatch.record import Record  # noqa: E402
+from taskbatch.report import mentions  # noqa: E402
 from taskbatch.store import ResultStore  # noqa: E402
 
 
@@ -77,7 +78,10 @@ class History:
 
 
 def private_words(repository: Path) -> list[str]:
-    """Text that a committed record must not contain: this machine's name and directories outside the tree."""
+    """Text that a committed record must not contain: this machine's name and directories outside the tree.
+
+    `taskbatch report --private-words -` takes them from `tools/claims.py words`, so the report of a run
+    warns about the same words that `adopt` refuses."""
     words = [str(Path.home()), str(repository), socket.gethostname()]
     return [word for word in words if len(word) > 3]
 
@@ -101,14 +105,14 @@ def adopt(run_dir: Path, records: Path, repository: Path) -> Adopted:
             f"{run_dir}: {len(dirty)} records, among them {dirty[0]}, were computed from a working tree with "
             "uncommitted changes or outside a checkout; commit the code and run the batch again"
         )
+    if not (run_dir / "manifest.json").exists():
+        raise AdoptError(f"{run_dir}: no manifest.json next to the records")
     text = (run_dir / "results.jsonl").read_text(encoding="utf-8")
-    manifest = (run_dir / "manifest.json").read_text(encoding="utf-8")
-    for word in private_words(repository):
-        if word.lower() in (text + manifest).lower():
-            raise AdoptError(
-                f"{run_dir}: a record names this machine or a directory outside the repository; "
-                "records are committed, so it is not adopted"
-            )
+    if mentions(run_dir, private_words(repository)):
+        raise AdoptError(
+            f"{run_dir}: a record names this machine or a directory outside the repository; "
+            "records are committed, so it is not adopted"
+        )
     # every line is copied as it is, unless its commit was renumbered by a rewrite of the history:
     # then that one field changes, and nothing else
     history = History(repository)

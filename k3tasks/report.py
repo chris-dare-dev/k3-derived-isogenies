@@ -6,7 +6,7 @@ Each task stands under one word, its verdict or the scheduler's status (see `exp
 from __future__ import annotations
 
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any, cast
 
@@ -94,9 +94,9 @@ def reproduction_lines(run_dir: Path) -> list[str]:
     return lines
 
 
-def render(run_dir: Path, *, full: bool = False) -> str:
+def render(run_dir: Path, *, full: bool = False, private: Iterable[str] = ()) -> str:
     return (
-        scheduler_report.render(run_dir, full=full).rstrip()
+        scheduler_report.render(run_dir, full=full, private=private).rstrip()
         + "\n\n"
         + "\n".join(reproduction_lines(run_dir)).rstrip()
         + "\n"

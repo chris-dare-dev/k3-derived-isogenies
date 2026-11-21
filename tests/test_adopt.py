@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import subprocess
 import sys
@@ -10,6 +12,7 @@ import unittest
 from pathlib import Path
 from typing import Any
 
+from taskbatch.report import render
 from taskbatch.settings import REPOSITORY
 
 from . import helpers
@@ -17,6 +20,8 @@ from . import helpers
 sys.path.insert(0, str(REPOSITORY / "tools"))
 
 import adopt
+
+import claims
 
 
 def record(task_id: str, commit: str = "a" * 40, dirty: bool = False, **fields: Any) -> dict[str, Any]:
@@ -51,6 +56,31 @@ class Adoption(unittest.TestCase):
             with self.assertRaisesRegex(adopt.AdoptError, "names this machine or a directory outside"):
                 adopt.adopt(run_dir, Path(scratch) / "records", REPOSITORY)
             self.assertFalse((Path(scratch) / "records").exists())
+
+    def test_the_report_warns_about_what_adoption_refuses(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            row = record("t", detail={"work_dir": f"{Path.home()}/somewhere"})
+            run_dir = run_directory(scratch, row)
+            words = adopt.private_words(REPOSITORY)
+            self.assertIn("private words given", render(run_dir, private=words))
+            with self.assertRaisesRegex(adopt.AdoptError, "names this machine or a directory outside"):
+                adopt.adopt(run_dir, Path(scratch) / "records", REPOSITORY)
+            clean = run_directory(scratch, record("t"))
+            self.assertNotIn("private words given", render(clean, private=words))
+
+    def test_a_run_without_a_manifest_is_refused_before_anything_is_written(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            run_dir = run_directory(scratch, record("t"))
+            (run_dir / "manifest.json").unlink()
+            with self.assertRaisesRegex(adopt.AdoptError, "no manifest.json"):
+                adopt.adopt(run_dir, Path(scratch) / "records", REPOSITORY)
+            self.assertFalse((Path(scratch) / "records").exists())
+
+    def test_the_words_claims_prints_are_the_words_adoption_refuses(self) -> None:
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(claims.main(["words"]), 0)
+        self.assertEqual(out.getvalue().splitlines(), adopt.private_words(REPOSITORY))
 
     def test_a_record_follows_its_commit_through_a_rewrite_of_the_messages(self) -> None:
         def git(*arguments: str) -> str:

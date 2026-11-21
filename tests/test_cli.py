@@ -77,6 +77,28 @@ class CommandLine(unittest.TestCase):
         path = self.run_dir / "results.jsonl"
         return [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
 
+    def test_the_report_warns_about_the_words_it_is_given(self) -> None:
+        self.assertEqual(self.taskbatch("run", self.batch(AGREEING)).returncode, EXIT_OK)
+        words = self.scratch / "words.txt"
+        words.write_text("wall_seconds\nno-such-word-anywhere\n\n")
+        report = self.taskbatch("report", self.run_dir, "--private-words", words)
+        self.assertEqual(report.returncode, EXIT_OK, report.stderr)
+        self.assertIn("contain 1 of the 2 private words given (not repeated here)", report.stdout)
+        self.assertNotIn("wall_seconds", report.stdout)
+        piped = subprocess.run(
+            self.command("report", self.run_dir, "--private-words", "-"),
+            input="no-such-word-anywhere\n",
+            capture_output=True,
+            text=True,
+            cwd=REPOSITORY,
+            timeout=120,
+        )
+        self.assertEqual(piped.returncode, EXIT_OK, piped.stderr)
+        self.assertNotIn("Warning", piped.stdout)
+        missing = self.taskbatch("report", self.run_dir, "--private-words", self.scratch / "absent.txt")
+        self.assertEqual(missing.returncode, EXIT_USAGE)
+        self.assertIn("cannot read the words", missing.stderr)
+
     def test_run_then_rerun_then_report(self) -> None:
         batch = self.batch(AGREEING)
         plan = self.taskbatch("plan", batch)
