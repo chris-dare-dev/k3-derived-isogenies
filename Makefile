@@ -68,7 +68,7 @@ run:
 	$(PYTHON) -m taskbatch run $(BATCH) $(ARGS)
 
 report:
-	$(PYTHON) -m k3tasks report $(RUN_DIR) $(REPORT_ARGS)
+	$(PYTHON) tools/claims.py words | $(PYTHON) -m k3tasks report $(RUN_DIR) --private-words - $(REPORT_ARGS)
 
 smoke:
 	rm -rf results/smoke
@@ -92,7 +92,7 @@ venv:
 
 data:
 	echo "$(SHA256)  $(ARCHIVE)" | sha256sum -c
-	tar --skip-old-files -xJf $(ARCHIVE)
+	tar --skip-old-files -xJf "$(ARCHIVE)"
 
 # work directories that were kept because a rerun differed or was stopped
 clean-work:
