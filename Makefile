@@ -7,7 +7,9 @@
 #   make plan BATCH=batches/smoke.toml list what a run would compute, with limits, without computing
 #   make run BATCH=batches/smoke.toml  compute the tasks of a batch that have no record yet
 #   make report BATCH=batches/smoke.toml REPORT_ARGS=--full
-#   make smoke                         the smoke batch, computed afresh, and its report
+#   make no-data                       the computations that need no stored results, computed afresh: what
+#                                      runs on a fresh clone, before `make data`
+#   make smoke                         the smoke batch, computed afresh, and its report (needs `make data`)
 #   make record BATCH=batches/smoke.toml   run, then copy the records into records/ (committed code only);
 #                                      EXPECT=1 for the negative control, EXPECT=3 for the limits demo.
 #                                      Commit what a record wrote before the next one: a file that git does
@@ -41,7 +43,7 @@ FORMATTED = taskbatch k3tasks runners tests tools
 
 BATCHES ?= $(basename $(notdir $(BATCH)))
 
-.PHONY: test lint format check list plan run report smoke record adopt tables venv data clean-work
+.PHONY: test lint format check list plan run report no-data smoke record adopt tables venv data clean-work
 
 test:
 	$(PYTHON) -m unittest discover -s tests -t .
@@ -70,7 +72,13 @@ run:
 report:
 	$(PYTHON) tools/claims.py words | $(PYTHON) -m k3tasks report $(RUN_DIR) --private-words - $(REPORT_ARGS)
 
+no-data:
+	rm -rf results/no-data
+	$(PYTHON) -m taskbatch run batches/no-data.toml --quiet $(ARGS)
+	$(PYTHON) -m k3tasks report results/no-data
+
 smoke:
+	@$(PYTHON) -m k3tasks data
 	rm -rf results/smoke
 	$(PYTHON) -m taskbatch run batches/smoke.toml --quiet $(ARGS)
 	$(PYTHON) -m k3tasks report results/smoke

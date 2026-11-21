@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -69,6 +71,29 @@ class Batches(unittest.TestCase):
         ids = {task["id"] for task in tasks}
         self.assertTrue({"n27/ledger", "n20/selftest", "n14/prym-check-17"} <= ids)
         self.assertLess(sum(task["cost"] for task in tasks), 60)
+
+    def test_the_no_data_batch_is_what_needs_no_stored_result_and_is_quick(self) -> None:
+        tasks = plan_batch(BATCHES / "no-data.toml").tasks
+        self.assertEqual({task["id"] for task in tasks}, {c.id for c in registry.select(tags=["no-data"])})
+        self.assertTrue(all(task["compared"] == [] and task["seeds"] is None for task in tasks))
+        self.assertLess(sum(task["cost"] for task in tasks), 60)
+
+    def test_the_command_line_says_in_one_line_whether_the_stored_results_are_installed(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            output, errors = io.StringIO(), io.StringIO()
+            with (
+                mock.patch.dict(os.environ, {"K3_DATA_DIR": scratch}),
+                contextlib.redirect_stdout(output),
+                contextlib.redirect_stderr(errors),
+            ):
+                self.assertEqual(command_line.main(["data"]), 1)
+                (Path(scratch) / "sixlines_ledger.log").write_text("installed\n")
+                self.assertEqual(command_line.main(["data"]), 0)
+        (line,) = errors.getvalue().splitlines()
+        self.assertIn("the stored results are not installed", line)
+        self.assertIn("`make data`", line)
+        self.assertIn("`make no-data` runs the 6 computations that need none", line)
+        self.assertIn("stored results: installed in", output.getvalue())
 
 
 class Expansion(unittest.TestCase):

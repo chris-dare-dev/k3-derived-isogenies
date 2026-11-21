@@ -22,10 +22,10 @@ Six-line surfaces match Hermitian lattices
 | `n02/enumerate-p29` | lattices | `sixlines_p29.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 125.248 s | reproduced |  |
 | `n02/enumerate-p31` | lattices | `sixlines_p31.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 240.02 s | reproduced |  |
 | `n02/enumerate-p37` | lattices | `sixlines_p37.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 636.208 s | reproduced |  |
-| `n02/selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 3.798 s | checked |  |
+| `n02/selftest` | lattices, no-data, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 3.798 s | checked |  |
 | `n03/enumerate-q25` | lattices | `sixlines_q25.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 93.369 s | reproduced |  |
 | `n03/enumerate-q49` | heavy | `sixlines_q49.log` (text): identical; `sixlines_q49.jsonl` (records): identical | ok, 2026-11-19, `c2690e8`, 9435.01 s | reproduced |  |
-| `n03/fq-selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 1.19 s | checked |  |
+| `n03/fq-selftest` | lattices, no-data, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 1.19 s | checked |  |
 | `n03/neighbours` | lattices | `sixlines_neighbours.log` (text): identical; `sixlines_neighbours.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 33.936 s | reproduced |  |
 | `n03/q49-cm` | lattices | `sixlines_q49_cm.log` (text): identical; `sixlines_q49_cm.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 129.385 s | reproduced |  |
 | `n04/enumerate-p5` | lattices | `sixlines_p5.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 0.405 s | reproduced |  |
@@ -33,7 +33,7 @@ Six-line surfaces match Hermitian lattices
 | `n04/forms-compare-p7` | lattices | `sixlines_forms_p7_compare.log` (text): identical; `sixlines_forms_p7_compare.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 0.482 s | reproduced |  |
 | `n04/forms-enumerate-p5` | lattices | `sixlines_forms_p5.log` (text): identical; `sixlines_forms_p5.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 2.13 s | reproduced |  |
 | `n04/forms-enumerate-p7` | lattices | `sixlines_forms_p7.log` (text): identical; `sixlines_forms_p7.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 16.38 s | reproduced |  |
-| `n04/forms-selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 3.455 s | checked |  |
+| `n04/forms-selftest` | lattices, no-data, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 3.455 s | checked |  |
 | `n04/types-q25` | lattices | `sixlines_types_q25.log` (text): identical; `sixlines_types_q25.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 6.127 s | reproduced |  |
 | `n04/types-q49` | lattices | `sixlines_types_q49.log` (text): identical; `sixlines_types_q49.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 26.87 s | reproduced |  |
 | `n05/nonsplit-enumerate-p11` | lattices | `sixlines_nonsplit_p11.log` (text): identical; `sixlines_nonsplit_p11.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 5.954 s | reproduced |  |
@@ -45,7 +45,7 @@ Six-line surfaces match Hermitian lattices
 | `n05/nonsplit-lattices-p19` | lattices | `sixlines_nonsplit_lat_p19.log` (text): identical; `sixlines_nonsplit_lat_p19.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 127.254 s | reproduced |  |
 | `n05/nonsplit-lattices-p23` | lattices | `sixlines_nonsplit_lat_p23.log` (text): identical; `sixlines_nonsplit_lat_p23.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 566.477 s | reproduced |  |
 | `n05/nonsplit-lattices-small` | lattices | `sixlines_nonsplit_lat_small.log` (text): identical; `sixlines_nonsplit_lat_small.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 38.382 s | reproduced |  |
-| `n05/nonsplit-selftest` | lattices, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 1.124 s | checked |  |
+| `n05/nonsplit-selftest` | lattices, no-data, smoke | expect /selftest passed/: found | ok, 2026-11-18, `089382a`, 1.124 s | checked |  |
 
 <a name="claim-fourfold"></a>
 
@@ -135,7 +135,7 @@ Six-line surfaces match Hermitian lattices
 | `n23/jacobian-character-extra` | heavy | `sixlines_jacobian_character_extra.log` (text): identical; `sixlines_jacobian_character_extra.jsonl` (records): identical | ok, 2026-11-18, `c2690e8`, 903.664 s | reproduced | the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not; the stored run was made in two pieces and joined, so its log differs from one run's |
 | `n23/jacobian-lattice` | quadratic-character | `sixlines_jacobian_lattice.log` (text): identical | ok, 2026-11-18, `089382a`, 1.351 s | reproduced |  |
 | `n23/jacobian-levels` | quadratic-character | `sixlines_jacobian_levels.log` (text): identical; `sixlines_jacobian_levels.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 208.529 s | reproduced | the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not |
-| `n23/jacobian-one-29` | quadratic-character | nothing: its output was not kept | ok, 2026-11-18, `089382a`, 41.048 s | ran | a rerun quoted in note 25 section 2; its output was not kept |
+| `n23/jacobian-one-29` | no-data, quadratic-character | nothing: its output was not kept | ok, 2026-11-18, `089382a`, 41.048 s | ran | a rerun quoted in note 25 section 2; its output was not kept |
 | `n23/jacobian-validate` | quadratic-character | `sixlines_jacobian_validate.log` (text): identical; `sixlines_jacobian_validate.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 82.153 s | reproduced | the classes are random (seeded): the counts of generators tried can differ between runs, the group structures and verdicts do not |
 | `n25/review2-delta` | quadratic-character | `sixlines_review2.log` (text-contained): identical; `sixlines_review2.jsonl` (records-subset): identical | ok, 2026-11-18, `089382a`, 104.695 s | reproduced |  |
 | `n25/review2-levels` | quadratic-character, smoke | `sixlines_review2.log` (text-contained): identical | ok, 2026-11-18, `089382a`, 0.181 s | reproduced |  |
@@ -153,7 +153,7 @@ Six-line surfaces match Hermitian lattices
 | `n26/delta-seed` | heavy | `sixlines_delta41.jsonl` (records-subset): identical | stale: recorded 2026-11-18 at `c2690e8` for the task as it was then |  | delta appends to sixlines_delta41.jsonl and skips what is there; this reading chooses its pairs from the records of the primary reading, so the rerun starts from the stored primary records and only the records it appends are compared with the stored file |
 | `n26/delta-twist1` | heavy | `sixlines_delta41.jsonl` (records-subset): identical | stale: recorded 2026-11-18 at `c2690e8` for the task as it was then |  | delta appends to sixlines_delta41.jsonl and skips what is there; this reading chooses its pairs from the records of the primary reading, so the rerun starts from the stored primary records and only the records it appends are compared with the stored file |
 | `n26/delta-twist2` | heavy | `sixlines_delta41.jsonl` (records-subset): identical | stale: recorded 2026-11-18 at `c2690e8` for the task as it was then |  | delta appends to sixlines_delta41.jsonl and skips what is there; this reading chooses its pairs from the records of the primary reading, so the rerun starts from the stored primary records and only the records it appends are compared with the stored file |
-| `n26/dyadic` | quadratic-character | nothing: its output was not kept | ok, 2026-11-18, `089382a`, 0.224 s | ran | no stored log |
+| `n26/dyadic` | no-data, quadratic-character | nothing: its output was not kept | ok, 2026-11-18, `089382a`, 0.224 s | ran | no stored log |
 | `n26/enumerate-p41` | heavy | `sixlines_p41.jsonl` (records): identical | ok, 2026-11-18, `c2690e8`, 1374.98 s | reproduced |  |
 | `n26/list` | quadratic-character | `sixlines_delta41.log` (text-contained): identical | ok, 2026-11-18, `089382a`, 0.203 s | reproduced | the stored log has the first 31 of the 32 lines that `list` prints: it lists surfaces 0 to 10 of the e1 = 22 torsor, which its own heading gives 12 surfaces, and lacks the line of surface 11.  The 31 lines are compared; the last line of the rerun is not |
 | `n26/prym` | quadratic-character | `sixlines_prym_p41.jsonl` (records): identical | ok, 2026-11-18, `089382a`, 697.476 s | reproduced |  |

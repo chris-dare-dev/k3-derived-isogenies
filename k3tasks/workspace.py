@@ -8,6 +8,10 @@ computation never runs in `experiments/`.  Its work directory, under `results/wo
 - a copy of every stored result file, except the files the computation writes: those start absent, as
   they would on a fresh run.
 
+A computation that the registry tags `no-data` reads no stored result and is compared with none.  It
+gets the links and no copy, so it runs the same whether or not the data archive is unpacked, and it is
+the only kind of computation that runs without the archive.
+
 Since `abspath` does not resolve links, a script run through its link takes the work directory as its
 own: it reads the copies and writes next to them.  The stored files are never opened for writing.  As a
 second guard, the size and modification time of every stored file are taken before and after the run,
@@ -69,7 +73,14 @@ class Places:
 
 
 def stored_files(data: Path) -> list[Path]:
+    if not data.is_dir():
+        return []
     return sorted(p for p in data.iterdir() if p.is_file() and p.suffix in DATA_SUFFIXES)
+
+
+def installed(places: Places) -> bool:
+    """Whether the data archive is unpacked where the stored results are looked for."""
+    return (places.data / DATA_MARKER).is_file()
 
 
 def _signature(paths: list[Path]) -> dict[str, tuple[int, int]]:
@@ -88,7 +99,7 @@ def check_installed(computation: Computation, places: Places) -> None:
     script = places.scripts / computation.script
     if not script.is_file():
         raise WorkspaceError(f"no script {script}")
-    if not (places.data / DATA_MARKER).is_file():
+    if computation.needs_data and not installed(places):
         raise WorkspaceError(
             f"the stored results are not installed in {places.data}: unpack the data archive as DATA.md "
             "describes (make data), or set K3_DATA_DIR"
@@ -157,7 +168,7 @@ def prepare(computation: Computation, places: Places) -> Path:
         if script.is_file() and script.suffix in SCRIPT_SUFFIXES:
             (work_dir / script.name).symlink_to(script.resolve())
     written = computation.written()
-    for stored in stored_files(places.data):
+    for stored in stored_files(places.data) if computation.needs_data else []:
         if stored.name not in written and not (work_dir / stored.name).exists():
             shutil.copy2(stored, work_dir / stored.name)
     return work_dir

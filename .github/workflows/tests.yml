@@ -34,6 +34,28 @@ jobs:
       - run: |
           for batch in batches/*.toml; do make plan BATCH="$batch"; done
 
+  # The computations that need no stored result, on a fresh clone with numpy and cypari2: the self-tests
+  # of the enumeration scripts and two short reruns.  No data archive.
+  no-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r experiments/requirements.txt
+      - run: make run BATCH=batches/no-data.toml ARGS="--memory-guard poll"
+      - if: always()
+        run: make report BATCH=batches/no-data.toml
+      - name: Without the stored results the smoke batch stops with one line that names the way out
+        run: |
+          status=0
+          make smoke 2> message.txt || status=$?
+          cat message.txt
+          test "$status" -ne 0
+          grep -q 'make no-data' message.txt
+
   # The smoke batch against the stored results, when the data archive can be fetched.
   # Set DATA_URL (a repository variable) to the release asset of DATA.md to enable it.
   smoke:

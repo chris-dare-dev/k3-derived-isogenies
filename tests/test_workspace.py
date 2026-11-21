@@ -244,6 +244,32 @@ class Workspace(unittest.TestCase):
         with self.assertRaisesRegex(WorkspaceError, "not installed"):
             prepare(toy(), self.places)
 
+    def alone(self, **changes: object) -> Computation:
+        """A computation tagged no-data, on a script that reads nothing stored."""
+        (self.places.scripts / "alone.py").write_text("print('selftest passed')\n")
+        fields: dict = {"script": "alone.py", "args": (), "checks": (), "expect": (r"selftest passed",)}
+        return toy(**(fields | {"tags": ("no-data",)} | changes))
+
+    def test_a_computation_tagged_no_data_runs_where_no_stored_result_is(self) -> None:
+        for stored in self.places.data.iterdir():
+            stored.unlink()
+        self.stored_before.clear()
+        result = self.run_toy(self.alone())
+        self.assertEqual((result["status"], result["verdict"]), ("ok", "checked"))
+        # nor does it need the directory of the stored results to exist
+        nowhere = Places(self.places.scripts, self.places.data / "absent", self.places.work, sys.executable)
+        self.assertEqual(reproduce(self.alone(), nowhere, 1)["status"], "ok")
+
+    def test_a_computation_tagged_no_data_is_given_no_stored_file(self) -> None:
+        work = prepare(self.alone(), self.places)
+        self.assertTrue((work / "alone.py").is_symlink())
+        self.assertEqual(sorted(path.name for path in work.iterdir() if not path.is_symlink()), [])
+
+    def test_the_tag_no_data_is_kept_true_where_the_stored_results_are_installed(self) -> None:
+        # toy.py reads toy_input.jsonl: tagged no-data it fails with the data installed, as it would without
+        with self.assertRaisesRegex(WorkspaceError, "toy_input.jsonl"):
+            self.run_toy(self.alone(script="toy.py", args=("ok",)))
+
     def test_missing_stored_reference(self) -> None:
         computation = toy(checks=(Check(STDOUT, "absent.log", "text"),))
         with self.assertRaisesRegex(WorkspaceError, "absent.log"):

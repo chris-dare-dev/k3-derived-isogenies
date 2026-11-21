@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import dataclasses
 import re
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from k3tasks import registry
 from k3tasks.registry import STDERR, STDOUT
@@ -100,6 +102,28 @@ class Registry(unittest.TestCase):
         single = registry.get("n27/ledger")
         self.assertEqual(single.expected_seconds(1), single.seconds)
         self.assertEqual(single.argv(4), [])
+
+    def test_what_needs_no_stored_result_is_compared_with_none(self) -> None:
+        free = registry.select(tags=["no-data"])
+        self.assertEqual(
+            sorted(c.id for c in free),
+            [
+                "n02/selftest",
+                "n03/fq-selftest",
+                "n04/forms-selftest",
+                "n05/nonsplit-selftest",
+                "n23/jacobian-one-29",
+                "n26/dyadic",
+            ],
+        )
+        self.assertFalse(any(c.needs_data or c.checks or c.seeds for c in free))
+        self.assertTrue(registry.get("n27/ledger").needs_data)
+        ledger = dataclasses.replace(registry.get("n27/ledger"), tags=registry.NO_DATA)
+        with mock.patch.object(registry, "all_computations", return_value=[ledger]):
+            self.assertEqual(
+                registry.validate(),
+                ["n27/ledger: tagged no-data, but it is compared with a stored file or starts from one"],
+            )
 
     def test_select(self) -> None:
         self.assertEqual([c.id for c in registry.select(ids=["n27/ledger"])], ["n27/ledger"])

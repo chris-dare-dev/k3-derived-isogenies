@@ -1,0 +1,18 @@
+# The computations that read no stored result and are compared with none (the tag `no-data` of the
+# registry): the self-tests of the four enumeration scripts, which compare the fast character sums and
+# counts with direct ones, and two short reruns whose output was not kept.  They run on a fresh clone,
+# without the data archive; they need numpy and cypari2 (make venv).  About a minute on one core.
+
+name = "no-data"
+
+[scheduler]
+workers = 4
+memory_budget_mb = 4000
+
+[limits]
+time_seconds = 300
+memory_mb = 1000
+
+[[tasks]]
+kind = "computation"
+tags = ["no-data"]

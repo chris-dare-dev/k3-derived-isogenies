@@ -36,9 +36,9 @@ Ordinary K3 surfaces over a finite field with the same Frobenius form torsors un
 ## Reproduce
 
 ```bash
-make venv && make data    # environment, and the stored results (dist/ → experiments/)
-make test                 # scheduler, registry and claim tables, standard library only
-make smoke                # the ledger of note 27 and a dozen quick checks, recomputed under the scheduler
+make test                    # scheduler, registry and claim tables: standard library only, nothing to install
+make venv && make no-data    # numpy and cypari2, then the six computations that need no stored results (a minute)
+make data && make smoke      # the stored results (DATA.md), then the ledger of note 27 and a dozen quick checks
 ```
 
 Or use the [notebooks](notebooks/README.md) with no command line, or `docker build -t k3-derived-isogenies .`.
