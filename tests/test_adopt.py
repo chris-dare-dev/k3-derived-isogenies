@@ -17,10 +17,9 @@ from taskbatch.settings import REPOSITORY
 
 from . import helpers
 
-sys.path.insert(0, str(REPOSITORY / "tools"))
+sys.path.insert(0, str(REPOSITORY / "src" / "bookkeeping"))
 
 import adopt
-
 import claims
 
 

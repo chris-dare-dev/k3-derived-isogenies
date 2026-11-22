@@ -1,6 +1,6 @@
 """Running a computation in its own work directory, with toy scripts and toy stored results.
 
-The toy script behaves like the scripts of experiments/: it finds its inputs next to itself, writes its
+The toy script behaves like the scripts of research/experiments/: it finds its inputs next to itself, writes its
 outputs there, and may append to a file that also exists among the stored results.
 """
 

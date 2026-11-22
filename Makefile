@@ -3,20 +3,22 @@
 #                                      (standard library only)
 #   make lint                          ruff and mypy (neither is needed to run anything)
 #   make venv                          numpy and cypari2 in a virtual environment under ~/.cache
-#   make data                          check the data archive in dist/ and unpack it into experiments/ (DATA.md)
-#   make plan BATCH=batches/smoke.toml list what a run would compute, with limits, without computing
-#   make run BATCH=batches/smoke.toml  compute the tasks of a batch that have no record yet
-#   make report BATCH=batches/smoke.toml REPORT_ARGS=--full
+#   make data                          check the data archive in dist/ and unpack it into research/experiments/
+#                                      (data/README.md)
+#   make plan BATCH=data/batches/smoke.toml   list what a run would compute, with limits, without computing
+#   make run BATCH=data/batches/smoke.toml    compute the tasks of a batch that have no record yet
+#   make report BATCH=data/batches/smoke.toml REPORT_ARGS=--full
 #   make no-data                       the computations that need no stored results, computed afresh: what
 #                                      runs on a fresh clone, before `make data`
 #   make smoke                         the smoke batch, computed afresh, and its report (needs `make data`)
-#   make record BATCH=batches/smoke.toml   run, then copy the records into records/ (committed code only);
-#                                      EXPECT=1 for the negative control, EXPECT=3 for the limits demo.
+#   make record BATCH=data/batches/smoke.toml run, then copy the records into data/records/ (committed code
+#                                      only); EXPECT=1 for the negative control, EXPECT=3 for the limits demo.
 #                                      Commit what a record wrote before the next one: a file that git does
 #                                      not know makes the working tree differ from its commit.  To record
 #                                      several batches in one go, `make run` each and then `make adopt`
-#   make adopt BATCHES="smoke audits"  copy the records of finished runs into records/
-#   make tables                        write the generated tables of CLAIMS.md, GUIDE.md and claims/RECORDS.md
+#   make adopt BATCHES="smoke audits"  copy the records of finished runs into data/records/
+#   make tables                        write the generated tables of CLAIMS.md, GUIDE.md and
+#                                      data/claims/RECORDS.md
 #   make check                         is the registry consistent, are the data installed, and are those
 #                                      tables what the claim registry and the records give?
 #   make list                          every computation of the registry
@@ -25,10 +27,10 @@
 # `make venv PYTHON=python3.12`.
 PYTHON  ?= python3
 VENV    ?= $(HOME)/.cache/k3-derived-isogenies/venv
-# the interpreter that runs the scripts of experiments/ (needs numpy and cypari2)
+# the interpreter that runs the scripts of research/experiments/ (needs numpy and cypari2)
 K3_PYTHON ?= $(if $(wildcard $(VENV)/bin/python),$(VENV)/bin/python,$(PYTHON))
 export K3_PYTHON
-BATCH   ?= batches/smoke.toml
+BATCH   ?= data/batches/smoke.toml
 ARGS    ?=
 REPORT_ARGS ?=
 ARCHIVE ?= dist/k3-derived-isogenies-data-v1.tar.xz
@@ -38,10 +40,13 @@ RUN_DIR = results/$(basename $(notdir $(BATCH)))
 # the status `run` must end with for `record` to adopt: 0, or 1 when every task is a negative control,
 # or 3 when tasks are stopped at their limits on purpose
 EXPECT  ?= 0
-CHECKED   = taskbatch k3tasks runners tests tools
-FORMATTED = taskbatch k3tasks runners tests tools
+CHECKED   = src/taskbatch src/k3tasks src/runners src/bookkeeping tests
+FORMATTED = src/taskbatch src/k3tasks src/runners src/bookkeeping tests
 
 BATCHES ?= $(basename $(notdir $(BATCH)))
+
+# the Python packages are under src/
+export PYTHONPATH := $(CURDIR)/src
 
 .PHONY: test lint format check list plan run report no-data smoke record adopt tables venv data clean-work
 
@@ -58,7 +63,7 @@ format:
 
 check:
 	$(PYTHON) -m k3tasks check
-	$(PYTHON) tools/claims.py check
+	$(PYTHON) src/bookkeeping/claims.py check
 
 list:
 	$(PYTHON) -m k3tasks list
@@ -70,37 +75,37 @@ run:
 	$(PYTHON) -m taskbatch run $(BATCH) $(ARGS)
 
 report:
-	$(PYTHON) tools/claims.py words | $(PYTHON) -m k3tasks report $(RUN_DIR) --private-words - $(REPORT_ARGS)
+	$(PYTHON) src/bookkeeping/claims.py words | $(PYTHON) -m k3tasks report $(RUN_DIR) --private-words - $(REPORT_ARGS)
 
 no-data:
 	rm -rf results/no-data
-	$(PYTHON) -m taskbatch run batches/no-data.toml --quiet $(ARGS)
+	$(PYTHON) -m taskbatch run data/batches/no-data.toml --quiet $(ARGS)
 	$(PYTHON) -m k3tasks report results/no-data
 
 smoke:
 	@$(PYTHON) -m k3tasks data
 	rm -rf results/smoke
-	$(PYTHON) -m taskbatch run batches/smoke.toml --quiet $(ARGS)
+	$(PYTHON) -m taskbatch run data/batches/smoke.toml --quiet $(ARGS)
 	$(PYTHON) -m k3tasks report results/smoke
 
 record:
 	status=0; $(PYTHON) -m taskbatch run $(BATCH) $(ARGS) || status=$$?; \
 	if [ $$status -ne $(EXPECT) ]; then echo "run ended with status $$status, expected $(EXPECT)"; exit 1; fi
-	$(PYTHON) tools/claims.py adopt $(RUN_DIR)
+	$(PYTHON) src/bookkeeping/claims.py adopt $(RUN_DIR)
 
 adopt:
-	$(PYTHON) tools/claims.py adopt $(addprefix results/,$(BATCHES))
+	$(PYTHON) src/bookkeeping/claims.py adopt $(addprefix results/,$(BATCHES))
 
 tables:
-	$(PYTHON) tools/claims.py tables
+	$(PYTHON) src/bookkeeping/claims.py tables
 
 venv:
 	$(PYTHON) -m venv $(VENV)
-	$(VENV)/bin/pip install -r experiments/requirements.txt
+	$(VENV)/bin/pip install -r research/experiments/requirements.txt
 
 data:
 	echo "$(SHA256)  $(ARCHIVE)" | sha256sum -c
-	tar --skip-old-files -xJf "$(ARCHIVE)"
+	tar -C research --skip-old-files -xJf "$(ARCHIVE)"
 
 # work directories that were kept because a rerun differed or was stopped
 clean-work:

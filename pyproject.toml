@@ -4,36 +4,38 @@ version = "1.0"
 description = "Notes, scripts and batches behind 'Derived isogenies of ordinary K3 surfaces as a class-group action'"
 requires-python = ">=3.11"
 license = "MIT"
-# The scheduler (taskbatch/) and the task registry (k3tasks/) use the standard library only.  The
-# scripts in experiments/ need numpy and cypari2: see experiments/requirements.txt.
+# The scheduler (src/taskbatch/) and the task registry (src/k3tasks/) use the standard library only.  The
+# scripts in research/experiments/ need numpy and cypari2: see research/experiments/requirements.txt.
 dependencies = []
 
-# What the scheduler (taskbatch/) is told about this repository: see taskbatch/PROTOCOL.md.
+# What the scheduler (src/taskbatch/) is told about this repository: see src/taskbatch/PROTOCOL.md.
 [tool.taskbatch]
-runner = ["{python}", "-I", "runners/task_runner.py"]
+runner = ["{python}", "-I", "src/runners/task_runner.py"]
 description_keys = []
 
 [tool.ruff]
+src = ["src", "tests"]
 line-length = 110
 target-version = "py311"
-extend-exclude = ["experiments", "notebooks"]
+extend-exclude = ["research"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "PIE", "RET", "RUF"]
 
 [tool.ruff.lint.per-file-ignores]
 # rows of a table, one computation each, and the sentences of their caveats
-"k3tasks/registry.py" = ["E501"]
+"src/k3tasks/registry.py" = ["E501"]
 # sentences of the generated pages, kept on one line each
-"tools/claims.py" = ["E501"]
+"src/bookkeeping/claims.py" = ["E501"]
 # lines of logs and rows of tables, as they are printed
 "tests/*.py" = ["E501"]
 
 [tool.ruff.format]
 # the registry is laid out by hand as a table
-exclude = ["k3tasks/registry.py"]
+exclude = ["src/k3tasks/registry.py"]
 
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["taskbatch", "k3tasks", "runners", "tools/adopt.py", "tools/claims.py"]
+files = ["src/taskbatch", "src/k3tasks", "src/runners", "src/bookkeeping/adopt.py", "src/bookkeeping/claims.py"]
+mypy_path = "src"

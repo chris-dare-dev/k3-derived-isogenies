@@ -1,4 +1,4 @@
-# Stored results are not kept in git; they ship as a release archive (see DATA.md).
+# Stored results are not kept in git; they ship as a release archive (see data/README.md).
 *.jsonl
 *.jsonl.gz
 *.json
@@ -22,6 +22,6 @@ results/
 .ruff_cache/
 .mypy_cache/
 # Kept in git, although the patterns above would ignore them: the records adopted from finished runs
-!records/*/results.jsonl
-!records/*/manifest.json
-!records/*/adopted.json
+!data/records/*/results.jsonl
+!data/records/*/manifest.json
+!data/records/*/adopted.json
