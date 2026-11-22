@@ -17,9 +17,11 @@ jobs:
           python-version: "3.12"
       - run: pip install ruff==0.17.5 mypy==2.4.1
       - run: make lint
+      - name: The root holds src/, tests/, data/, research/ and the standard files
+        run: python3 .github/check_root.py
 
   # The scheduler, the task registry, the batch files and the claim tables: standard library only, no
-  # data archive.  `make check` fails if CLAIMS.md, claims/RECORDS.md or the guide's table of main
+  # data archive.  `make check` fails if CLAIMS.md, data/claims/RECORDS.md or the guide's table of main
   # results is not what the claim registry and the records give.
   unit-tests:
     runs-on: ubuntu-latest
@@ -32,7 +34,7 @@ jobs:
       - run: make test
       - run: make check
       - run: |
-          for batch in batches/*.toml; do make plan BATCH="$batch"; done
+          for batch in data/batches/*.toml; do make plan BATCH="$batch"; done
 
   # The computations that need no stored result, on a fresh clone with numpy and cypari2: the self-tests
   # of the enumeration scripts and two short reruns.  No data archive.
@@ -44,10 +46,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r experiments/requirements.txt
-      - run: make run BATCH=batches/no-data.toml ARGS="--memory-guard poll"
+      - run: pip install -r research/experiments/requirements.txt
+      - run: make run BATCH=data/batches/no-data.toml ARGS="--memory-guard poll"
       - if: always()
-        run: make report BATCH=batches/no-data.toml
+        run: make report BATCH=data/batches/no-data.toml
       - name: Without the stored results the smoke batch stops with one line that names the way out
         run: |
           status=0
@@ -57,7 +59,7 @@ jobs:
           grep -q 'make no-data' message.txt
 
   # The smoke batch against the stored results, when the data archive can be fetched.
-  # Set DATA_URL (a repository variable) to the release asset of DATA.md to enable it.
+  # Set DATA_URL (a repository variable) to the release asset of data/README.md to enable it.
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -67,23 +69,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r experiments/requirements.txt
+      - run: pip install -r research/experiments/requirements.txt
       - run: |
           mkdir -p dist
           curl -fsSL -o dist/k3-derived-isogenies-data-v1.tar.xz "${{ vars.DATA_URL }}"
           make data
-      - run: make run BATCH=batches/smoke.toml ARGS="--memory-guard poll"
+      - run: make run BATCH=data/batches/smoke.toml ARGS="--memory-guard poll"
       - if: always()
-        run: make report BATCH=batches/smoke.toml
+        run: make report BATCH=data/batches/smoke.toml
       - name: The stored lines named as evidence are where the claim registry says
         run: make check
       - name: The negative control ends as three mismatches, with status 1
         run: |
           status=0
-          python3 -m taskbatch run batches/negative-control.toml --memory-guard poll || status=$?
+          PYTHONPATH=src python3 -m taskbatch run data/batches/negative-control.toml --memory-guard poll || status=$?
           test "$status" -eq 1
       - name: The limits demo ends with a timeout and a memory stop, with status 3
         run: |
           status=0
-          python3 -m taskbatch run batches/limits-demo.toml --memory-guard poll || status=$?
+          PYTHONPATH=src python3 -m taskbatch run data/batches/limits-demo.toml --memory-guard poll || status=$?
           test "$status" -eq 3

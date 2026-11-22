@@ -28,9 +28,9 @@ Ordinary K3 surfaces over a finite field with the same Frobenius form torsors un
 | | |
 |---|---|
 | [SUMMARY.md](SUMMARY.md) | Self-contained summary paper, about 12 pages |
-| [docs/](docs/README.md) | 29 notes: arguments, computations, checks |
+| [research/docs/](research/docs/README.md) | 29 notes: arguments, computations, checks |
 | [CLAIMS.md](CLAIMS.md) | Each claim, the script behind it, and what its stored record says |
-| [DATA.md](DATA.md) | The stored results and how to install them |
+| [data/README.md](data/README.md) | The stored results and how to install them |
 | [GUIDE.md](GUIDE.md) | Results table, limits, layout, running batches |
 
 ## Reproduce
@@ -38,10 +38,10 @@ Ordinary K3 surfaces over a finite field with the same Frobenius form torsors un
 ```bash
 make test                    # scheduler, registry and claim tables: standard library only, nothing to install
 make venv && make no-data    # numpy and cypari2, then the six computations that need no stored results (a minute)
-make data && make smoke      # the stored results (DATA.md), then the ledger of note 27 and a dozen quick checks
+make data && make smoke      # the stored results (data/README.md), then the ledger of note 27 and a dozen quick checks
 ```
 
-Or use the [notebooks](notebooks/README.md) with no command line, or `docker build -t k3-derived-isogenies .`.
+Or use the [notebooks](research/notebooks/README.md) with no command line, or `docker build -t k3-derived-isogenies .`.
 
 ## Status
 

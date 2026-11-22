@@ -16,7 +16,7 @@ from taskbatch.store import ResultStore
 
 from . import helpers
 
-sys.path.insert(0, str(REPOSITORY / "tools"))
+sys.path.insert(0, str(REPOSITORY / "src" / "bookkeeping"))
 
 import claims
 
@@ -93,7 +93,7 @@ class Registry(unittest.TestCase):
         self.assertIn("no_task", rows["torsors"])
 
     def test_the_ledger_rows_are_those_of_note_27_word_for_word(self) -> None:
-        note = (REPOSITORY / "docs" / "27-hypothesis-ledger.md").read_text(encoding="utf-8")
+        note = (REPOSITORY / "research" / "docs" / "27-hypothesis-ledger.md").read_text(encoding="utf-8")
         rows = {}
         for line in note.splitlines():
             if re.match(r"\| H\d+ \|", line):
@@ -160,7 +160,7 @@ class Registry(unittest.TestCase):
         self.assertEqual(summary(H29, {}), "no task: no section")
         text = summary(H1, {"n27/ledger": record("n27/ledger")})
         self.assertIn("its task is **ok** (1 reproduced)", text)
-        self.assertIn("[tasks](claims/RECORDS.md#claim-ledger)", text)
+        self.assertIn("[tasks](data/claims/RECORDS.md#claim-ledger)", text)
         self.assertTrue(text.endswith("Covers: the recount."))
 
     def test_the_detail_page_lists_comparison_record_and_caveat(self) -> None:
@@ -236,7 +236,10 @@ class Files(unittest.TestCase):
         self.assertEqual(stale, [], "run `make tables`")
 
     def test_generated_parts_need_their_markers(self) -> None:
-        begin, end = "<!-- BEGIN GENERATED x: tools/claims.py tables -->", "<!-- END GENERATED x -->"
+        begin, end = (
+            "<!-- BEGIN GENERATED x: src/bookkeeping/claims.py tables -->",
+            "<!-- END GENERATED x -->",
+        )
         text = f"before\n{begin}\nold\n{end}\nafter\n"
         self.assertEqual(
             claims.splice(text, "x", ["new"], Path("f.md")), f"before\n{begin}\nnew\n{end}\nafter\n"

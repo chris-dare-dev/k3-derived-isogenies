@@ -1,0 +1,5 @@
+#!/bin/bash
+# Fetch and unpack the stored results into research/experiments/ (see data/README.md and
+# research/notebooks/k3data.py).
+set -e
+python -c "import sys; sys.path.insert(0, 'research/notebooks'); import k3data; k3data.ensure_data()"

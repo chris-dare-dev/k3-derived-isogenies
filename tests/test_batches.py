@@ -16,9 +16,9 @@ from k3tasks import registry
 from k3tasks.tasks import ComputationTask, SyntheticTask, expand_batch, plan_batch, run_task
 
 REPOSITORY = Path(__file__).resolve().parent.parent
-BATCHES = REPOSITORY / "batches"
+BATCHES = REPOSITORY / "data" / "batches"
 
-sys.path.insert(0, str(REPOSITORY / "tools"))
+sys.path.insert(0, str(REPOSITORY / "src" / "bookkeeping"))
 
 import claims  # noqa: E402
 

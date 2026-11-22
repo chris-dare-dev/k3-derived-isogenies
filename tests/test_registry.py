@@ -13,12 +13,12 @@ from k3tasks import registry
 from k3tasks.registry import STDERR, STDOUT
 
 REPOSITORY = Path(__file__).resolve().parent.parent
-EXPERIMENTS = REPOSITORY / "experiments"
+EXPERIMENTS = REPOSITORY / "research" / "experiments"
 
 
 def archive_manifest() -> set[str]:
-    """The file names of the data archive, from the manifest table of DATA.md."""
-    text = (REPOSITORY / "DATA.md").read_text(encoding="utf-8")
+    """The file names of the data archive, from the manifest table of data/README.md."""
+    text = (REPOSITORY / "data" / "README.md").read_text(encoding="utf-8")
     manifest = text.split("## Manifest", 1)[1]
     return set(re.findall(r"^\| `([^`]+)` \|", manifest, flags=re.MULTILINE))
 
@@ -99,11 +99,11 @@ class Registry(unittest.TestCase):
     def test_note_matches_id(self) -> None:
         for c in registry.all_computations():
             self.assertTrue(c.id.startswith(f"n{c.note:02d}/"), c.id)
-            self.assertTrue(any((REPOSITORY / "docs").glob(f"{c.note:02d}-*.md")), c.id)
+            self.assertTrue(any((REPOSITORY / "research" / "docs").glob(f"{c.note:02d}-*.md")), c.id)
 
     def test_scripts_named_in_a_reproduce_section_have_a_computation(self) -> None:
         named = set()
-        for note in sorted((REPOSITORY / "docs").glob("[0-9][0-9]-*.md")):
+        for note in sorted((REPOSITORY / "research" / "docs").glob("[0-9][0-9]-*.md")):
             text = note.read_text(encoding="utf-8")
             if "Reproduce" in text:
                 section = text.split("Reproduce", 1)[1]
